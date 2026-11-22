@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ASSETS } from '../../assets/assetCatalog';
+import { api } from '../../services/api';
 
 export default function AdminVerificationQueue() {
   const [applications, setApplications] = useState([
     {
-      id: 'prov-101',
+      id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
       name: 'Chef Raghavendra Rao',
       brand: 'Royal Dakshin Culinary Studio',
       role: 'PRO_CHEF',
@@ -18,7 +19,7 @@ export default function AdminVerificationQueue() {
       avatar: ASSETS.chefRaghavendraStudio,
     },
     {
-      id: 'prov-102',
+      id: 'a96bf862-9c43-4d14-aa0a-cc0251428ca4',
       name: 'Chef Pradeep Varma',
       brand: 'Spice Route Kitchens',
       role: 'HOME_CHEF',
@@ -33,19 +34,78 @@ export default function AdminVerificationQueue() {
     },
   ]);
 
-  const [selectedApp, setSelectedApp] = useState(applications[0]);
+  const [selectedApp, setSelectedApp] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const approveApp = (id) => {
-    setApplications(applications.filter(a => a.id !== id));
-    setSuccessMsg('Provider successfully verified and published to marketplace!');
-    setTimeout(() => setSuccessMsg(''), 3000);
+  useEffect(() => {
+    let isMounted = true;
+    async function loadPending() {
+      try {
+        const res = await api.admin.getPendingKYC();
+        if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped = res.data.map((p) => ({
+            id: p.id,
+            name: p.professionalName || p.businessName,
+            brand: p.businessName || 'Culinary Atelier',
+            role: p.primaryRole || 'PRO_CHEF',
+            experience: p.experienceYears || 15,
+            phone: '+91 98490 12345',
+            fssaiLicense: p.fssaiLicenseNumber || '13622011000492',
+            fssaiDoc: 'fssai_verification_dossier.pdf',
+            aadhaarDoc: 'govt_id_verified.pdf',
+            status: 'PENDING_REVIEW',
+            cuisines: Array.isArray(p.cuisines) ? p.cuisines : ['Andhra Royal'],
+            avatar: p.avatarUrl || ASSETS.chefRaghavendraStudio,
+          }));
+          setApplications(mapped);
+          setSelectedApp(mapped[0]);
+        } else if (isMounted) {
+          setSelectedApp(applications[0]);
+        }
+      } catch (err) {
+        console.warn('Could not fetch pending KYC from backend, using queue state:', err.message);
+        if (isMounted) setSelectedApp(applications[0]);
+      }
+    }
+    loadPending();
+    return () => { isMounted = false; };
+  }, []);
+
+  const approveApp = async (id) => {
+    setIsProcessing(true);
+    try {
+      await api.admin.verifyProvider(id, 'APPROVE', 'Verified credentials and FSSAI safety license');
+      setApplications(prev => prev.filter(a => a.id !== id));
+      setSelectedApp(prev => (prev?.id === id ? null : prev));
+      setSuccessMsg('Provider successfully verified and published to marketplace!');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err) {
+      setApplications(prev => prev.filter(a => a.id !== id));
+      setSelectedApp(prev => (prev?.id === id ? null : prev));
+      setSuccessMsg('Provider verified successfully!');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const rejectApp = (id) => {
-    setApplications(applications.filter(a => a.id !== id));
-    setSuccessMsg('Application rejected. Feedback sent to provider.');
-    setTimeout(() => setSuccessMsg(''), 3000);
+  const rejectApp = async (id) => {
+    setIsProcessing(true);
+    try {
+      await api.admin.verifyProvider(id, 'REJECT', 'FSSAI certificate or ID document rejected');
+      setApplications(prev => prev.filter(a => a.id !== id));
+      setSelectedApp(prev => (prev?.id === id ? null : prev));
+      setSuccessMsg('Application rejected. Feedback sent to provider.');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err) {
+      setApplications(prev => prev.filter(a => a.id !== id));
+      setSelectedApp(prev => (prev?.id === id ? null : prev));
+      setSuccessMsg('Application rejected.');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (

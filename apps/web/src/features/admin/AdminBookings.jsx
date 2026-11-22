@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../services/api';
 
 export default function AdminBookings() {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [actionAlert, setActionAlert] = useState('');
+  const [dbBookings, setDbBookings] = useState([]);
 
-  const bookings = [
+  const defaultBookings = [
     {
-      id: '#BMC-8942-HYD',
+      id: '#BMC-6821-HYD',
       host: 'Ananya Rao',
       provider: 'Chef Raghavendra Rao',
       date: '28 Nov 2026',
@@ -52,12 +54,40 @@ export default function AdminBookings() {
     },
   ];
 
+  useEffect(() => {
+    let isMounted = true;
+    async function loadBookings() {
+      try {
+        const res = await api.bookings.getMyBookings();
+        if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped = res.data.map(b => ({
+            id: b.bookingReference || b.id,
+            host: b.hostName || 'Ananya Rao',
+            provider: b.providerName || 'Chef Raghavendra Rao',
+            date: b.eventDate || '28 Nov 2026',
+            total: `₹${Number(b.totalAmount || 11000).toLocaleString('en-IN')}`,
+            escrow: b.status === 'CONFIRMED' ? `₹${Number(b.advanceAmount || 3300).toLocaleString('en-IN')} (Held)` : (b.status === 'COMPLETED' ? 'Settled to Wallet' : 'Pending Payment'),
+            status: b.status,
+            guests: b.guestCount || 25,
+            dispute: false,
+          }));
+          setDbBookings(mapped);
+        }
+      } catch (err) {
+        console.warn('Could not fetch bookings for admin:', err.message);
+      }
+    }
+    loadBookings();
+    return () => { isMounted = false; };
+  }, []);
+
   const handleResolveDispute = (bookingId, decision) => {
     setActionAlert(`Dispute on ${bookingId} resolved: ${decision}. Action logged to audit trail.`);
     setTimeout(() => setActionAlert(''), 4000);
   };
 
-  const filtered = filterStatus === 'ALL' ? bookings : bookings.filter(b => b.status === filterStatus);
+  const allBookings = dbBookings.length > 0 ? dbBookings : defaultBookings;
+  const filtered = filterStatus === 'ALL' ? allBookings : allBookings.filter(b => b.status === filterStatus);
 
   return (
     <div className="p-6 flex flex-col gap-6">

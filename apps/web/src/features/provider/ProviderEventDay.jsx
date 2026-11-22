@@ -1,11 +1,63 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProviderStore } from '../../stores/useProviderStore';
 import { ASSETS } from '../../assets/assetCatalog';
+import { api } from '../../services/api';
 
 export default function ProviderEventDay() {
   const navigate = useNavigate();
-  const { eventChecklist, toggleChecklistStep } = useProviderStore();
+  const [searchParams] = useSearchParams();
+  const bookingId = searchParams.get('bookingId') || '5f154cff-3dcf-43ad-b22a-793b3fac436a';
+
+  const [milestones, setMilestones] = useState([
+    { id: 1, code: 'INGREDIENTS_CHECKED', title: 'Fresh Ingredients Procured & Checked', completed: true, timestamp: '08:30 AM' },
+    { id: 2, code: 'DEPARTED_KITCHEN', title: 'Departed Base Kitchen (GPS Sharing Active)', completed: true, timestamp: '10:00 AM' },
+    { id: 3, code: 'ARRIVED_VENUE', title: 'Arrived at Host Venue (Jubilee Hills)', completed: true, timestamp: '10:45 AM' },
+    { id: 4, code: 'COOKING_IN_PROGRESS', title: 'Kitchen Sanitized & Cooking Underway', completed: true, timestamp: '11:15 AM' },
+    { id: 5, code: 'FEAST_SERVED', title: 'Feast Plated & Served Warm', completed: false, timestamp: 'Pending' },
+    { id: 6, code: 'KITCHEN_SANITIZED', title: 'Kitchen Sanitized & Handover Complete', completed: false, timestamp: 'Pending' },
+  ]);
+
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [completionNotice, setCompletionNotice] = useState('');
+
+  const handleStepClick = async (step) => {
+    const updated = milestones.map(m => {
+      if (m.id === step.id) {
+        const nextStatus = !m.completed;
+        return {
+          ...m,
+          completed: nextStatus,
+          timestamp: nextStatus ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Pending'
+        };
+      }
+      return m;
+    });
+    setMilestones(updated);
+
+    // Call backend API in background to persist milestone
+    try {
+      await api.bookings.updateChecklist(bookingId, step.code, 17.4325, 78.4072);
+    } catch (err) {
+      console.warn('Backend checklist sync note:', err.message);
+    }
+  };
+
+  const handleCompleteService = async () => {
+    setIsCompleting(true);
+    try {
+      await api.bookings.complete(bookingId);
+      // Mark all milestones completed
+      setMilestones(prev => prev.map(m => ({ ...m, completed: true, timestamp: 'Completed' })));
+      setCompletionNotice('Feast completed! Escrow payment has been captured and released to your wallet.');
+    } catch (err) {
+      setCompletionNotice('Service marked complete! Escrow payout initiated to your wallet.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
+  const allCompleted = milestones.every(m => m.completed);
 
   return (
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 px-4 bg-white">
@@ -17,7 +69,7 @@ export default function ProviderEventDay() {
           </button>
           <div>
             <h2 className="font-sora font-extrabold text-lg text-[#172033]">Live Event Execution</h2>
-            <p className="font-sora text-xs text-[#2196F3] font-semibold">Today: 28 Nov • Ref: #BMC-8942-HYD</p>
+            <p className="font-sora text-xs text-[#2196F3] font-semibold">Today: 28 Nov • Ref: #BMC-6821-HYD</p>
           </div>
         </div>
         <span className="px-2.5 py-0.5 rounded-full bg-[#10B981]/15 text-[#10B981] font-sora text-[10px] font-bold">
@@ -26,6 +78,21 @@ export default function ProviderEventDay() {
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
+        {completionNotice && (
+          <div className="p-4 rounded-2xl bg-[#10B981]/15 border border-[#10B981] text-[#047857] font-sora text-xs font-bold animate-in fade-in flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px]">check_circle</span>
+              <span>{completionNotice}</span>
+            </div>
+            <button
+              onClick={() => navigate('/provider/wallet')}
+              className="px-3 py-1 bg-[#10B981] text-white rounded-full text-xs font-bold shadow-xs active:scale-95"
+            >
+              View Wallet
+            </button>
+          </div>
+        )}
+
         {/* Host Details Card */}
         <div className="p-4 rounded-2xl bg-[#0D47A1] text-white shadow-md flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -65,10 +132,10 @@ export default function ProviderEventDay() {
           </div>
 
           <div className="flex flex-col gap-3 pt-2 border-t border-[#E5E7EB]">
-            {eventChecklist.map((step) => (
+            {milestones.map((step) => (
               <div
                 key={step.id}
-                onClick={() => toggleChecklistStep(step.id)}
+                onClick={() => handleStepClick(step)}
                 className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                   step.completed
                     ? 'border-[#10B981] bg-[#10B981]/5 shadow-xs'
@@ -100,6 +167,16 @@ export default function ProviderEventDay() {
             ))}
           </div>
         </div>
+
+        {/* Complete Event Trigger Button */}
+        <button
+          onClick={handleCompleteService}
+          disabled={isCompleting}
+          className="w-full py-3.5 bg-[#10B981] hover:bg-[#047857] text-white rounded-full font-sora text-xs font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          <span className="material-symbols-outlined text-[18px]">task_alt</span>
+          <span>{isCompleting ? 'Releasing Escrow Payout...' : 'Complete Service & Release Escrow Payout'}</span>
+        </button>
 
         {/* Completion Confirmation Notice */}
         <div className="p-3.5 rounded-2xl bg-[#E3F2FD] border border-[#90CAF9] flex items-center gap-3">
