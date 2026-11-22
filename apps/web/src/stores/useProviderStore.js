@@ -46,7 +46,7 @@ export const useProviderStore = create((set) => ({
   incomingLeads: [
     {
       id: 'lead-1',
-      hostName: 'Ananya Rao',
+      hostName: 'Meera Nambiar',
       eventType: 'Family Gathering / Housewarming',
       eventDate: '28 Nov 2026',
       timeSlot: 'Lunch (12:30 PM)',

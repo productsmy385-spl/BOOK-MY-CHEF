@@ -100,7 +100,7 @@ export default function ProviderEventDay() {
               <img src={ASSETS.userAvatar} alt="Host Avatar" className="w-full h-full object-cover" />
             </div>
             <div>
-              <h4 className="font-sora font-bold text-sm text-white">Ananya Rao (Host)</h4>
+              <h4 className="font-sora font-bold text-sm text-white">Meera Nambiar (Host)</h4>
               <p className="font-sora text-xs text-[#90CAF9]">Road No. 36, Jubilee Hills</p>
               <span className="font-sora text-[10px] text-white/80">Arrival OTP: 4892</span>
             </div>
@@ -114,7 +114,7 @@ export default function ProviderEventDay() {
               <span className="material-symbols-outlined text-[18px]">chat</span>
             </button>
             <a
-              href="tel:+919876543210"
+              href="tel:+919840112044"
               className="w-9 h-9 rounded-full bg-white text-[#0D47A1] flex items-center justify-center font-bold hover:bg-[#E3F2FD] transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">call</span>

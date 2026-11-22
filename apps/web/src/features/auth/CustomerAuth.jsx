@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { useClerkOtp } from '../../hooks/useClerkOtp';
 import OtpInput6 from '../../components/auth/OtpInput6';
 import { formatToE164, isValidIndianMobile, syncUserWithPostgres } from '../../lib/clerkAuthService';
+import { ASSETS } from '../../assets/assetCatalog';
 
 export default function CustomerAuth() {
   const navigate = useNavigate();
@@ -23,11 +24,12 @@ export default function CustomerAuth() {
   const [step, setStep] = useState('PHONE_ENTRY'); // 'PHONE_ENTRY' | 'OTP_VERIFY'
   const [localLoading, setLocalLoading] = useState(false);
 
-  // Form Fields
-  const [fullName, setFullName] = useState('Ananya Rao');
-  const [mobileNumber, setMobileNumber] = useState('+919876543210');
-  const [email, setEmail] = useState('ananya.rao@example.com');
-  const [location, setLocation] = useState('Jubilee Hills, Hyderabad');
+  // Form Fields (Clean initial state - zero fake prefilled data)
+  const [fullName, setFullName] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [location, setLocation] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const isLoading = isClerkLoading || localLoading;
 
@@ -36,6 +38,11 @@ export default function CustomerAuth() {
     e.preventDefault();
     setErrorMessage('');
 
+    if (mode === 'REGISTER' && !termsAccepted) {
+      setErrorMessage('Please accept the Terms of Service and Privacy Policy to register.');
+      return;
+    }
+
     const formattedPhone = formatToE164(mobileNumber);
     if (!isValidIndianMobile(formattedPhone)) {
       setErrorMessage('Please enter a valid 10-digit Indian mobile number (+91 followed by 6, 7, 8, or 9).');
@@ -43,7 +50,6 @@ export default function CustomerAuth() {
     }
 
     if (isConfigured) {
-      // Dispatches actual SMS OTP via Clerk
       const res = mode === 'REGISTER'
         ? await sendSignUpOtp(formattedPhone)
         : await sendSignInOtp(formattedPhone);
@@ -52,12 +58,7 @@ export default function CustomerAuth() {
         setStep('OTP_VERIFY');
       }
     } else {
-      // Fallback if Clerk publishable key is not yet configured in environment
-      setLocalLoading(true);
-      setTimeout(() => {
-        setLocalLoading(false);
-        setStep('OTP_VERIFY');
-      }, 700);
+      setErrorMessage('Clerk authentication is not configured in this environment. Please check VITE_CLERK_PUBLISHABLE_KEY.');
     }
   };
 
@@ -66,67 +67,62 @@ export default function CustomerAuth() {
     setErrorMessage('');
     const formattedPhone = formatToE164(mobileNumber);
 
-    if (isConfigured) {
-      // Verify with Clerk backend
-      const res = mode === 'REGISTER'
-        ? await verifySignUpOtp(code)
-        : await verifySignInOtp(code);
+    if (!isConfigured) {
+      setErrorMessage('Clerk authentication is not configured.');
+      return;
+    }
 
-      if (!res.success) return;
+    // Verify with Clerk backend
+    const res = mode === 'REGISTER'
+      ? await verifySignUpOtp(code)
+      : await verifySignInOtp(code);
 
-      setLocalLoading(true);
+    if (!res.success) return;
 
+    setLocalLoading(true);
+
+    try {
       // Synchronize verified Clerk identity with internal PostgreSQL database
       const syncResult = await syncUserWithPostgres({
         clerkId: res.clerkUserId,
         phone: formattedPhone,
-        email,
+        email: email || undefined,
         fullName: mode === 'REGISTER' ? fullName : undefined,
         intendedRole: 'CUSTOMER',
       });
 
-      // Update local state and session
+      // Update local state and session with genuine verified identity
       if (mode === 'REGISTER') {
         registerCustomer({
+          id: syncResult?.userId,
           fullName,
           mobileNumber: formattedPhone,
           email,
           location,
+          clerkId: res.clerkUserId,
+          sessionToken: res.sessionId,
         });
       } else {
         loginCustomer({
+          id: syncResult?.userId,
           identifier: formattedPhone,
-          otp: code,
+          phone: formattedPhone,
+          email,
+          name: syncResult?.fullName || 'Customer',
+          clerkId: res.clerkUserId,
+          sessionToken: res.sessionId,
         });
       }
 
       setLocalLoading(false);
-      // Automatic Redirect to Customer Home
       navigate('/customer/home', { replace: true });
-    } else {
-      // Offline/Local dev fallback
-      setLocalLoading(true);
-      setTimeout(() => {
-        if (mode === 'REGISTER') {
-          registerCustomer({
-            fullName,
-            mobileNumber: formattedPhone,
-            email,
-            location,
-          });
-        } else {
-          loginCustomer({
-            identifier: formattedPhone,
-            otp: code,
-          });
-        }
-        setLocalLoading(false);
-        navigate('/customer/home', { replace: true });
-      }, 600);
+    } catch (err) {
+      console.error('PostgreSQL sync failed:', err);
+      setLocalLoading(false);
+      navigate('/customer/home', { replace: true });
     }
   };
 
-  // Resend OTP
   const handleResendOtp = async () => {
     const formattedPhone = formatToE164(mobileNumber);
     if (isConfigured) {
@@ -139,215 +135,282 @@ export default function CustomerAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-between max-w-lg mx-auto p-6 font-sora shadow-xl">
-      <div>
-        {/* Top Header & Back Button */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
-          <button
-            onClick={() =>
-              step === 'OTP_VERIFY' ? setStep('PHONE_ENTRY') : navigate('/auth/welcome')
-            }
-            className="flex items-center gap-1.5 text-xs font-semibold text-[#64748B] hover:text-[#172033]"
-          >
-            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span>{step === 'OTP_VERIFY' ? 'Change Mobile Number' : 'Back'}</span>
-          </button>
-          <div className="flex items-center gap-1.5 bg-[#E3F2FD] border border-[#90CAF9] px-2.5 py-1 rounded-full">
-            <span className="material-symbols-outlined text-[14px] text-[#2196F3]">person</span>
-            <span className="text-[11px] font-bold text-[#0D47A1]">Customer Account</span>
-          </div>
-        </div>
-
-        {/* Brand & Heading */}
-        <div className="mt-6 mb-6">
-          <h1 className="font-extrabold text-2xl text-[#172033] tracking-tight">
-            {step === 'OTP_VERIFY'
-              ? 'Enter Verification Code'
-              : mode === 'REGISTER'
-              ? 'Customer Registration'
-              : 'Customer Mobile Sign In'}
-          </h1>
-          <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">
-            {step === 'OTP_VERIFY'
-              ? 'Verify your mobile number via Clerk SMS OTP to secure your gourmet account.'
-              : mode === 'REGISTER'
-              ? 'Sign up with your mobile number to discover chefs, book catering, and track events.'
-              : 'Enter your registered mobile number to receive a secure SMS verification code.'}
-          </p>
-        </div>
-
-        {/* Tab Switcher: Register / Sign In */}
-        {step === 'PHONE_ENTRY' && (
-          <div className="flex rounded-xl bg-[#f1f3ff] p-1 mb-6 border border-[#E5E7EB]">
-            <button
-              type="button"
-              onClick={() => {
-                setMode('REGISTER');
-                setErrorMessage('');
-              }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                mode === 'REGISTER'
-                  ? 'bg-white text-[#0D47A1] shadow-sm'
-                  : 'text-[#64748B] hover:text-[#172033]'
-              }`}
-            >
-              Customer Sign Up
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('LOGIN');
-                setErrorMessage('');
-              }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                mode === 'LOGIN'
-                  ? 'bg-white text-[#0D47A1] shadow-sm'
-                  : 'text-[#64748B] hover:text-[#172033]'
-              }`}
-            >
-              Sign In via SMS
-            </button>
-          </div>
-        )}
-
-        {/* Error Notification */}
-        {errorMessage && step === 'PHONE_ENTRY' && (
-          <div className="mb-4 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2 animate-in fade-in">
-            <span className="material-symbols-outlined text-[18px] text-red-500 flex-shrink-0">
-              error
-            </span>
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* STEP 1: Phone Entry & Details */}
-        {step === 'PHONE_ENTRY' ? (
-          <form onSubmit={handleSendOtp} className="flex flex-col gap-4 text-xs">
-            {mode === 'REGISTER' && (
-              <div>
-                <label className="block text-[#172033] font-bold uppercase text-[10px] mb-1.5">
-                  Full Name *
-                </label>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
-                    badge
-                  </span>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Ananya Rao"
-                    className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] text-[#172033] font-semibold text-sm outline-none focus:ring-2 focus:ring-[#90CAF9] focus:bg-white"
-                  />
-                </div>
-              </div>
-            )}
-
+    <div className="min-h-screen bg-white flex flex-col lg:grid lg:grid-cols-12">
+      {/* Desktop Left Brand & Editorial Section (Sharp Geometry) */}
+      <div className="hidden lg:flex lg:col-span-5 bg-[#0D47A1] text-white flex-col justify-between p-12 relative overflow-hidden">
+        <div className="relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-md flex items-center justify-center">
+              <span className="material-symbols-outlined text-[#90CAF9] text-[24px]">restaurant_menu</span>
+            </div>
             <div>
-              <label className="block text-[#172033] font-bold uppercase text-[10px] mb-1.5">
-                Indian Mobile Number *
-              </label>
-              <div className="relative flex items-center">
-                <div className="absolute left-3.5 flex items-center gap-1.5 border-r border-[#CBD5E1] pr-2">
-                  <span className="text-sm">🇮🇳</span>
-                  <span className="font-bold text-xs text-[#0D47A1]">+91</span>
-                </div>
-                <input
-                  type="tel"
-                  required
-                  value={mobileNumber.replace(/^\+91/, '')}
-                  onChange={(e) => setMobileNumber(`+91${e.target.value.replace(/[^0-9]/g, '').slice(0, 10)}`)}
-                  placeholder="98765 43210"
-                  className="w-full h-12 pl-20 pr-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] text-[#172033] font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-[#90CAF9] focus:bg-white tracking-wider"
-                />
-              </div>
-              <span className="text-[10px] text-[#64748B] mt-1 block">
-                Real SMS verification code will be dispatched to this number.
+              <span className="font-sora font-extrabold text-xl tracking-tight text-white block">
+                BOOK MY CHEF
+              </span>
+              <span className="font-inter text-[11px] text-[#90CAF9] uppercase tracking-widest font-semibold block">
+                Culinary &amp; Event Atelier
               </span>
             </div>
+          </div>
 
-            {mode === 'REGISTER' && (
-              <>
+          <div className="mt-16">
+            <span className="inline-block px-3 py-1 bg-white/10 border border-white/20 text-[#90CAF9] text-xs font-semibold rounded-md uppercase tracking-wider mb-4">
+              Premium Host Experience
+            </span>
+            <h2 className="font-sora font-bold text-3xl leading-snug text-white">
+              Discover verified masterchefs, caterers &amp; event artisans for your private celebrations.
+            </h2>
+            <p className="font-inter text-sm text-white/80 mt-4 leading-relaxed max-w-md">
+              From traditional home-style banana leaf banquets to luxury five-course plated dinners, book top-tier culinary artists with escrow-protected payments.
+            </p>
+          </div>
+        </div>
+
+        {/* Highlight Image & Trust Badges */}
+        <div className="relative z-10 mt-8">
+          <div className="card-sharp overflow-hidden border border-white/20 bg-white/5 backdrop-blur-sm p-4">
+            <div className="flex items-center gap-3">
+              <img
+                src={ASSETS.chefRaghavendraStudio}
+                alt="Chef Raghavendra"
+                className="w-12 h-12 rounded-full object-cover border-2 border-white/40"
+              />
+              <div>
+                <h4 className="font-sora font-bold text-sm text-white">100% Background-Verified</h4>
+                <p className="font-inter text-xs text-[#90CAF9]">FSSAI certified cooks &amp; strict kitchen hygiene pledge</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-between text-xs text-[#90CAF9] border-t border-white/10 pt-4 font-inter">
+            <span>© 2026 BOOK MY CHEF Technologies</span>
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-[16px]">lock</span>
+              Bank-Grade 256-Bit SSL
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column: Form Container (Desktop & Mobile) */}
+      <div className="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-16 max-w-xl mx-auto w-full">
+        <div>
+          {/* Top Bar Navigation */}
+          <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
+            <button
+              onClick={() => step === 'OTP_VERIFY' ? setStep('PHONE_ENTRY') : navigate('/auth/welcome')}
+              className="btn-ghost"
+            >
+              <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+              <span>{step === 'OTP_VERIFY' ? 'Change Number' : 'Back'}</span>
+            </button>
+            <div className="flex items-center gap-1.5 bg-[#E3F2FD] border border-[#90CAF9] px-3 py-1 rounded-md">
+              <span className="material-symbols-outlined text-[14px] text-[#2196F3]">person</span>
+              <span className="font-sora text-xs font-bold text-[#0D47A1]">Customer Account</span>
+            </div>
+          </div>
+
+          {/* Heading */}
+          <div className="mt-8 mb-6">
+            <h1 className="font-sora font-extrabold text-2xl text-[#172033] tracking-tight">
+              {step === 'OTP_VERIFY'
+                ? 'Enter Verification Code'
+                : mode === 'REGISTER'
+                ? 'Create Customer Account'
+                : 'Customer Sign In'}
+            </h1>
+            <p className="font-inter text-xs text-[#64748B] mt-1.5 leading-relaxed">
+              {step === 'OTP_VERIFY'
+                ? `Enter the 6-digit SMS verification code dispatched to ${mobileNumber}`
+                : mode === 'REGISTER'
+                ? 'Register with your verified mobile number to discover chefs, book catering, and track events.'
+                : 'Enter your registered mobile number to receive a secure SMS OTP.'}
+            </p>
+          </div>
+
+          {/* Tabs: Sign Up / Sign In (Sharp Geometry) */}
+          {step === 'PHONE_ENTRY' && (
+            <div className="flex bg-[#f1f3ff] p-1 mb-6 border border-[#E5E7EB] rounded-md">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('REGISTER');
+                  setErrorMessage('');
+                }}
+                className={`flex-1 py-2 font-sora text-xs font-bold rounded transition-all ${
+                  mode === 'REGISTER'
+                    ? 'bg-white text-[#0D47A1] shadow-xs'
+                    : 'text-[#64748B] hover:text-[#172033]'
+                }`}
+              >
+                Host Sign Up
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('LOGIN');
+                  setErrorMessage('');
+                }}
+                className={`flex-1 py-2 font-sora text-xs font-bold rounded transition-all ${
+                  mode === 'LOGIN'
+                    ? 'bg-white text-[#0D47A1] shadow-xs'
+                    : 'text-[#64748B] hover:text-[#172033]'
+                }`}
+              >
+                Sign In via SMS
+              </button>
+            </div>
+          )}
+
+          {/* Error Banner */}
+          {errorMessage && step === 'PHONE_ENTRY' && (
+            <div className="mb-4 p-3.5 rounded-md bg-red-50 border border-red-200 text-red-700 font-inter text-xs flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px] text-red-500 flex-shrink-0">error</span>
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* STEP 1: Phone Entry & Details */}
+          {step === 'PHONE_ENTRY' ? (
+            <form onSubmit={handleSendOtp} className="flex flex-col gap-4 text-xs font-inter">
+              {mode === 'REGISTER' && (
                 <div>
-                  <label className="block text-[#172033] font-bold uppercase text-[10px] mb-1.5">
-                    Email Address (Optional)
+                  <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                    Full Name *
                   </label>
                   <div className="relative flex items-center">
                     <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
-                      mail
-                    </span>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="ananya.rao@example.com"
-                      className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] text-[#172033] font-semibold text-sm outline-none focus:ring-2 focus:ring-[#90CAF9] focus:bg-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[#172033] font-bold uppercase text-[10px] mb-1.5">
-                    Host City / Location *
-                  </label>
-                  <div className="relative flex items-center">
-                    <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
-                      location_on
+                      badge
                     </span>
                     <input
                       type="text"
                       required
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder="Jubilee Hills, Hyderabad"
-                      className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] text-[#172033] font-semibold text-sm outline-none focus:ring-2 focus:ring-[#90CAF9] focus:bg-white"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="input-sharp w-full pl-11"
                     />
                   </div>
                 </div>
-              </>
-            )}
+              )}
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="mt-2 w-full py-4 bg-[#0D47A1] hover:bg-[#1565C0] text-white rounded-2xl font-bold text-sm shadow-lg shadow-[#0D47A1]/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
+              <div>
+                <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                  Indian Mobile Number *
+                </label>
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 flex items-center gap-1.5 border-r border-[#CBD5E1] pr-2">
+                    <span className="text-sm">🇮🇳</span>
+                    <span className="font-sora font-bold text-xs text-[#0D47A1]">+91</span>
+                  </div>
+                  <input
+                    type="tel"
+                    required
+                    value={mobileNumber.replace(/^\+91/, '')}
+                    onChange={(e) => setMobileNumber(`+91${e.target.value.replace(/[^0-9]/g, '').slice(0, 10)}`)}
+                    placeholder="Enter 10-digit mobile number"
+                    className="input-sharp w-full pl-20 font-mono font-bold tracking-wider"
+                  />
+                </div>
+                <span className="text-[11px] text-[#64748B] mt-1 block">
+                  A genuine SMS OTP will be sent to this number.
+                </span>
+              </div>
+
+              {mode === 'REGISTER' && (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Requesting Real SMS OTP...</span>
-                </>
-              ) : (
-                <>
-                  <span>Send Real SMS OTP Code</span>
-                  <span className="material-symbols-outlined text-[18px]">sms</span>
+                  <div>
+                    <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                      Email Address (Optional)
+                    </label>
+                    <div className="relative flex items-center">
+                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
+                        mail
+                      </span>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@example.com (optional)"
+                        className="input-sharp w-full pl-11"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                      Host City / Location *
+                    </label>
+                    <div className="relative flex items-center">
+                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
+                        location_on
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="e.g. Jubilee Hills, Hyderabad"
+                        className="input-sharp w-full pl-11"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-0.5 rounded border-[#E5E7EB] text-[#2196F3] focus:ring-[#2196F3]"
+                    />
+                    <label htmlFor="terms" className="text-xs text-[#64748B] leading-tight cursor-pointer">
+                      I agree to the <span className="text-[#0D47A1] font-semibold hover:underline">Terms of Service</span> and <span className="text-[#0D47A1] font-semibold hover:underline">Privacy Policy</span>.
+                    </label>
+                  </div>
                 </>
               )}
-            </button>
-          </form>
-        ) : (
-          /* STEP 2: 6-Box Individual Digit OTP Verification */
-          <OtpInput6
-            phoneNumber={formatToE164(mobileNumber)}
-            onVerify={handleVerifyOtp}
-            onResend={handleResendOtp}
-            onChangeNumber={() => setStep('PHONE_ENTRY')}
-            isLoading={isLoading}
-            errorMessage={errorMessage}
-          />
-        )}
-      </div>
 
-      {/* Switch to Service Partner CTA */}
-      <div className="pt-6 border-t border-[#E5E7EB] text-center text-xs text-[#64748B]">
-        <span>Are you a culinary or event professional? </span>
-        <button
-          onClick={() => navigate('/auth/partner')}
-          className="font-bold text-[#0D47A1] hover:underline"
-        >
-          Join as Service Partner →
-        </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn-primary w-full py-3.5 mt-2"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending SMS OTP...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Send SMS Verification Code</span>
+                    <span className="material-symbols-outlined text-[18px]">sms</span>
+                  </>
+                )}
+              </button>
+            </form>
+          ) : (
+            /* STEP 2: 6-Box Individual Digit OTP Verification */
+            <OtpInput6
+              phoneNumber={formatToE164(mobileNumber)}
+              onVerify={handleVerifyOtp}
+              onResend={handleResendOtp}
+              onChangeNumber={() => setStep('PHONE_ENTRY')}
+              isLoading={isLoading}
+              errorMessage={errorMessage}
+            />
+          )}
+        </div>
+
+        {/* Switch to Service Partner CTA */}
+        <div className="pt-6 border-t border-[#E5E7EB] text-center text-xs font-inter text-[#64748B]">
+          <span>Are you a chef, caterer, or event professional? </span>
+          <button
+            onClick={() => navigate('/auth/partner')}
+            className="font-sora font-bold text-[#0D47A1] hover:underline inline-flex items-center gap-0.5 ml-1"
+          >
+            Join as Service Partner →
+          </button>
+        </div>
       </div>
     </div>
   );

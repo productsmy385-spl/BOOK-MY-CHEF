@@ -104,7 +104,7 @@ export default function ProviderCalendar() {
                   Lunch (12:30 PM) • Jubilee Hills
                 </span>
                 <h5 className="font-sora font-bold text-xs text-[#172033] mt-0.5">
-                  Gruhapravesam Feast • Ananya Rao
+                  Gruhapravesam Feast • Meera Nambiar
                 </h5>
                 <span className="font-sora text-[11px] text-[#64748B]">25 Guests • Andhra Royal Feast</span>
               </div>

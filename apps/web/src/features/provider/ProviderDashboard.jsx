@@ -25,7 +25,7 @@ export default function ProviderDashboard() {
           setRealLeads(pending.map(b => ({
             id: b.id,
             reference: b.bookingReference,
-            hostName: b.hostName || 'Ananya Rao',
+            hostName: b.hostName || 'Host',
             eventType: b.eventType || 'Family Feast',
             eventDate: b.eventDate || '28 Nov 2026',
             timeSlot: b.timeSlot || 'Lunch (12:30 PM)',
@@ -44,7 +44,7 @@ export default function ProviderDashboard() {
           setActiveEventToday({
             id: active.id,
             reference: active.bookingReference,
-            hostName: active.hostName || 'Ananya Rao',
+            hostName: active.hostName || 'Host',
             eventType: active.eventType || 'Gruhapravesam Feast',
             location: 'Jubilee Hills',
             guestCount: active.guestCount || 25,
@@ -200,7 +200,7 @@ export default function ProviderDashboard() {
               </span>
             </div>
             <h4 className="font-sora font-bold text-sm text-white mt-1">
-              {activeEventToday ? `${activeEventToday.eventType} • ${activeEventToday.hostName}` : 'Gruhapravesam Feast • Ananya Rao'}
+              {activeEventToday ? `${activeEventToday.eventType} • ${activeEventToday.hostName}` : 'Gruhapravesam Feast • Meera Nambiar'}
             </h4>
             <p className="font-sora text-xs text-white/80">
               {activeEventToday ? `${activeEventToday.location} • ${activeEventToday.guestCount} Guests (${activeEventToday.timeSlot})` : 'Jubilee Hills • 25 Guests (Lunch)'}

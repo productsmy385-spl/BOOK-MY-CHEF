@@ -53,12 +53,13 @@ public class SecurityConfig {
                     "/api/v1/payments/webhook"
                 ).permitAll()
 
-                // Public Discovery & Catalog APIs (Read-Only)
+                // Public Discovery, Catalog & Tracking APIs (Read-Only)
                 .requestMatchers(HttpMethod.GET,
                     "/api/v1/search/**",
                     "/api/v1/providers/**",
                     "/api/v1/availability/**",
-                    "/api/v1/reviews/**"
+                    "/api/v1/reviews/**",
+                    "/api/v1/bookings/*"
                 ).permitAll()
 
                 // Public Auth Sync & User Profile Read

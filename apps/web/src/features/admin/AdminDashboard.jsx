@@ -76,7 +76,7 @@ export default function AdminDashboard() {
 
   const recentBookings = [
     { id: '#BMC-6821-HYD', host: 'Aarav Sharma', provider: 'Chef Raghavendra Rao', date: '15 Dec 2026', amount: '₹6,500', status: 'CONFIRMED' },
-    { id: '#BMC-8942-HYD', host: 'Ananya Rao', provider: 'Chef Raghavendra Rao', date: '28 Nov 2026', amount: '₹11,000', status: 'CONFIRMED' },
+    { id: '#BMC-8942-HYD', host: 'Meera Nambiar', provider: 'Chef Raghavendra Rao', date: '28 Nov 2026', amount: '₹11,000', status: 'CONFIRMED' },
     { id: '#BMC-8941-HYD', host: 'Vikramaditya V.', provider: 'Chef Anupama Joshi', date: '02 Dec 2026', amount: '₹18,000', status: 'PENDING_PAYMENT' },
     { id: '#BMC-8940-HYD', host: 'Deepika S.', provider: 'Utsav Event Planners', date: '05 Dec 2026', amount: '₹45,000', status: 'CONFIRMED' },
     { id: '#BMC-8939-HYD', host: 'Karan Mehra', provider: 'Royal Dakshin Caterers', date: '10 Dec 2026', amount: '₹85,000', status: 'QUOTATION_SENT' },

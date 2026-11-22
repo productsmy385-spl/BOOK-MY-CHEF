@@ -11,7 +11,7 @@ export default function ProviderAlerts() {
       id: 1,
       type: 'BOOKING_LEAD',
       title: 'New Booking Request: 25 Guests Housewarming',
-      desc: 'Ananya Rao requested Andhra Royal Feast for 28 Nov at Jubilee Hills.',
+      desc: 'Meera Nambiar requested Andhra Royal Feast for 28 Nov at Jubilee Hills.',
       time: '15 mins ago',
       urgent: true,
       action: '/provider/chat',
@@ -97,7 +97,7 @@ export default function ProviderAlerts() {
                 Gruhapravesam Feast for 25 Guests
               </h3>
               <p className="font-sora text-xs text-[#64748B] mt-0.5">
-                Host: <strong>Ananya Rao</strong> • Jubilee Hills, Hyderabad
+                Host: <strong>Meera Nambiar</strong> • Jubilee Hills, Hyderabad
               </p>
             </div>
 

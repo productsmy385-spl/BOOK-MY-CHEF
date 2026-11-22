@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 export default function AdminUsers() {
   const [customers, setCustomers] = useState([
-    { id: 'usr-1', name: 'Ananya Rao', phone: '+91 98765 43210', email: 'ananya.rao@example.com', bookingsCount: 3, totalSpent: '₹34,500', status: 'ACTIVE' },
+    { id: 'usr-1', name: 'Meera Nambiar', phone: '+91 98401 12044', email: 'meera.n@example.com', bookingsCount: 3, totalSpent: '₹34,500', status: 'ACTIVE' },
     { id: 'usr-2', name: 'Vikramaditya V.', phone: '+91 98220 11990', email: 'vikram.v@example.com', bookingsCount: 5, totalSpent: '₹62,000', status: 'ACTIVE' },
     { id: 'usr-3', name: 'Deepika S.', phone: '+91 99401 22334', email: 'deepika.s@example.com', bookingsCount: 1, totalSpent: '₹45,000', status: 'ACTIVE' },
     { id: 'usr-4', name: 'Karan Mehra', phone: '+91 98110 33445', email: 'karan.m@example.com', bookingsCount: 2, totalSpent: '₹95,000', status: 'ACTIVE' },

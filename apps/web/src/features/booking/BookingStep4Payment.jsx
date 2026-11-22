@@ -74,9 +74,9 @@ export default function BookingStep4Payment() {
           description: `Booking #${activeBooking?.bookingReference || 'BMC-8942-HYD'} - ${provider.name}`,
           order_id: razorpayOrderId,
           prefill: {
-            name: user?.name || 'Aarav Sharma',
-            contact: user?.phone || '+919876543210',
-            email: user?.email || 'host@bookmychef.com',
+            name: user?.name || '',
+            contact: user?.phone || '',
+            email: user?.email || '',
           },
           theme: {
             color: '#2196F3',
@@ -86,7 +86,7 @@ export default function BookingStep4Payment() {
             await verifyAndProceed(
               response.razorpay_order_id || razorpayOrderId,
               response.razorpay_payment_id || generatedPaymentId,
-              response.razorpay_signature || 'mock_valid_signature_for_test'
+              response.razorpay_signature || ''
             );
           },
           modal: {

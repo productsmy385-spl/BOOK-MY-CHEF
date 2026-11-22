@@ -9,7 +9,7 @@ export default function AdminBookings() {
   const defaultBookings = [
     {
       id: '#BMC-6821-HYD',
-      host: 'Ananya Rao',
+      host: 'Meera Nambiar',
       provider: 'Chef Raghavendra Rao',
       date: '28 Nov 2026',
       total: '₹11,000',
@@ -62,7 +62,7 @@ export default function AdminBookings() {
         if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
           const mapped = res.data.map(b => ({
             id: b.bookingReference || b.id,
-            host: b.hostName || 'Ananya Rao',
+            host: b.hostName || 'Host',
             provider: b.providerName || 'Chef Raghavendra Rao',
             date: b.eventDate || '28 Nov 2026',
             total: `₹${Number(b.totalAmount || 11000).toLocaleString('en-IN')}`,

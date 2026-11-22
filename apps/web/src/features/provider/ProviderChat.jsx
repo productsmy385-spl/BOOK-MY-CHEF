@@ -16,7 +16,7 @@ export default function ProviderChat() {
     {
       id: 2,
       sender: 'CHEF',
-      text: 'Namaste Ananya ji! Congratulations on your new home. I will gladly prepare our heirloom Gutti Vankaya, slow-simmered mango pappu, and fresh hot Bobbatlu on-site. I have sent the itemized quotation below.',
+      text: 'Namaste Meera ji! Congratulations on your new home. I will gladly prepare our heirloom Gutti Vankaya, slow-simmered mango pappu, and fresh hot Bobbatlu on-site. I have sent the itemized quotation below.',
       time: '10:22 AM',
     },
   ]);
@@ -51,12 +51,12 @@ export default function ProviderChat() {
             <img src={ASSETS.userAvatar} alt="Host Avatar" className="w-full h-full object-cover" />
           </div>
           <div>
-            <h3 className="font-sora font-bold text-sm text-[#172033]">Ananya Rao (Host)</h3>
+            <h3 className="font-sora font-bold text-sm text-[#172033]">Meera Nambiar (Host)</h3>
             <span className="font-sora text-[11px] text-[#2196F3] font-semibold">Gruhapravesam • 28 Nov</span>
           </div>
         </div>
 
-        <a href="tel:+919876543210" className="w-9 h-9 rounded-full bg-[#E3F2FD] text-[#0D47A1] flex items-center justify-center">
+        <a href="tel:+919840112044" className="w-9 h-9 rounded-full bg-[#E3F2FD] text-[#0D47A1] flex items-center justify-center">
           <span className="material-symbols-outlined text-[18px]">call</span>
         </a>
       </div>
@@ -136,7 +136,7 @@ export default function ProviderChat() {
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Message Ananya Rao..."
+          placeholder="Message Meera Nambiar..."
           className="flex-1 h-11 px-4 rounded-full bg-[#f1f3ff] border border-[#E5E7EB] font-sora text-xs text-[#172033] outline-none focus:ring-2 focus:ring-[#90CAF9] focus:bg-white"
         />
         <button
