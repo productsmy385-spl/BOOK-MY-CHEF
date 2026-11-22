@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useClerkOtp } from '../../hooks/useClerkOtp';
 import OtpInput6 from '../../components/auth/OtpInput6';
+import FormInput from '../../components/common/FormInput';
 import { syncUserWithPostgres } from '../../lib/clerkAuthService';
 import { ASSETS } from '../../assets/assetCatalog';
 
@@ -65,7 +66,7 @@ export default function CustomerAuth() {
 
     if (mode === 'REGISTER') {
       // Dispatch Clerk Email Verification Code
-      const res = await sendSignUpEmailOtp(normalizedEmail, password);
+      const res = await sendSignUpEmailOtp(normalizedEmail, password, fullName);
       if (res.success) {
         setStep('OTP_VERIFY');
       }
@@ -155,7 +156,7 @@ export default function CustomerAuth() {
     const normalizedEmail = email.trim().toLowerCase();
     if (isConfigured) {
       if (mode === 'REGISTER') {
-        await sendSignUpEmailOtp(normalizedEmail, password);
+        await sendSignUpEmailOtp(normalizedEmail, password, fullName);
       } else {
         await sendSignInEmailOtp(normalizedEmail);
       }
@@ -185,7 +186,7 @@ export default function CustomerAuth() {
             <span className="inline-block px-3 py-1 bg-white/15 border border-white/30 text-[#E3F2FD] text-xs font-semibold rounded-md uppercase tracking-wider mb-4">
               Premium Host Experience
             </span>
-            <h2 className="heading-1 text-white leading-tight">
+            <h2 className="heading-1-on-dark leading-tight">
               Discover verified masterchefs, caterers &amp; event artisans for your private celebrations.
             </h2>
             <p className="font-inter text-sm text-[#E3F2FD] mt-4 leading-relaxed max-w-md">
@@ -222,7 +223,7 @@ export default function CustomerAuth() {
       </div>
 
       {/* Right Column: Form Container (Desktop & Mobile) */}
-      <div className="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-16 max-w-xl mx-auto w-full">
+      <div className="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 max-w-xl mx-auto w-full min-h-screen lg:min-h-0">
         <div>
           {/* Top Bar Navigation */}
           <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
@@ -240,7 +241,7 @@ export default function CustomerAuth() {
           </div>
 
           {/* Heading */}
-          <div className="mt-8 mb-6">
+          <div className="mt-6 mb-5">
             <h1 className="heading-2">
               {step === 'OTP_VERIFY'
                 ? 'Enter Verification Code'
@@ -253,7 +254,7 @@ export default function CustomerAuth() {
                 ? `Enter the 6-digit email verification code sent to ${email}`
                 : mode === 'REGISTER'
                 ? 'Register with your verified email to discover chefs, book catering, and track events.'
-                : 'Sign in to access your bookings, saved menus, and guest guestlists.'}
+                : 'Sign in to access your bookings, saved menus, and guestlists.'}
             </p>
           </div>
 
@@ -293,7 +294,7 @@ export default function CustomerAuth() {
 
           {/* Secondary Sub-Tabs for LOGIN Mode: Email OTP vs Password */}
           {step === 'FORM_ENTRY' && mode === 'LOGIN' && (
-            <div className="flex items-center gap-2 mb-6 p-1 bg-[#F1F5F9] rounded-md text-xs font-inter">
+            <div className="flex items-center gap-2 mb-5 p-1 bg-[#F1F5F9] rounded-md text-xs font-inter">
               <button
                 type="button"
                 onClick={() => {
@@ -339,110 +340,68 @@ export default function CustomerAuth() {
           {step === 'FORM_ENTRY' ? (
             <form onSubmit={handleSubmitForm} className="flex flex-col gap-4 text-xs font-inter">
               {mode === 'REGISTER' && (
-                <div>
-                  <label htmlFor="customer-name" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                    Full Name *
-                  </label>
-                  <div className="relative flex items-center">
-                    <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                      badge
-                    </span>
-                    <input
-                      id="customer-name"
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
-                      className="input-sharp w-full pl-11"
-                    />
-                  </div>
-                </div>
+                <FormInput
+                  id="customer-name"
+                  label="Full Name"
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Enter your full name"
+                  leadingIcon="badge"
+                />
               )}
 
-              <div>
-                <label htmlFor="customer-email" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                  Email Address *
-                </label>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                    mail
-                  </span>
-                  <input
-                    id="customer-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
-                    className="input-sharp w-full pl-11"
-                  />
-                </div>
-                {mode === 'REGISTER' && (
-                  <span className="text-[11px] text-[#64748B] mt-1.5 block">
-                    A 6-digit verification code will be sent to this email address.
-                  </span>
-                )}
-              </div>
+              <FormInput
+                id="customer-email"
+                label="Email Address"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                leadingIcon="mail"
+                helperText={mode === 'REGISTER' ? "A 6-digit verification code will be sent to this email address." : undefined}
+              />
 
               {/* Password Field (Required on REGISTER and on LOGIN with Password) */}
               {(mode === 'REGISTER' || (mode === 'LOGIN' && loginMethod === 'PASSWORD')) && (
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="customer-password" className="block text-[#172033] font-sora font-bold uppercase text-[10px]">
-                      {mode === 'REGISTER' ? 'Create Password *' : 'Password *'}
-                    </label>
-                    {mode === 'REGISTER' && (
-                      <span className="text-[10px] text-[#64748B]">Min 8 characters</span>
-                    )}
-                  </div>
-                  <div className="relative flex items-center">
-                    <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                      lock
-                    </span>
-                    <input
-                      id="customer-password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder={mode === 'REGISTER' ? 'At least 8 characters' : 'Enter your password'}
-                      className="input-sharp w-full pl-11 pr-11"
-                    />
+                <FormInput
+                  id="customer-password"
+                  label={mode === 'REGISTER' ? "Create Password" : "Password"}
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'REGISTER' ? "At least 8 characters" : "Enter your password"}
+                  leadingIcon="lock"
+                  helperText={mode === 'REGISTER' ? "Min 8 characters" : undefined}
+                  trailingAction={
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 text-[#64748B] hover:text-[#172033] transition-colors"
+                      className="text-[#64748B] hover:text-[#172033] transition-colors focus:outline-none"
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         {showPassword ? 'visibility_off' : 'visibility'}
                       </span>
                     </button>
-                  </div>
-                </div>
+                  }
+                />
               )}
 
               {mode === 'REGISTER' && (
                 <>
-                  <div>
-                    <label htmlFor="customer-location" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                      Host City / Location *
-                    </label>
-                    <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                        location_on
-                      </span>
-                      <input
-                        id="customer-location"
-                        type="text"
-                        required
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        placeholder="e.g. Jubilee Hills, Hyderabad"
-                        className="input-sharp w-full pl-11"
-                      />
-                    </div>
-                  </div>
+                  <FormInput
+                    id="customer-location"
+                    label="Host City / Location"
+                    type="text"
+                    required
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g. Jubilee Hills, Hyderabad"
+                    leadingIcon="location_on"
+                  />
 
                   <div className="flex items-start gap-2 pt-1">
                     <input
@@ -462,7 +421,7 @@ export default function CustomerAuth() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full py-3.5 mt-2"
+                className="btn-primary w-full py-3.5 mt-2 transition-all shadow-sm hover:shadow"
               >
                 {isLoading ? (
                   <>
@@ -505,7 +464,7 @@ export default function CustomerAuth() {
         </div>
 
         {/* Switch to Service Partner CTA */}
-        <div className="pt-6 border-t border-[#E5E7EB] text-center text-xs font-inter text-[#64748B]">
+        <div className="pt-6 pb-4 border-t border-[#E5E7EB] text-center text-xs font-inter text-[#64748B]">
           <span>Are you a chef, caterer, or event professional? </span>
           <button
             onClick={() => navigate('/auth/partner')}

@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { useProviderStore } from '../../stores/useProviderStore';
 import { useClerkOtp } from '../../hooks/useClerkOtp';
 import OtpInput6 from '../../components/auth/OtpInput6';
+import FormInput from '../../components/common/FormInput';
 import { syncUserWithPostgres } from '../../lib/clerkAuthService';
 
 export default function PartnerAuth() {
@@ -90,7 +91,7 @@ export default function PartnerAuth() {
 
     if (mode === 'REGISTER') {
       // Send Email OTP for Partner Registration
-      const res = await sendSignUpEmailOtp(normalizedEmail, password);
+      const res = await sendSignUpEmailOtp(normalizedEmail, password, fullName);
       if (res.success) {
         setStep('OTP');
       }
@@ -192,7 +193,7 @@ export default function PartnerAuth() {
     const normalizedEmail = email.trim().toLowerCase();
     if (isConfigured) {
       if (mode === 'REGISTER') {
-        await sendSignUpEmailOtp(normalizedEmail, password);
+        await sendSignUpEmailOtp(normalizedEmail, password, fullName);
       } else {
         await sendSignInEmailOtp(normalizedEmail);
       }
@@ -222,7 +223,7 @@ export default function PartnerAuth() {
             <span className="inline-block px-3 py-1 bg-white/15 border border-white/30 text-[#E3F2FD] text-xs font-semibold rounded-md uppercase tracking-wider mb-4">
               Service Partner Ecosystem
             </span>
-            <h2 className="heading-1 text-white leading-tight">
+            <h2 className="heading-1-on-dark leading-tight">
               Direct booking leads, calendar slot locks, and zero-delay escrow payouts.
             </h2>
             <p className="font-inter text-sm text-[#E3F2FD] mt-4 leading-relaxed max-w-md">
@@ -249,7 +250,7 @@ export default function PartnerAuth() {
       </div>
 
       {/* Right Column: Form Container (Desktop & Mobile) */}
-      <div className="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 max-w-2xl mx-auto w-full">
+      <div className="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 max-w-2xl mx-auto w-full min-h-screen lg:min-h-0">
         <div>
           {/* Top Bar Navigation */}
           <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
@@ -330,7 +331,7 @@ export default function PartnerAuth() {
 
           {/* Secondary Sub-Tabs for LOGIN Mode: Email OTP vs Password */}
           {step === 'DETAILS' && mode === 'LOGIN' && (
-            <div className="flex items-center gap-2 mb-6 p-1 bg-[#F1F5F9] rounded-md text-xs font-inter">
+            <div className="flex items-center gap-2 mb-5 p-1 bg-[#F1F5F9] rounded-md text-xs font-inter">
               <button
                 type="button"
                 onClick={() => {
@@ -433,7 +434,7 @@ export default function PartnerAuth() {
                   setErrorMessage('');
                   setStep('DETAILS');
                 }}
-                className="btn-primary w-full py-3.5 mt-2"
+                className="btn-primary w-full py-3.5 mt-2 transition-all shadow-sm hover:shadow"
               >
                 <span>Continue to Profile Details ({selectedRoles.length} Selected)</span>
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -446,135 +447,84 @@ export default function PartnerAuth() {
             <form onSubmit={handleSubmitForm} className="flex flex-col gap-4 text-xs font-inter">
               {mode === 'REGISTER' && (
                 <>
-                  <div>
-                    <label htmlFor="partner-name" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                      Professional Name *
-                    </label>
-                    <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                        person
-                      </span>
-                      <input
-                        id="partner-name"
-                        type="text"
-                        required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="e.g. Chef Raghavendra Rao"
-                        className="input-sharp w-full pl-11"
-                      />
-                    </div>
-                  </div>
+                  <FormInput
+                    id="partner-name"
+                    label="Professional Name"
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Chef Raghavendra Rao"
+                    leadingIcon="person"
+                  />
 
-                  <div>
-                    <label htmlFor="partner-brand" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                      Culinary Brand / Studio Name (Optional)
-                    </label>
-                    <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                        storefront
-                      </span>
-                      <input
-                        id="partner-brand"
-                        type="text"
-                        value={businessName}
-                        onChange={(e) => setBusinessName(e.target.value)}
-                        placeholder="e.g. Royal Dakshin Culinary Studio"
-                        className="input-sharp w-full pl-11"
-                      />
-                    </div>
-                  </div>
+                  <FormInput
+                    id="partner-brand"
+                    label="Culinary Brand / Studio Name (Optional)"
+                    type="text"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="e.g. Royal Dakshin Culinary Studio"
+                    leadingIcon="storefront"
+                  />
                 </>
               )}
 
-              <div>
-                <label htmlFor="partner-email" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                  Email Address *
-                </label>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                    mail
-                  </span>
-                  <input
-                    id="partner-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="chef@atelier.in"
-                    className="input-sharp w-full pl-11"
-                  />
-                </div>
-                {mode === 'REGISTER' && (
-                  <span className="text-[11px] text-[#64748B] mt-1.5 block">
-                    A 6-digit verification code will be sent to this email address.
-                  </span>
-                )}
-              </div>
+              <FormInput
+                id="partner-email"
+                label="Email Address"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="chef@atelier.in"
+                leadingIcon="mail"
+                helperText={mode === 'REGISTER' ? "A 6-digit verification code will be sent to this email address." : undefined}
+              />
 
               {/* Password Field (Required on REGISTER and on LOGIN with Password) */}
               {(mode === 'REGISTER' || (mode === 'LOGIN' && loginMethod === 'PASSWORD')) && (
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="partner-password" className="block text-[#172033] font-sora font-bold uppercase text-[10px]">
-                      {mode === 'REGISTER' ? 'Create Password *' : 'Password *'}
-                    </label>
-                    {mode === 'REGISTER' && (
-                      <span className="text-[10px] text-[#64748B]">Min 8 characters</span>
-                    )}
-                  </div>
-                  <div className="relative flex items-center">
-                    <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                      lock
-                    </span>
-                    <input
-                      id="partner-password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder={mode === 'REGISTER' ? 'At least 8 characters' : 'Enter your password'}
-                      className="input-sharp w-full pl-11 pr-11"
-                    />
+                <FormInput
+                  id="partner-password"
+                  label={mode === 'REGISTER' ? "Create Password" : "Password"}
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'REGISTER' ? "At least 8 characters" : "Enter your password"}
+                  leadingIcon="lock"
+                  helperText={mode === 'REGISTER' ? "Min 8 characters" : undefined}
+                  trailingAction={
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 text-[#64748B] hover:text-[#172033] transition-colors"
+                      className="text-[#64748B] hover:text-[#172033] transition-colors focus:outline-none"
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         {showPassword ? 'visibility_off' : 'visibility'}
                       </span>
                     </button>
-                  </div>
-                </div>
+                  }
+                />
               )}
 
               {mode === 'REGISTER' && (
-                <div>
-                  <label htmlFor="partner-location" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
-                    Operating Base City *
-                  </label>
-                  <div className="relative flex items-center">
-                    <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
-                      location_on
-                    </span>
-                    <input
-                      id="partner-location"
-                      type="text"
-                      required
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder="e.g. Jubilee Hills, Hyderabad"
-                      className="input-sharp w-full pl-11"
-                    />
-                  </div>
-                </div>
+                <FormInput
+                  id="partner-location"
+                  label="Operating Base City"
+                  type="text"
+                  required
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Jubilee Hills, Hyderabad"
+                  leadingIcon="location_on"
+                />
               )}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full py-3.5 mt-2"
+                className="btn-primary w-full py-3.5 mt-2 transition-all shadow-sm hover:shadow"
               >
                 {isLoading ? (
                   <>
@@ -619,13 +569,13 @@ export default function PartnerAuth() {
         </div>
 
         {/* Switch to Customer CTA */}
-        <div className="pt-6 border-t border-[#E5E7EB] text-center text-xs font-inter text-[#64748B]">
-          <span>Looking to book a chef or catering for your event? </span>
+        <div className="pt-6 pb-4 border-t border-[#E5E7EB] text-center text-xs font-inter text-[#64748B]">
+          <span>Looking to hire chefs or book catering? </span>
           <button
             onClick={() => navigate('/auth/customer')}
             className="font-sora font-bold text-[#0D47A1] hover:underline inline-flex items-center gap-0.5 ml-1"
           >
-            Customer Sign In →
+            Switch to Host Account →
           </button>
         </div>
       </div>

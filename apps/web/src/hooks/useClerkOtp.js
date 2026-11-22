@@ -4,10 +4,11 @@ import { getClerkPublishableKey } from '../components/auth/ClerkAuthProvider';
 
 /**
  * Custom Hook: useClerkOtp
- * Production-ready Clerk custom flows for:
- * 1. Email OTP (Verification code sent to email inbox)
- * 2. Password Sign-In (Instant password-based login)
- * 3. Dual factor resolution
+ * Production-ready Clerk custom authentication flow supporting:
+ * 1. Clerk Core 3 Modern API (verifications.sendEmailCode, verifyEmailCode, finalize)
+ * 2. Clerk Core 2 Legacy Fallback (prepareEmailAddressVerification, attemptEmailAddressVerification)
+ * 3. Email OTP, Password Sign-In, and Phone SMS OTP
+ * 4. Error shielding & user-friendly error formatting
  */
 export function useClerkOtp() {
   const hasClerkKey = Boolean(getClerkPublishableKey());
@@ -33,11 +34,13 @@ export function useClerkOtp() {
    */
   const formatClerkError = (err, defaultMsg, flowType = 'SIGN_UP') => {
     console.error(`Clerk ${flowType} error:`, err);
+
+    // Extract message from Clerk error object or string
     const rawMsg =
       err?.errors?.[0]?.longMessage ||
       err?.errors?.[0]?.message ||
       err?.message ||
-      '';
+      (typeof err === 'string' ? err : '');
     const code = err?.errors?.[0]?.code || '';
 
     // Error 1: Email already in use
@@ -50,7 +53,7 @@ export function useClerkOtp() {
       code === 'form_identifier_not_found' ||
       code === 'identifier_invalid' ||
       rawMsg.includes('Identifier is invalid') ||
-      rawMsg.includes('Couldn\'t find your account')
+      rawMsg.includes("Couldn't find your account")
     ) {
       return 'No registered account found with this email. Please switch to "Sign Up" to register first.';
     }
@@ -67,7 +70,7 @@ export function useClerkOtp() {
 
     // Error 5: Password incorrect
     if (code === 'form_password_incorrect' || rawMsg.includes('Password is incorrect')) {
-      return 'Incorrect password. Please try again or switch to "Sign In via Email OTP".';
+      return 'Incorrect password. Please try again or switch to "Sign In with Email OTP".';
     }
 
     // Error 6: Password too weak
@@ -80,13 +83,20 @@ export function useClerkOtp() {
       return 'Too many attempts. Please wait 60 seconds before trying again.';
     }
 
+    // Filter out internal code trace messages from displaying to users
+    if (rawMsg.includes('is not a function') || rawMsg.includes('undefined')) {
+      return defaultMsg;
+    }
+
     return rawMsg || defaultMsg;
   };
 
   /**
    * 1. Send Email Verification Code for Sign-Up
+   * Fully compatible with Clerk Core 3 (signUp.password + signUp.verifications.sendEmailCode)
+   * and fallback to legacy Core 2 methods.
    */
-  const sendSignUpEmailOtp = async (email, password = '') => {
+  const sendSignUpEmailOtp = async (email, password = '', fullName = '') => {
     setIsLoading(true);
     setErrorMessage('');
 
@@ -98,21 +108,64 @@ export function useClerkOtp() {
       }
 
       const { signUp } = signUpHook;
+      const normalizedEmail = email.trim().toLowerCase();
 
-      // Prepare payload with emailAddress and optional password
+      const nameParts = (fullName || '').trim().split(' ');
+      const firstName = nameParts[0] || undefined;
+      const lastName = nameParts.slice(1).join(' ') || undefined;
+
+      // Modern Clerk Core 3 API
+      if (signUp.verifications && typeof signUp.verifications.sendEmailCode === 'function') {
+        if (password && password.trim().length >= 8 && typeof signUp.password === 'function') {
+          const createRes = await signUp.password({
+            emailAddress: normalizedEmail,
+            password: password.trim(),
+            firstName,
+            lastName,
+          });
+          if (createRes?.error) {
+            throw createRes.error;
+          }
+        } else if (typeof signUp.create === 'function') {
+          const createRes = await signUp.create({
+            emailAddress: normalizedEmail,
+            password: password ? password.trim() : undefined,
+            firstName,
+            lastName,
+          });
+          if (createRes?.error) {
+            throw createRes.error;
+          }
+        }
+
+        const sendRes = await signUp.verifications.sendEmailCode();
+        if (sendRes?.error) {
+          throw sendRes.error;
+        }
+
+        setIsLoading(false);
+        return { success: true };
+      }
+
+      // Legacy Clerk Core 2 API
       const payload = {
-        emailAddress: email.trim().toLowerCase(),
+        emailAddress: normalizedEmail,
       };
       if (password && password.trim().length >= 8) {
         payload.password = password.trim();
       }
+      if (firstName) payload.firstName = firstName;
+      if (lastName) payload.lastName = lastName;
 
-      await signUp.create(payload);
+      if (typeof signUp.create === 'function') {
+        await signUp.create(payload);
+      }
 
-      // Trigger Clerk Email Verification Code
-      await signUp.prepareEmailAddressVerification({
-        strategy: 'email_code',
-      });
+      if (typeof signUp.prepareEmailAddressVerification === 'function') {
+        await signUp.prepareEmailAddressVerification({
+          strategy: 'email_code',
+        });
+      }
 
       setIsLoading(false);
       return { success: true };
@@ -126,6 +179,8 @@ export function useClerkOtp() {
 
   /**
    * 2. Verify Email OTP Code for Sign-Up
+   * Fully compatible with Clerk Core 3 (signUp.verifications.verifyEmailCode + signUp.finalize)
+   * and legacy Core 2 methods.
    */
   const verifySignUpEmailOtp = async (code) => {
     setIsLoading(true);
@@ -137,22 +192,52 @@ export function useClerkOtp() {
       }
 
       const { signUp, setActive } = signUpHook;
+      const cleanCode = code.trim();
 
-      const result = await signUp.attemptEmailAddressVerification({
-        code: code.trim(),
-      });
+      // Modern Clerk Core 3 API
+      if (signUp.verifications && typeof signUp.verifications.verifyEmailCode === 'function') {
+        const verifyRes = await signUp.verifications.verifyEmailCode({ code: cleanCode });
+        if (verifyRes?.error) {
+          throw verifyRes.error;
+        }
 
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
+        if (typeof signUp.finalize === 'function') {
+          const finalizeRes = await signUp.finalize();
+          if (finalizeRes?.error) {
+            throw finalizeRes.error;
+          }
+        } else if (typeof setActive === 'function' && signUp.createdSessionId) {
+          await setActive({ session: signUp.createdSessionId });
+        }
+
         setIsLoading(false);
         return {
           success: true,
-          clerkUserId: result.createdUserId || clerk?.user?.id,
-          sessionId: result.createdSessionId,
+          clerkUserId: signUp.createdUserId || clerk?.user?.id,
+          sessionId: signUp.createdSessionId,
         };
-      } else {
-        throw new Error(`Sign-up incomplete (status: ${result.status})`);
       }
+
+      // Legacy Clerk Core 2 API
+      if (typeof signUp.attemptEmailAddressVerification === 'function') {
+        const result = await signUp.attemptEmailAddressVerification({ code: cleanCode });
+
+        if (result.status === 'complete') {
+          if (typeof setActive === 'function') {
+            await setActive({ session: result.createdSessionId });
+          }
+          setIsLoading(false);
+          return {
+            success: true,
+            clerkUserId: result.createdUserId || clerk?.user?.id,
+            sessionId: result.createdSessionId,
+          };
+        } else {
+          throw new Error(`Sign-up incomplete (status: ${result.status})`);
+        }
+      }
+
+      throw new Error('Email verification is not supported by current Clerk SDK.');
     } catch (err) {
       const msg = formatClerkError(err, 'Invalid or expired verification code. Please check your email and try again.', 'VERIFY_SIGN_UP');
       setErrorMessage(msg);
@@ -163,6 +248,7 @@ export function useClerkOtp() {
 
   /**
    * 3. Send Email OTP Code for Sign-In
+   * Modern Clerk Core 3 (signIn.emailCode.sendCode) with legacy fallback
    */
   const sendSignInEmailOtp = async (email) => {
     setIsLoading(true);
@@ -178,23 +264,31 @@ export function useClerkOtp() {
       const { signIn } = signInHook;
       const normalizedEmail = email.trim().toLowerCase();
 
-      // Initiate sign-in with email identifier
+      // Modern Clerk Core 3 API
+      if (signIn.emailCode && typeof signIn.emailCode.sendCode === 'function') {
+        const res = await signIn.emailCode.sendCode({ emailAddress: normalizedEmail });
+        if (res?.error) {
+          throw res.error;
+        }
+        setIsLoading(false);
+        return { success: true };
+      }
+
+      // Legacy Clerk Core 2 API
       const signInAttempt = await signIn.create({
         identifier: normalizedEmail,
       });
 
-      // Find the email_code first factor
       const emailFactor = signInAttempt.supportedFirstFactors?.find(
         (factor) => factor.strategy === 'email_code'
       );
 
       if (!emailFactor) {
         throw new Error(
-          'Email code verification factor is not available for this account. Ensure email code is enabled in Clerk Dashboard.'
+          'Email verification factor is not available for this account. Ensure email sign-in is enabled in Clerk Dashboard.'
         );
       }
 
-      // Dispatch genuine Clerk Email OTP
       await signIn.prepareFirstFactor({
         strategy: 'email_code',
         emailAddressId: emailFactor.emailAddressId,
@@ -212,6 +306,7 @@ export function useClerkOtp() {
 
   /**
    * 4. Verify Email OTP Code for Sign-In
+   * Modern Clerk Core 3 (signIn.emailCode.verifyCode + signIn.finalize) with legacy fallback
    */
   const verifySignInEmailOtp = async (code) => {
     setIsLoading(true);
@@ -223,14 +318,44 @@ export function useClerkOtp() {
       }
 
       const { signIn, setActive } = signInHook;
+      const cleanCode = code.trim();
 
+      // Modern Clerk Core 3 API
+      if (signIn.emailCode && typeof signIn.emailCode.verifyCode === 'function') {
+        const verifyRes = await signIn.emailCode.verifyCode({ code: cleanCode });
+        if (verifyRes?.error) {
+          throw verifyRes.error;
+        }
+
+        if (signIn.status === 'complete') {
+          if (typeof signIn.finalize === 'function') {
+            const finalizeRes = await signIn.finalize();
+            if (finalizeRes?.error) {
+              throw finalizeRes.error;
+            }
+          } else if (typeof setActive === 'function' && signIn.createdSessionId) {
+            await setActive({ session: signIn.createdSessionId });
+          }
+        }
+
+        setIsLoading(false);
+        return {
+          success: true,
+          clerkUserId: signIn.createdUserId || clerk?.user?.id,
+          sessionId: signIn.createdSessionId,
+        };
+      }
+
+      // Legacy Clerk Core 2 API
       const result = await signIn.attemptFirstFactor({
         strategy: 'email_code',
-        code: code.trim(),
+        code: cleanCode,
       });
 
       if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
+        if (typeof setActive === 'function') {
+          await setActive({ session: result.createdSessionId });
+        }
         setIsLoading(false);
         return {
           success: true,
@@ -250,6 +375,7 @@ export function useClerkOtp() {
 
   /**
    * 5. Sign In with Password (Instant)
+   * Modern Clerk Core 3 (signIn.password + signIn.finalize) with legacy fallback
    */
   const signInWithPassword = async (email, password) => {
     setIsLoading(true);
@@ -262,14 +388,47 @@ export function useClerkOtp() {
 
       const { signIn, setActive } = signInHook;
       const normalizedEmail = email.trim().toLowerCase();
+      const cleanPassword = password.trim();
 
+      // Modern Clerk Core 3 API
+      if (typeof signIn.password === 'function') {
+        const res = await signIn.password({
+          identifier: normalizedEmail,
+          password: cleanPassword,
+        });
+        if (res?.error) {
+          throw res.error;
+        }
+
+        if (signIn.status === 'complete') {
+          if (typeof signIn.finalize === 'function') {
+            const finalizeRes = await signIn.finalize();
+            if (finalizeRes?.error) {
+              throw finalizeRes.error;
+            }
+          } else if (typeof setActive === 'function' && signIn.createdSessionId) {
+            await setActive({ session: signIn.createdSessionId });
+          }
+        }
+
+        setIsLoading(false);
+        return {
+          success: true,
+          clerkUserId: signIn.createdUserId || clerk?.user?.id,
+          sessionId: signIn.createdSessionId,
+        };
+      }
+
+      // Legacy Clerk Core 2 API
       const result = await signIn.create({
         identifier: normalizedEmail,
-        password: password.trim(),
+        password: cleanPassword,
       });
 
       if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
+        if (typeof setActive === 'function') {
+          await setActive({ session: result.createdSessionId });
+        }
         setIsLoading(false);
         return {
           success: true,
@@ -288,7 +447,7 @@ export function useClerkOtp() {
   };
 
   // Backward-compatibility wrappers
-  const sendSignUpOtp = (identifier, password) => sendSignUpEmailOtp(identifier, password);
+  const sendSignUpOtp = (identifier, password, fullName) => sendSignUpEmailOtp(identifier, password, fullName);
   const verifySignUpOtp = (code) => verifySignUpEmailOtp(code);
   const sendSignInOtp = (identifier) => sendSignInEmailOtp(identifier);
   const verifySignInOtp = (code) => verifySignInEmailOtp(code);
