@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export const useBookingStore = create((set, get) => ({
   // Active Booking Draft State
   provider: {
-    id: '7cb20e81-a9f3-4217-a0bf-7bc3343ef812',
+    id: 'ab33603d-aefb-414f-a4b9-145bcaf9154a',
     name: 'Chef Raghavendra Rao',
     avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBn2XXRg9r81Z8f3uO4GcheOfa8iz1OGk9CCRHknu3aNDgjBpLDFl3ibvtQnbh650z6tXktdKgsOu4xvly0XNYCqXiX0lRzN8r9EtLDJwB3hLEJL7CezSTUxg1OFeyqEc4-v0v8bkBLj9tn1x_zNPKF3f41qvd8orqxOaWkpIEXMgP2XbmpsmCsPs-Cn6iUAoY6uQtwF0OkXhQlAuLXAUlQ7bAOtkmX5pSodbli95M',
     title: 'Culinary Master • 18+ Yrs Exp',
@@ -45,24 +45,35 @@ export const useBookingStore = create((set, get) => ({
   },
 
   activeBooking: {
-    bookingId: 'c4d3e2b1-0987-6543-21ba-fedcba987654',
-    bookingReference: '#BMC-8942-HYD',
+    bookingId: '5f154cff-3dcf-43ad-b22a-793b3fac436a',
+    bookingReference: '#BMC-6821-HYD',
     status: 'CONFIRMED', // 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED'
     paidAdvance: 3300,
-    paymentMethod: 'UPI (Google Pay)',
+    paymentMethod: 'Razorpay UPI',
     transactionId: 'TXN_987625121',
   },
 
   // Actions
-  updateStep1: (fields) => set((state) => ({
-    step1Requirements: { ...state.step1Requirements, ...fields },
-    quotation: {
-      ...state.quotation,
-      perHeadCost: (fields.guestCount || state.step1Requirements.guestCount) * state.provider.perPersonRate,
-      totalPayable: state.quotation.baseVisitingFee + ((fields.guestCount || state.step1Requirements.guestCount) * state.provider.perPersonRate) + state.quotation.travelLogistics + state.quotation.platformServiceFee,
-      advancePayable: Math.round((state.quotation.baseVisitingFee + ((fields.guestCount || state.step1Requirements.guestCount) * state.provider.perPersonRate) + state.quotation.travelLogistics + state.quotation.platformServiceFee) * 0.3)
-    }
-  })),
+  setProvider: (newProvider) => set({ provider: { ...get().provider, ...newProvider } }),
+
+  updateStep1: (fields) => set((state) => {
+    const updated = { ...state.step1Requirements, ...fields };
+    const guestCount = fields.guestCount !== undefined ? Number(fields.guestCount) : state.step1Requirements.guestCount;
+    const perHead = guestCount * state.provider.perPersonRate;
+    const total = state.quotation.baseVisitingFee + perHead + state.quotation.travelLogistics + state.quotation.platformServiceFee;
+    const advance = Math.round(total * 0.3);
+
+    return {
+      step1Requirements: updated,
+      quotation: {
+        ...state.quotation,
+        perHeadCost: perHead,
+        totalPayable: total,
+        advancePayable: advance,
+        balanceOnCompletion: total - advance,
+      }
+    };
+  }),
 
   updateStep2: (fields) => set((state) => ({
     step2Preferences: { ...state.step2Preferences, ...fields }

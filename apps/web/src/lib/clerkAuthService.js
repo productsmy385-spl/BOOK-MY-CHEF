@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '../services/api';
+
 /**
  * Clerk Authentication Service & Mobile SMS OTP Helper
  * Manages phone number normalization (E.164), Clerk custom flows, and PostgreSQL synchronization
@@ -44,13 +46,21 @@ export async function syncUserWithPostgres({
   roles,
 }) {
   try {
-    const response = await fetch('/api/v1/auth/sync', {
+    const baseUrl = getApiBaseUrl();
+    const token = typeof window !== 'undefined' ? (localStorage.getItem('bmc_clerk_token') || localStorage.getItem('token')) : null;
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Mock-User-Id': clerkId,
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${baseUrl}/auth/sync`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Mock-User-Id': clerkId,
-      },
+      headers,
       body: JSON.stringify({
+        clerkId,
         phone: formatToE164(phone),
         email: email || '',
         fullName: fullName || 'User',

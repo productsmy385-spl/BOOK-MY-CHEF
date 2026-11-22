@@ -20,4 +20,10 @@ public class AuthSyncRequest {
 
     @NotBlank(message = "Intended role is required")
     private String intendedRole; // CUSTOMER, PROVIDER
+
+    private String clerkId;
+
+    private String businessName;
+
+    private java.util.List<String> roles;
 }

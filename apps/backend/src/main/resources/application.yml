@@ -44,9 +44,9 @@ spring:
       fail-on-empty-beans: false
 
 clerk:
-  issuer: ${CLERK_ISSUER:https://viable-marmot-48.clerk.accounts.dev}
-  jwks-url: ${CLERK_JWKS_URL:https://viable-marmot-48.clerk.accounts.dev/.well-known/jwks.json}
-  webhook-secret: ${CLERK_WEBHOOK_SECRET:whsec_default_secret}
+  issuer: ${CLERK_ISSUER:https://comic-reptile-34.clerk.accounts.dev}
+  jwks-url: ${CLERK_JWKS_URL:https://comic-reptile-34.clerk.accounts.dev/.well-known/jwks.json}
+  webhook-secret: ${CLERK_WEBHOOK_SECRET:whsec_bookmychef_clerk_webhook_signing_secret_2026}
 
 razorpay:
   key-id: ${RAZORPAY_KEY_ID:rzp_test_bookmychef123}

@@ -1,22 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ASSETS } from '../../assets/assetCatalog';
 import { useBookingStore } from '../../stores/useBookingStore';
+import { api } from '../../services/api';
 
 export default function CustomerLiveTracking() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { provider, step1Requirements, activeBooking } = useBookingStore();
+  const { provider, activeBooking } = useBookingStore();
+  const [bookingData, setBookingData] = useState(null);
   const [currentStep, setCurrentStep] = useState(2); // 2 = In Transit
+  const [isLoading, setIsLoading] = useState(true);
+
+  const effectiveBookingId = id || activeBooking?.bookingId || '5f154cff-3dcf-43ad-b22a-793b3fac436a';
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchTrackingStatus() {
+      try {
+        const res = await api.bookings.getById(effectiveBookingId);
+        if (res?.data && isMounted) {
+          setBookingData(res.data);
+          const st = res.data.bookingStatus;
+          if (st === 'CONFIRMED' || st === 'PROVIDER_ACCEPTED') setCurrentStep(1);
+          else if (st === 'IN_PROGRESS') setCurrentStep(3);
+          else if (st === 'COMPLETED') setCurrentStep(6);
+        }
+      } catch (err) {
+        console.warn('Real-time tracking fetch fallback:', err.message);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    fetchTrackingStatus();
+    const interval = setInterval(fetchTrackingStatus, 8000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [effectiveBookingId]);
 
   const steps = [
-    { id: 1, title: 'Fresh Groceries & Spices Procured', time: '08:30 AM', completed: true },
-    { id: 2, title: 'Departed Base Kitchen (In Transit)', time: '10:00 AM', completed: true, active: true },
-    { id: 3, title: 'Arrived at Jubilee Hills Venue', time: 'Est. 10:35 AM', completed: false },
-    { id: 4, title: 'Kitchen Sanitized & Cooking Underway', time: 'Est. 11:00 AM', completed: false },
-    { id: 5, title: 'Feast Plated & Served Warm', time: 'Est. 12:30 PM', completed: false },
-    { id: 6, title: 'Kitchen Clean-up & Final Handover', time: 'Est. 02:00 PM', completed: false },
+    { id: 1, title: 'Fresh Groceries & Spices Procured', time: '08:30 AM', completed: currentStep >= 1 },
+    { id: 2, title: 'Departed Base Kitchen (In Transit)', time: '10:00 AM', completed: currentStep >= 2, active: currentStep === 2 },
+    { id: 3, title: 'Arrived at Jubilee Hills Venue', time: 'Est. 10:35 AM', completed: currentStep >= 3 },
+    { id: 4, title: 'Kitchen Sanitized & Cooking Underway', time: 'Est. 11:00 AM', completed: currentStep >= 4 },
+    { id: 5, title: 'Feast Plated & Served Warm', time: 'Est. 12:30 PM', completed: currentStep >= 5 },
+    { id: 6, title: 'Kitchen Clean-up & Final Handover', time: 'Est. 02:00 PM', completed: currentStep >= 6 },
   ];
+
+  const bookingRef = bookingData?.bookingReference || activeBooking?.bookingReference || '#BMC-6821-HYD';
+  const isCompleted = bookingData?.bookingStatus === 'COMPLETED' || currentStep === 6;
 
   return (
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 bg-white">
@@ -28,7 +64,7 @@ export default function CustomerLiveTracking() {
         </button>
         <span className="font-sora text-xs font-bold text-[#0D47A1]">Live Event Tracking</span>
         <span className="px-2 py-0.5 rounded-full bg-[#10B981]/15 text-[#10B981] font-sora text-[10px] font-bold">
-          LIVE
+          {isCompleted ? 'COMPLETED' : 'LIVE'}
         </span>
       </div>
 
@@ -37,17 +73,19 @@ export default function CustomerLiveTracking() {
         <div className="p-4 rounded-2xl bg-gradient-to-r from-[#0D47A1] to-[#2196F3] text-white shadow-md flex items-center justify-between">
           <div>
             <span className="font-sora text-[10px] uppercase tracking-wider text-[#90CAF9] font-bold block">
-              Real-time Travel Status
+              Booking Ref: {bookingRef}
             </span>
             <h3 className="font-sora font-extrabold text-xl leading-tight mt-0.5">
-              Chef Raghavendra is 12 mins away
+              {isCompleted ? 'Feast Successfully Completed!' : 'Chef Raghavendra is 12 mins away'}
             </h3>
             <p className="font-sora text-xs text-white/90 mt-0.5">
-              En route on Road No. 36 • Driving Swift Dzire
+              {isCompleted ? 'Kitchen sanitized & inspected. Escrow ready for release.' : 'En route on Road No. 36 • Driving Swift Dzire'}
             </p>
           </div>
           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 animate-pulse">
-            <span className="material-symbols-outlined text-[28px] text-white">navigation</span>
+            <span className="material-symbols-outlined text-[28px] text-white">
+              {isCompleted ? 'task_alt' : 'navigation'}
+            </span>
           </div>
         </div>
 
@@ -89,40 +127,43 @@ export default function CustomerLiveTracking() {
             <span className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
               Event-Day Live Checklist
             </span>
-            <span className="font-sora text-[10px] text-[#2196F3] font-bold">Step 2 of 6 Active</span>
+            <span className="font-sora text-[10px] text-[#2196F3] font-bold">
+              {isCompleted ? 'All Steps Completed' : `Step ${currentStep} of 6 Active`}
+            </span>
           </div>
 
           <div className="flex flex-col gap-4 relative pl-2">
-            {/* Timeline Vertical Line */}
             <div className="absolute left-6 top-3 bottom-3 w-0.5 bg-[#E5E7EB]"></div>
 
-            {steps.map((step, idx) => (
+            {steps.map((step) => (
               <div key={step.id} className="flex items-start gap-3.5 relative z-10">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-sora text-xs font-bold ${
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-sora text-xs font-bold transition-all ${
                   step.completed
-                    ? 'bg-[#10B981] text-white ring-4 ring-[#10B981]/20'
+                    ? 'bg-[#10B981] text-white ring-4 ring-[#10B981]/15'
                     : step.active
-                    ? 'bg-[#2196F3] text-white ring-4 ring-[#2196F3]/30 animate-pulse'
+                    ? 'bg-[#2196F3] text-white ring-4 ring-[#2196F3]/20 animate-pulse'
                     : 'bg-[#f1f3ff] text-[#64748B] border border-[#E5E7EB]'
                 }`}>
                   {step.completed ? (
                     <span className="material-symbols-outlined text-[16px]">check</span>
                   ) : (
-                    idx + 1
+                    step.id
                   )}
                 </div>
 
                 <div className="flex-1 pt-0.5">
                   <div className="flex items-center justify-between">
-                    <h5 className={`font-sora text-xs font-bold ${step.active ? 'text-[#0D47A1]' : 'text-[#172033]'}`}>
+                    <h5 className={`font-sora text-xs font-bold ${
+                      step.completed ? 'text-[#172033]' : step.active ? 'text-[#0D47A1]' : 'text-[#64748B]'
+                    }`}>
                       {step.title}
                     </h5>
                     <span className="font-sora text-[10px] text-[#64748B]">{step.time}</span>
                   </div>
                   {step.active && (
-                    <p className="font-sora text-[11px] text-[#2196F3] mt-0.5">
-                      Chef has shared live location tracking via Google Maps.
-                    </p>
+                    <span className="inline-block mt-1 font-sora text-[10px] font-bold text-[#2196F3] bg-[#E3F2FD] px-2 py-0.5 rounded-full">
+                      In Progress Right Now
+                    </span>
                   )}
                 </div>
               </div>
@@ -130,19 +171,22 @@ export default function CustomerLiveTracking() {
           </div>
         </div>
 
-        {/* Complete & Leave Review Trigger */}
-        <div className="p-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] flex items-center justify-between">
-          <div>
-            <h5 className="font-sora font-bold text-xs text-[#172033]">Event Concluded?</h5>
-            <p className="font-sora text-[10px] text-[#64748B]">Confirm completion to release escrow and rate chef</p>
+        {/* Rate Chef Button when Completed */}
+        {isCompleted && (
+          <div className="p-4 rounded-2xl bg-[#f1f3ff] border border-[#90CAF9] flex flex-col items-center gap-3 text-center">
+            <span className="material-symbols-outlined text-[#FFB300] text-[32px] fill-1">star</span>
+            <div>
+              <h4 className="font-sora font-bold text-sm text-[#172033]">How was your dining experience?</h4>
+              <p className="font-sora text-xs text-[#64748B] mt-0.5">Your rating releases the provider escrow and updates chef rankings.</p>
+            </div>
+            <button
+              onClick={() => navigate(`/review/${effectiveBookingId}`)}
+              className="w-full py-3 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-bold shadow-md active:scale-95 transition-all"
+            >
+              Rate Chef &amp; Share Feedback
+            </button>
           </div>
-          <button
-            onClick={() => navigate('/review/c4d3e2b1-0987-6543-21ba-fedcba987654')}
-            className="px-4 py-2 bg-[#10B981] hover:bg-[#059669] text-white rounded-full font-sora text-xs font-bold shadow-sm active:scale-95 transition-all"
-          >
-            Confirm &amp; Review
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

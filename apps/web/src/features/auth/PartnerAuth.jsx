@@ -24,6 +24,7 @@ export default function PartnerAuth() {
   const [mode, setMode] = useState('REGISTER'); // 'REGISTER' | 'LOGIN'
   const [step, setStep] = useState('DETAILS'); // 'DETAILS' | 'OTP' | 'ROLE_SELECTION'
   const [localLoading, setLocalLoading] = useState(false);
+  const [clerkUserId, setClerkUserId] = useState('');
 
   // Form Fields
   const [fullName, setFullName] = useState('Chef Raghavendra Rao');
@@ -98,6 +99,10 @@ export default function PartnerAuth() {
 
       if (!res.success) return;
 
+      if (res.clerkUserId) {
+        setClerkUserId(res.clerkUserId);
+      }
+
       if (mode === 'REGISTER') {
         // Move to Role Selection screen
         setStep('ROLE_SELECTION');
@@ -145,6 +150,7 @@ export default function PartnerAuth() {
 
     // Save in PostgreSQL via sync endpoint
     await syncUserWithPostgres({
+      clerkId: clerkUserId || undefined,
       phone: formattedPhone,
       email,
       fullName,
