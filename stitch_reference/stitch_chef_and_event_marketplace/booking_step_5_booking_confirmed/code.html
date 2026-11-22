@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700&family=Inter:wght@400;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"tertiary":"#2b5bb5","tertiary-fixed-dim":"#b0c6ff","secondary-fixed":"#d1e4ff","secondary-fixed-dim":"#9ecaff","inverse-on-surface":"#edf0ff","on-secondary-container":"#00355c","secondary":"#0061a4","on-primary-fixed":"#001e30","on-secondary-fixed-variant":"#00497d","on-surface":"#121b2e","on-tertiary-container":"#174ca6","surface-bright":"#f9f9ff","tertiary-fixed":"#d9e2ff","on-secondary":"#ffffff","tertiary-container":"#acc3ff","primary-fixed-dim":"#93cdfc","outline-variant":"#c1c7cf","background":"#f9f9ff","on-tertiary-fixed-variant":"#00429c","on-primary-container":"#08557e","primary":"#21638d","on-background":"#121b2e","surface-container":"#e9edff","on-tertiary":"#ffffff","outline":"#71787f","on-tertiary-fixed":"#001945","surface-container-highest":"#d9e2fc","surface-dim":"#d1daf4","inverse-primary":"#93cdfc","surface-container-high":"#e1e8ff","surface-variant":"#d9e2fc","on-secondary-fixed":"#001d36","error-container":"#ffdad6","surface-tint":"#21638d","surface-container-lowest":"#ffffff","on-error":"#ffffff","on-primary-fixed-variant":"#004b71","on-surface-variant":"#41474e","secondary-container":"#33a0fd","on-primary":"#ffffff","primary-container":"#90caf9","on-error-container":"#93000a","primary-fixed":"#cbe6ff","error":"#ba1a1a","surface":"#f9f9ff","inverse-surface":"#273044","surface-container-low":"#f1f3ff"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"space-md":"1rem","space-xl":"2rem","gutter":"1rem","space-lg":"1.5rem","margin":"1rem","space-xs":"0.25rem","space-sm":"0.5rem"},"fontFamily":{"headline-md":["Epilogue"],"headline-xl":["Epilogue"],"headline-sm":["Epilogue"],"metric-price":["Epilogue"],"label-sm":["Inter"],"body-md":["Inter"],"label-md":["Inter"],"body-sm":["Inter"],"title-md":["Epilogue"],"headline-lg":["Epilogue"],"body-lg":["Inter"]},"fontSize":{"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"metric-price":["18px",{"lineHeight":"22px","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"title-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"headline-lg":["26px",{"lineHeight":"34px","letterSpacing":"-0.015em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}]}}}};</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><button aria-label="Go back" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-low transition-colors" onclick="history.back()"><span class="material-symbols-outlined">arrow_back</span></button><div class="flex-1 flex flex-col items-center justify-center min-w-0"><h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Payment & Confirmation</h1><div aria-label="Booking progress" class="w-24 h-1 bg-surface-container-high rounded-full overflow-hidden mt-space-xs" role="progressbar"><div class="w-1/2 h-full bg-primary rounded-full"></div></div></div><div class="w-11 h-11 flex items-center justify-center"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full px-margin pt-16 pb-safe bg-surface flex-1"><div class="flex flex-col w-full gap-space-lg pb-space-lg relative overflow-hidden">
+<!-- Subtle celebratory confetti container -->
+<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 h-56 overflow-hidden" id="confetti-burst"></div>
+<!-- Celebratory Header Section -->
+<div class="flex flex-col items-center text-center pt-space-md px-space-sm relative z-10">
+<!-- Layered Checkmark Badge -->
+<div class="relative flex items-center justify-center mb-space-md">
+<div class="w-24 h-24 rounded-full bg-primary-container/30 flex items-center justify-center animate-pulse">
+<div class="w-18 h-18 rounded-full bg-primary-container/60 flex items-center justify-center p-2">
+<div class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary-container text-[18px] absolute -top-1 -right-2" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="material-symbols-outlined text-primary text-[14px] absolute bottom-1 -left-3" style="font-variation-settings: 'FILL' 1;">drive_file_rename_outline</span>
+</div>
+<!-- Status Badge -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/20 text-on-secondary-container text-label-sm font-label-sm mb-space-sm">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>CONFIRMED • Slot Locked</span>
+</div>
+<!-- Heading & Subtitle -->
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-space-xs">
+      Booking Request Confirmed!
+    </h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs">
+      Your advance payment of <span class="font-semibold text-on-surface">₹5,565</span> was successful. Chef Raghavendra Rao has been notified.
+    </p>
+<!-- Interactive Booking ID Pill -->
+<button aria-label="Copy Booking ID #CEA-2025-8492" class="mt-space-md inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors shadow-sm" id="copy-booking-id" onclick="copyBookingId()" type="button">
+<span class="font-label-md text-label-md text-on-surface">Booking ID: #CEA-2025-8492</span>
+<span class="material-symbols-outlined text-[16px] text-primary" id="copy-icon">content_copy</span>
+</button>
+<span class="text-label-sm font-label-sm text-primary mt-1 opacity-0 transition-opacity duration-200" id="copy-feedback">Copied to clipboard</span>
+</div>
+<!-- Compact Booking Summary Card -->
+<div class="bg-surface-container-lowest rounded-lg p-space-md shadow-md flex flex-col gap-space-md relative z-10">
+<!-- Provider Header -->
+<div class="flex items-center gap-3 pb-space-sm bg-surface-container-low/60 p-space-sm rounded-DEFAULT">
+<img alt="Chef Raghavendra Rao" class="w-12 h-12 rounded-full object-cover shrink-0 shadow-sm" data-alt="Warm editorial portrait of Chef Raghavendra Rao, an experienced South Indian culinary master in a crisp white chef coat with subtle blue apron accents, smiling warmly in a sunlit modern kitchen, soft natural lighting, clean minimal background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4i3otVceTf71j8osMGHYR8AEzExzSp7f4WIoybQrLL5t0T7WvScPNPxMIzaDfHp-pWkN0WD2qoT47iYEpVyf3vIrS-FDdvLW7gDUiD8qzScbq2r7DrfGa8RzfsV1zH6vireSCpiWQaiTI5FPA8yQ_h7u-4574QiLesvtFIyX8DKKnAFotdy0mYbZ18X-8o0Egf7naFPoSRbA0WXr2JzKtvqNYndW1TVQ61zPaRW8"/>
+<div class="flex flex-col min-w-0 flex-1">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Culinary Partner</span>
+<div class="flex items-center gap-1">
+<span class="font-title-md text-title-md text-on-surface truncate">Chef Raghavendra Rao</span>
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+</div>
+<!-- Event Details Grid -->
+<div class="flex flex-col gap-3 px-1">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/30 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">celebration</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Event</span>
+<span class="text-body-md font-semibold text-on-surface">Family Gathering (20 Guests)</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/30 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Date & Time</span>
+<span class="text-body-md font-semibold text-on-surface">Sat, 24 May 2025 • 11:30 AM</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/30 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Location</span>
+<span class="text-body-md font-semibold text-on-surface">Jubilee Hills, Hyderabad</span>
+</div>
+</div>
+</div>
+<!-- Payment Summary Strip -->
+<div class="bg-surface-container-low rounded-DEFAULT p-space-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">paid</span>
+<span class="text-body-sm text-on-surface-variant">Paid: <strong class="text-on-surface font-semibold">₹5,565</strong></span>
+</div>
+<div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+<div class="text-body-sm text-on-surface-variant">
+        Balance Due: <strong class="text-on-surface font-semibold">₹12,985</strong>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-space-sm pt-space-xs relative z-10">
+<button class="w-full py-3.5 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-md hover:bg-on-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-2" type="button">
+<span>View Booking Details</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="w-full py-3.5 px-6 rounded-full bg-surface-container-low text-primary font-label-md text-label-md hover:bg-surface-container active:scale-[0.99] transition-all flex items-center justify-center" type="button">
+<span>Back to Home</span>
+</button>
+</div>
+</div>
+<script>
+  function copyBookingId() {
+    const idText = '#CEA-2025-8492';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(idText).catch(() => {});
+    }
+    const feedback = document.getElementById('copy-feedback');
+    const icon = document.getElementById('copy-icon');
+    if (feedback && icon) {
+      icon.textContent = 'check';
+      feedback.classList.remove('opacity-0');
+      feedback.classList.add('opacity-100');
+      setTimeout(() => {
+        icon.textContent = 'content_copy';
+        feedback.classList.remove('opacity-100');
+        feedback.classList.add('opacity-0');
+      }, 2000);
+    }
+  }
+
+  (function launchConfetti() {
+    const container = document.getElementById('confetti-burst');
+    if (!container) return;
+    const colors = ['bg-primary', 'bg-secondary-container', 'bg-primary-container', 'bg-tertiary'];
+    for (let i = 0; i < 18; i++) {
+      const dot = document.createElement('span');
+      const size = Math.random() * 6 + 4;
+      const left = Math.random() * 90 + 5;
+      const top = Math.random() * 70 + 10;
+      const colorClass = colors[i % colors.length];
+      dot.className = `absolute rounded-full ${colorClass} opacity-60 transition-all duration-1000`;
+      dot.style.width = `${size}px`;
+      dot.style.height = `${size}px`;
+      dot.style.left = `${left}%`;
+      dot.style.top = `${top}%`;
+      dot.style.transform = `translateY(${Math.random() * 16 - 8}px) scale(${Math.random() * 0.6 + 0.7})`;
+      container.appendChild(dot);
+    }
+  })();
+</script></main></body></html>

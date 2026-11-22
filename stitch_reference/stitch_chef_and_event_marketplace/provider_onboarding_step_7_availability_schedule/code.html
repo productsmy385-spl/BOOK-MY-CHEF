@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;min-height:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"outline":"#71787f","on-secondary-container":"#00355c","primary-container":"#90caf9","on-secondary":"#ffffff","error":"#ba1a1a","primary-fixed-dim":"#93cdfc","surface-dim":"#d1daf4","secondary-container":"#33a0fd","on-tertiary":"#ffffff","surface-container-low":"#f1f3ff","on-secondary-fixed":"#001d36","on-primary-fixed-variant":"#004b71","surface-bright":"#f9f9ff","on-surface-variant":"#41474e","on-error":"#ffffff","on-error-container":"#93000a","surface":"#ffffff","tertiary-fixed-dim":"#b0c6ff","inverse-surface":"#273044","on-background":"#121b2e","background":"#ffffff","on-primary-container":"#08557e","secondary-fixed":"#d1e4ff","outline-variant":"#c1c7cf","secondary-fixed-dim":"#9ecaff","on-primary-fixed":"#001e30","primary-fixed":"#cbe6ff","surface-container-highest":"#d9e2fc","tertiary":"#2b5bb5","on-tertiary-container":"#174ca6","surface-tint":"#21638d","on-primary":"#ffffff","tertiary-container":"#acc3ff","secondary":"#0061a4","on-secondary-fixed-variant":"#00497d","tertiary-fixed":"#d9e2ff","surface-container-high":"#e1e8ff","on-tertiary-fixed-variant":"#00429c","surface-container-lowest":"#ffffff","inverse-on-surface":"#edf0ff","on-surface":"#121b2e","primary":"#21638d","on-tertiary-fixed":"#001945","inverse-primary":"#93cdfc","surface-container":"#e9edff","error-container":"#ffdad6","surface-variant":"#d9e2fc"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"gutter":"1rem","margin":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","space-md":"1rem","space-xl":"2rem","space-lg":"1.5rem"},"fontFamily":{"body-lg":["Inter"],"metric-price":["Epilogue"],"body-sm":["Inter"],"headline-lg":["Epilogue"],"label-sm":["Inter"],"headline-sm":["Epilogue"],"headline-xl":["Epilogue"],"headline-md":["Epilogue"],"label-md":["Inter"],"title-md":["Epilogue"],"body-md":["Inter"]},"fontSize":{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"metric-price":["18px",{"lineHeight":"22px","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-lg":["26px",{"lineHeight":"34px","letterSpacing":"-0.015em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}};</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-20 px-gutter flex flex-col justify-center gap-space-xs"><div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="Go back" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low active:bg-surface-container transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface tracking-tight truncate">Kitchen &amp; Gear Audit</h1></div><div class="flex items-center gap-space-sm"><button class="min-h-[44px] px-space-sm py-space-xs rounded-full font-label-md text-label-md text-primary hover:bg-surface-container-low transition-colors active:text-on-primary-container" type="button">Save &amp; Exit</button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="w-full flex items-center gap-1.5 px-1 pb-1"><div class="h-1.5 flex-1 rounded-full bg-primary transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-primary-container/60 transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div></div></div></header><main class="flex-1 flex flex-col relative w-full px-gutter pt-20 pb-28 bg-surface"><div class="flex flex-col w-full gap-space-lg">
+<!-- Step Tracker Headline Card -->
+<section class="flex flex-col gap-space-xs bg-surface-container-lowest p-space-md rounded-2xl shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+          7
+        </span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">
+          Step 7 of 9 • Working Rhythm
+        </span>
+</div>
+<span class="font-label-md text-label-md text-primary font-semibold">
+        77% Completed
+      </span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-500" style="width: 77%;"></div>
+</div>
+<div class="mt-space-xs">
+<h2 class="font-headline-md text-headline-md text-on-surface">Availability &amp; Working Hours</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Configure your weekly booking schedule, daily capacity limits, and advance booking rules.
+      </p>
+</div>
+</section>
+<!-- Editorial Visual Cue -->
+<div class="relative w-full h-32 rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Sunlit clean professional luxury kitchen studio counter with copper sauté pans, fresh sprigs of rosemary, and a structured leather-bound weekly chef schedule calendar in warm ambient morning glow, editorial culinary tone, pristine sky blue background accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpyf8Dxu3xwKCLQnxON4t_7Rf8bsrYLP21d7ywhZgTjaVQeJ_nGM-D-_C1DhmnjVQ-Qs8-tWoZ58yqwdRoYxGr5i6qMmBrGedrN4vCroWH9fJ9OsRSKm_7NJciHoFpPOm-qWSAI2fA_TsfxC4v3ygg9DDPrWWnZesuJd0SK2-ApAifyb1Tae4bJEGF3tNI66VZmhOz13MJX_G48Zq1F_U5FkDhkihnGVhwEj1wEbw"/>
+<div class="absolute inset-0 bg-gradient-to-r from-on-surface/80 via-on-surface/40 to-transparent flex items-center p-space-md">
+<div class="max-w-[240px] text-surface-bright">
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-primary-container">Chef Autonomy</p>
+<p class="font-title-md text-title-md leading-tight text-surface">You control the table. No overlapping bookings guaranteed.</p>
+</div>
+</div>
+</div>
+<!-- Section 1: Weekly Operating Days Picker -->
+<section class="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md rounded-2xl shadow-sm">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Weekly Operating Days</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tap days to toggle open/closed booking windows</p>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">event_available</span>
+        6 Days Active
+      </span>
+</div>
+<!-- Day Buttons Grid -->
+<div class="grid grid-cols-7 gap-1.5 pt-space-xs" id="weekday-selector">
+<!-- Mon -->
+<button class="day-chip flex flex-col items-center justify-center py-2.5 rounded-xl bg-primary text-on-primary shadow-sm transition-all" data-active="true" type="button">
+<span class="font-label-sm text-label-sm">M</span>
+<span class="font-title-md text-title-md">Mon</span>
+</button>
+<!-- Tue -->
+<button class="day-chip flex flex-col items-center justify-center py-2.5 rounded-xl bg-primary text-on-primary shadow-sm transition-all" data-active="true" type="button">
+<span class="font-label-sm text-label-sm">T</span>
+<span class="font-title-md text-title-md">Tue</span>
+</button>
+<!-- Wed -->
+<button class="day-chip flex flex-col items-center justify-center py-2.5 rounded-xl bg-primary text-on-primary shadow-sm transition-all" data-active="true" type="button">
+<span class="font-label-sm text-label-sm">W</span>
+<span class="font-title-md text-title-md">Wed</span>
+</button>
+<!-- Thu -->
+<button class="day-chip flex flex-col items-center justify-center py-2.5 rounded-xl bg-primary text-on-primary shadow-sm transition-all" data-active="true" type="button">
+<span class="font-label-sm text-label-sm">T</span>
+<span class="font-title-md text-title-md">Thu</span>
+</button>
+<!-- Fri -->
+<button class="day-chip flex flex-col items-center justify-center py-2.5 rounded-xl bg-primary text-on-primary shadow-sm transition-all" data-active="true" type="button">
+<span class="font-label-sm text-label-sm">F</span>
+<span class="font-title-md text-title-md">Fri</span>
+</button>
+<!-- Sat -->
+<button class="day-chip flex flex-col items-center justify-center py-2.5 rounded-xl bg-primary text-on-primary shadow-sm transition-all" data-active="true" type="button">
+<span class="font-label-sm text-label-sm">S</span>
+<span class="font-title-md text-title-md">Sat</span>
+</button>
+<!-- Sun Special -->
+<button class="day-chip relative flex flex-col items-center justify-center py-2.5 rounded-xl bg-secondary-fixed text-on-secondary-fixed shadow-sm transition-all" data-active="true" type="button">
+<span class="absolute -top-2 px-1 rounded-full bg-secondary text-on-secondary text-[8px] font-bold tracking-tight scale-90">
+          VIP
+        </span>
+<span class="font-label-sm text-label-sm text-secondary">S</span>
+<span class="font-title-md text-title-md font-bold text-secondary">Sun</span>
+</button>
+</div>
+<!-- Sunday weekend indicator note -->
+<div class="flex items-center gap-space-xs p-2.5 rounded-xl bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span>Sunday bookings automatically command your premium <strong class="text-on-surface font-semibold">+20% Weekend Rate</strong>.</span>
+</div>
+</section>
+<!-- Section 2: Daily Service Slots & Working Hours -->
+<section class="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md rounded-2xl shadow-sm">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Daily Service Slots</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Choose the culinary services you accept each day</p>
+</div>
+<span class="material-symbols-outlined text-outline">schedule</span>
+</div>
+<!-- Slot 1: Lunch (Active) -->
+<div class="flex flex-col gap-space-xs p-space-md rounded-2xl bg-surface-container-low">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[20px]">sunny</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Lunch Banquets &amp; Family Meals</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Recommended for leisurely mid-day sit-downs</p>
+</div>
+</div>
+<button aria-checked="true" class="slot-toggle relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full bg-primary p-0.5 transition-colors duration-200" role="switch" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-on-primary shadow-sm transition duration-200"></span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-space-xs border-none">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+<span>10:30 AM – 3:30 PM</span>
+</div>
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-0.5" type="button">
+<span>Edit window</span>
+<span class="material-symbols-outlined text-[14px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Slot 2: Dinner (Active) -->
+<div class="flex flex-col gap-space-xs p-space-md rounded-2xl bg-surface-container-low">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[20px]">dinner_dining</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Dinner Parties &amp; Feasts</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Peak demand slot for weekend soirees</p>
+</div>
+</div>
+<button aria-checked="true" class="slot-toggle relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full bg-primary p-0.5 transition-colors duration-200" role="switch" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-on-primary shadow-sm transition duration-200"></span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+<span>6:00 PM – 11:00 PM</span>
+</div>
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-0.5" type="button">
+<span>Edit window</span>
+<span class="material-symbols-outlined text-[14px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Slot 3: Breakfast / Pooja (Optional / Inactive) -->
+<div class="flex flex-col gap-space-xs p-space-md rounded-2xl bg-surface-container-high/40">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-full bg-surface-container-highest flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[20px]">wb_twilight</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Breakfast &amp; Morning Pooja</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Traditional sattvic or morning breakfast services</p>
+</div>
+</div>
+<button aria-checked="false" class="slot-toggle relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full bg-surface-container-highest p-0.5 transition-colors duration-200" role="switch" type="button">
+<span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-on-primary shadow-sm transition duration-200"></span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-label-sm text-label-sm text-outline">Currently paused • 7:00 AM – 10:00 AM</span>
+<button class="text-secondary font-label-sm text-label-sm font-semibold" type="button">Enable for Pooja</button>
+</div>
+</div>
+</section>
+<!-- Section 3: Capacity & Limits per Day -->
+<section class="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md rounded-2xl shadow-sm">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Daily Event Capacity</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cap maximum load to guarantee plating precision</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[18px]">lock_clock</span>
+</div>
+</div>
+<!-- Stepper Control -->
+<div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-2xl">
+<div class="flex flex-col pl-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Active Cap</span>
+<span class="font-metric-price text-metric-price text-on-surface" id="events-count-label">2 Events / Day</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="w-11 h-11 rounded-full bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center justify-center font-bold text-lg active:scale-95 transition-all" id="btn-dec-events" type="button">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<span class="w-8 text-center font-headline-sm text-headline-sm text-primary" id="events-number">2</span>
+<button class="w-11 h-11 rounded-full bg-primary text-on-primary hover:bg-secondary flex items-center justify-center font-bold text-lg active:scale-95 transition-all shadow-sm" id="btn-inc-events" type="button">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+<div class="flex items-start gap-space-xs px-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px] mt-0.5">verified_user</span>
+<p>Ensures you maintain 5-star culinary craftsmanship, manage prep commutes smoothly, and never double-book.</p>
+</div>
+</section>
+<!-- Section 4: Advance Notice & Booking Window -->
+<section class="flex flex-col gap-space-md bg-surface-container-lowest p-space-md rounded-2xl shadow-sm">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Advance Notice &amp; Lead Time</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Set procurement buffers and forward planning rules</p>
+</div>
+<!-- Minimum Notice Picker -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Minimum Notice Period</label>
+<div class="grid grid-cols-4 gap-space-xs">
+<button class="notice-pill py-2 px-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm text-center" type="button">
+          Same Day
+        </button>
+<button class="notice-pill py-2 px-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm text-center" type="button">
+          12 Hours
+        </button>
+<button class="notice-pill py-2 px-1 rounded-full bg-primary text-on-primary font-label-sm text-label-sm text-center font-semibold shadow-sm" type="button">
+          24 Hours
+        </button>
+<button class="notice-pill py-2 px-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm text-center" type="button">
+          48 Hours
+        </button>
+</div>
+<p class="font-body-sm text-body-sm text-outline px-1">Allows adequate time for farm-to-table organic sourcing.</p>
+</div>
+<!-- Maximum Booking Advance Range -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Maximum Booking Window</label>
+<span class="font-label-md text-label-md text-secondary font-semibold">60 Days Forward</span>
+</div>
+<div class="p-space-sm rounded-2xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">date_range</span>
+<span class="font-body-md text-body-md text-on-surface">Accepting dates through <strong>mid-July</strong></span>
+</div>
+<button class="font-label-sm text-label-sm text-primary px-3 py-1 rounded-full bg-surface-container-lowest shadow-sm" type="button">Change</button>
+</div>
+</div>
+<!-- Instant Booking Toggle -->
+<div class="flex items-center justify-between p-space-md rounded-2xl bg-secondary-fixed/40">
+<div class="flex items-center gap-space-sm pr-space-xs">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h4 class="font-title-md text-title-md text-on-secondary-fixed font-semibold">Instant Booking</h4>
+<span class="px-1.5 py-0.2 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-[10px] font-bold uppercase tracking-wider">Fast-Track</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-secondary-fixed-variant">Allows pre-vetted host tier to secure open slots without manual quotation chats.</p>
+</div>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full bg-secondary p-0.5 transition-colors duration-200" role="switch" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-on-secondary shadow-sm transition duration-200"></span>
+</button>
+</div>
+</section>
+<!-- Section 5: Blocked Dates / Vacation Mode Calendar Preview -->
+<section class="flex flex-col gap-space-sm bg-surface-container-lowest p-space-md rounded-2xl shadow-sm mb-4">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Blocked Dates &amp; Leave</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pause bookings for family celebrations or catering downtime</p>
+</div>
+<span class="material-symbols-outlined text-outline">event_busy</span>
+</div>
+<!-- Mini Calendar Widget -->
+<div class="p-space-sm rounded-2xl bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between px-space-xs pb-space-xs">
+<span class="font-title-md text-title-md text-on-surface">May 2025</span>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-outline" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Calendar Day Names -->
+<div class="grid grid-cols-7 text-center font-label-sm text-label-sm text-outline pb-1">
+<span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span class="text-secondary font-semibold">Su</span>
+</div>
+<!-- Calendar Numbers Mockup -->
+<div class="grid grid-cols-7 gap-1 text-center font-body-sm text-body-sm">
+<span class="py-1 text-outline-variant">28</span>
+<span class="py-1 text-outline-variant">29</span>
+<span class="py-1 text-outline-variant">30</span>
+<span class="py-1">1</span>
+<span class="py-1">2</span>
+<span class="py-1">3</span>
+<span class="py-1 font-semibold text-secondary">4</span>
+<span class="py-1">5</span>
+<span class="py-1">6</span>
+<span class="py-1">7</span>
+<span class="py-1">8</span>
+<span class="py-1">9</span>
+<span class="py-1">10</span>
+<span class="py-1 font-semibold text-secondary">11</span>
+<span class="py-1">12</span>
+<!-- Blocked Date 13 -->
+<span class="py-1 relative text-outline font-semibold rounded-lg bg-surface-container-highest line-through" title="Blocked: Personal Leave">
+          13
+        </span>
+<!-- Blocked Date 14 -->
+<span class="py-1 relative text-outline font-semibold rounded-lg bg-surface-container-highest line-through" title="Blocked: Personal Leave">
+          14
+        </span>
+<span class="py-1">15</span>
+<span class="py-1">16</span>
+<span class="py-1">17</span>
+<span class="py-1 font-semibold text-secondary">18</span>
+<span class="py-1">19</span>
+<span class="py-1">20</span>
+<!-- Selected Today Marker -->
+<span class="py-1 rounded-full bg-primary text-on-primary font-bold shadow-sm">21</span>
+<span class="py-1">22</span>
+<span class="py-1">23</span>
+<span class="py-1">24</span>
+<span class="py-1 font-semibold text-secondary">25</span>
+<span class="py-1">26</span>
+<span class="py-1">27</span>
+<span class="py-1">28</span>
+<span class="py-1">29</span>
+<span class="py-1">30</span>
+<span class="py-1">31</span>
+<span class="py-1 text-outline-variant">1</span>
+</div>
+<!-- Legend -->
+<div class="flex items-center justify-between pt-2 px-1 text-xs">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest line-through"></span>
+<span class="font-body-sm text-body-sm text-outline">Blocked (May 13–14)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Available</span>
+</div>
+</div>
+</div>
+<!-- Action Button to Add Blocked Dates -->
+<button class="w-full py-3 rounded-full bg-surface-container text-primary hover:bg-surface-container-high flex items-center justify-center gap-space-xs font-label-md text-label-md font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>+ Block Specific Vacation Dates</span>
+</button>
+</section>
+</div>
+<script>
+  // Simple interactive behaviors for client delight
+  (function initScheduleInteractions() {
+    // Stepper Logic
+    let eventCount = 2;
+    const btnInc = document.getElementById('btn-inc-events');
+    const btnDec = document.getElementById('btn-dec-events');
+    const labelNum = document.getElementById('events-number');
+    const labelMain = document.getElementById('events-count-label');
+
+    if (btnInc && btnDec && labelNum && labelMain) {
+      btnInc.addEventListener('click', () => {
+        if (eventCount < 4) {
+          eventCount++;
+          labelNum.textContent = eventCount;
+          labelMain.textContent = `${eventCount} Events / Day`;
+        }
+      });
+      btnDec.addEventListener('click', () => {
+        if (eventCount > 1) {
+          eventCount--;
+          labelNum.textContent = eventCount;
+          labelMain.textContent = `${eventCount} Events / Day`;
+        }
+      });
+    }
+
+    // Weekday Toggle
+    const dayChips = document.querySelectorAll('.day-chip');
+    dayChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const isActive = chip.getAttribute('data-active') === 'true';
+        if (isActive) {
+          chip.setAttribute('data-active', 'false');
+          chip.classList.remove('bg-primary', 'text-on-primary', 'bg-secondary-fixed', 'text-on-secondary-fixed');
+          chip.classList.add('bg-surface-container-low', 'text-outline');
+        } else {
+          chip.setAttribute('data-active', 'true');
+          chip.classList.remove('bg-surface-container-low', 'text-outline');
+          chip.classList.add('bg-primary', 'text-on-primary');
+        }
+      });
+    });
+
+    // Notice Pill Selector
+    const noticePills = document.querySelectorAll('.notice-pill');
+    noticePills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        noticePills.forEach(p => {
+          p.classList.remove('bg-primary', 'text-on-primary', 'font-semibold', 'shadow-sm');
+          p.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        });
+        pill.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        pill.classList.add('bg-primary', 'text-on-primary', 'font-semibold', 'shadow-sm');
+      });
+    });
+
+    // Toggle switch emulation
+    const toggles = document.querySelectorAll('.slot-toggle');
+    toggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const checked = toggle.getAttribute('aria-checked') === 'true';
+        const indicator = toggle.querySelector('span');
+        if (checked) {
+          toggle.setAttribute('aria-checked', 'false');
+          toggle.classList.remove('bg-primary');
+          toggle.classList.add('bg-surface-container-highest');
+          indicator.classList.remove('translate-x-5');
+          indicator.classList.add('translate-x-0');
+        } else {
+          toggle.setAttribute('aria-checked', 'true');
+          toggle.classList.remove('bg-surface-container-highest');
+          toggle.classList.add('bg-primary');
+          indicator.classList.remove('translate-x-0');
+          indicator.classList.add('translate-x-5');
+        }
+      });
+    });
+  })();
+</script></main><footer class="fixed bottom-0 inset-x-0 z-50 bg-surface/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(13,71,161,0.06)] pb-safe"><div class="h-20 px-gutter flex items-center justify-between gap-space-md"><button class="min-h-[48px] px-space-lg rounded-full font-label-md text-label-md text-secondary hover:bg-surface-container-low active:bg-surface-container flex items-center justify-center gap-space-xs transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[18px]">arrow_back</span><span>Back</span></button><button class="min-h-[48px] flex-1 max-w-[220px] px-space-lg bg-primary hover:bg-secondary active:bg-on-primary-fixed-variant text-on-primary rounded-full font-label-md text-label-md font-semibold flex items-center justify-center gap-space-xs shadow-[0_4px_14px_rgba(33,150,243,0.18)] transition-all" type="button"><span>Continue</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button></div></footer></body></html>

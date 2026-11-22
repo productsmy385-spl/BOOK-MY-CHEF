@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;min-height:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"outline":"#71787f","on-secondary-container":"#00355c","primary-container":"#90caf9","on-secondary":"#ffffff","error":"#ba1a1a","primary-fixed-dim":"#93cdfc","surface-dim":"#d1daf4","secondary-container":"#33a0fd","on-tertiary":"#ffffff","surface-container-low":"#f1f3ff","on-secondary-fixed":"#001d36","on-primary-fixed-variant":"#004b71","surface-bright":"#f9f9ff","on-surface-variant":"#41474e","on-error":"#ffffff","on-error-container":"#93000a","surface":"#ffffff","tertiary-fixed-dim":"#b0c6ff","inverse-surface":"#273044","on-background":"#121b2e","background":"#ffffff","on-primary-container":"#08557e","secondary-fixed":"#d1e4ff","outline-variant":"#c1c7cf","secondary-fixed-dim":"#9ecaff","on-primary-fixed":"#001e30","primary-fixed":"#cbe6ff","surface-container-highest":"#d9e2fc","tertiary":"#2b5bb5","on-tertiary-container":"#174ca6","surface-tint":"#21638d","on-primary":"#ffffff","tertiary-container":"#acc3ff","secondary":"#0061a4","on-secondary-fixed-variant":"#00497d","tertiary-fixed":"#d9e2ff","surface-container-high":"#e1e8ff","on-tertiary-fixed-variant":"#00429c","surface-container-lowest":"#ffffff","inverse-on-surface":"#edf0ff","on-surface":"#121b2e","primary":"#21638d","on-tertiary-fixed":"#001945","inverse-primary":"#93cdfc","surface-container":"#e9edff","error-container":"#ffdad6","surface-variant":"#d9e2fc"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"gutter":"1rem","margin":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","space-md":"1rem","space-xl":"2rem","space-lg":"1.5rem"},"fontFamily":{"body-lg":["Inter"],"metric-price":["Epilogue"],"body-sm":["Inter"],"headline-lg":["Epilogue"],"label-sm":["Inter"],"headline-sm":["Epilogue"],"headline-xl":["Epilogue"],"headline-md":["Epilogue"],"label-md":["Inter"],"title-md":["Epilogue"],"body-md":["Inter"]},"fontSize":{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"metric-price":["18px",{"lineHeight":"22px","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-lg":["26px",{"lineHeight":"34px","letterSpacing":"-0.015em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}};</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-20 px-gutter flex flex-col justify-center gap-space-xs"><div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="Go back" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low active:bg-surface-container transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface tracking-tight truncate">Kitchen &amp; Gear Audit</h1></div><div class="flex items-center gap-space-sm"><button class="min-h-[44px] px-space-sm py-space-xs rounded-full font-label-md text-label-md text-primary hover:bg-surface-container-low transition-colors active:text-on-primary-container" type="button">Save &amp; Exit</button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="w-full flex items-center gap-1.5 px-1 pb-1"><div class="h-1.5 flex-1 rounded-full bg-primary transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-primary-container/60 transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div><div class="h-1.5 flex-1 rounded-full bg-surface-container-highest transition-all duration-300"></div></div></div></header><main class="flex-1 flex flex-col relative w-full px-gutter pt-20 pb-28 bg-surface"><div class="flex flex-col w-full gap-space-lg">
+<!-- Progress Milestone Header Badge -->
+<div class="flex items-center justify-between bg-surface-container-low px-space-md py-space-sm rounded-full">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-md text-label-md text-primary font-semibold">Step 9 of 9 • 100% Completed</span>
+</div>
+<span class="font-label-sm text-label-sm bg-primary text-on-primary px-space-sm py-0.5 rounded-full shadow-sm">Ready to Launch</span>
+</div>
+<!-- Editorial Section Title -->
+<div class="flex flex-col gap-space-xs">
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Review Your Atelier Profile</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+      Verify your details before submitting for Atelier Master screening and live customer bookings across Hyderabad.
+    </p>
+</div>
+<!-- Provider Live Preview Card (Editorial Showcase Card) -->
+<div class="relative bg-surface-container-lowest rounded-lg shadow-sm overflow-hidden flex flex-col">
+<!-- Visual Ambient Cover Backdrop -->
+<div class="h-28 w-full bg-gradient-to-r from-primary via-secondary to-primary-container relative flex items-start justify-end p-space-sm">
+<div class="bg-surface-container-lowest/90 backdrop-blur-md px-space-sm py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Ready for Verification</span>
+</div>
+</div>
+<!-- Chef Avatar & Header Block -->
+<div class="px-space-md pb-space-md pt-0 relative flex flex-col gap-space-sm">
+<div class="flex items-end justify-between -mt-12">
+<div class="relative">
+<img class="w-24 h-24 rounded-full object-cover shadow-md bg-surface-container-high" data-alt="Editorial close up portrait of Chef Raghavendra Rao, an Indian master culinary artist with a warm confident smile, pristine white chef coat, warm natural kitchen ambient lighting, high contrast luxury aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsNAbmhv-z-QjQMdFf1-cpmIRtZ4L7yyVCcP3cE7h63jJAbc0LfzO3tuKWmYsKB7D9LdYfmBj1PrwjhCE6aY4AB7EOMwKmfuk5IqXpIPk3a3_WI8LztUc2jB5VbYQCNNDr9zcScb6rpKdh1MCYEKA1jDNqwye2IFpaMCyWaOi1rZuQJkP7p6kdSSFGGe1D7F6xA-Tjs2OGO989tGihJcEEQr1Dh8JibZCeA9DSxVY"/>
+<div class="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full p-1 shadow flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<button class="min-h-[44px] px-space-md rounded-full bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>Guest View</span>
+</button>
+</div>
+<div class="flex flex-col gap-0.5 mt-space-xs">
+<div class="flex items-center gap-1.5 flex-wrap">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Chef Raghavendra Rao</h3>
+<span class="bg-primary-container/40 text-on-primary-container px-2 py-0.5 rounded-full font-label-sm text-label-sm">Atelier Pro</span>
+</div>
+<p class="font-title-md text-title-md text-primary font-medium">Master Home Chef &amp; Rayalaseema Specialist</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+<span>12 Years in Industry</span>
+<span class="text-outline-variant">•</span>
+<span class="material-symbols-outlined text-[16px] text-primary">near_me</span>
+<span>Jubilee Hills, Hyderabad (15 km radius)</span>
+</p>
+</div>
+<!-- Configured Roles Tags -->
+<div class="flex items-center gap-space-xs flex-wrap pt-space-xs">
+<span class="px-space-sm py-1 bg-surface-container-low text-on-secondary-container rounded-full font-label-sm text-label-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">soup_kitchen</span> Home Chef
+        </span>
+<span class="px-space-sm py-1 bg-surface-container-low text-on-secondary-container rounded-full font-label-sm text-label-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">restaurant</span> Professional Chef
+        </span>
+<span class="px-space-sm py-1 bg-surface-container-low text-on-secondary-container rounded-full font-label-sm text-label-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">outdoor_grill</span> Event Caterer
+        </span>
+</div>
+</div>
+</div>
+<!-- Step Summary Tiles -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant">Detailed Onboarding Breakdown</span>
+<span class="font-label-sm text-label-sm text-primary">5 of 5 steps checked</span>
+</div>
+<!-- Tile 1: Roles & Specializations -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex items-start justify-between gap-space-md transition-all hover:shadow-md">
+<div class="flex gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">room_service</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h4 class="font-title-md text-title-md text-on-surface">Roles &amp; Specializations</h4>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5 line-clamp-2">
+            Andhra, Telangana, Sattvic, Dum Biryanis • 3 Service Modes (Home, Delivery, Banquet)
+          </p>
+</div>
+</div>
+<button aria-label="Edit Roles &amp; Specializations" class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container text-primary flex items-center justify-center flex-shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<!-- Tile 2: Services & Pricing -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex items-start justify-between gap-space-md transition-all hover:shadow-md">
+<div class="flex gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h4 class="font-title-md text-title-md text-on-surface">Services &amp; Pricing</h4>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+            3 Packages configured (₹400 to ₹550/plate) • ₹1,800 Base Home Visit
+          </p>
+<div class="flex items-center gap-2 mt-2">
+<span class="bg-surface-container-low px-2 py-0.5 rounded-full font-label-sm text-label-sm text-on-surface">Royal Rayalaseema Feast</span>
+<span class="bg-surface-container-low px-2 py-0.5 rounded-full font-label-sm text-label-sm text-on-surface">Gongura Special</span>
+</div>
+</div>
+</div>
+<button aria-label="Edit Services &amp; Pricing" class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container text-primary flex items-center justify-center flex-shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<!-- Tile 3: Locations & Coverage -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex items-start justify-between gap-space-md transition-all hover:shadow-md">
+<div class="flex gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">map</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h4 class="font-title-md text-title-md text-on-surface">Locations &amp; Coverage</h4>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+            Jubilee Hills base • 6 Prime Neighborhoods • Up to 15 km
+          </p>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">Banjara Hills, Madhapur, Gachibowli, Kondapur, Hitec City</p>
+</div>
+</div>
+<button aria-label="Edit Locations &amp; Coverage" class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container text-primary flex items-center justify-center flex-shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<!-- Tile 4: Availability -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex items-start justify-between gap-space-md transition-all hover:shadow-md">
+<div class="flex gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h4 class="font-title-md text-title-md text-on-surface">Availability</h4>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+            Mon - Sat • Lunch &amp; Dinner Slots • 2 Events/Day max
+          </p>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Instant booking active for 4-hr slots</span>
+</div>
+</div>
+</div>
+<button aria-label="Edit Availability" class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container text-primary flex items-center justify-center flex-shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<!-- Tile 5: Portfolio & Licenses -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex items-start justify-between gap-space-md transition-all hover:shadow-md">
+<div class="flex gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h4 class="font-title-md text-title-md text-on-surface">Portfolio &amp; Licenses</h4>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
+            6 Media uploaded • FSSAI Certified (#2362400918) • Govt ID Verified
+          </p>
+<div class="flex items-center gap-2 mt-2">
+<img class="w-12 h-12 rounded-DEFAULT object-cover shadow-sm bg-surface-container" data-alt="Gourmet Andhra Dum Biryani presented in copper handi garnished with saffron, mint leaves, caramelized onions, luxury culinary presentation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuE7AKs5Em00o0Qk43lBV52uZzMl0C7h9cYJa8cmFu08k1z00x9l313dFieiNHb01jtz8qT7FqIS62uHK7Wymm7b4Thj0n82A0rtpayPTMppyeULMkvDl5AdBhu8iiRlwVt7Cpib3yZTOHkavHwgK-fTut59oDBMH1MHBskYEK_1BF6Sf0iba3lpOsCPVZBjOkmQAnJqXQlt0btaCABFq89ZNMJeTp14PLbNMERJg"/>
+<img class="w-12 h-12 rounded-DEFAULT object-cover shadow-sm bg-surface-container" data-alt="Traditional South Indian festive thali spread arranged neatly with brass bowls on banana leaf, aromatic curries, vibrant colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN0RiaKRLxG_MA9LNY7-x_kx2bBPo1IODHNwmCbIfmdRMnwmujz-6mnvoRE-H4LIF3wcnjsH9KVaFCk-skO0a5hyC8ayFc6ZMBAZ6-te1G3d5jEGLw8GY7a7DjRElIjF_C030Wh-ytvba6CQ_7y0n_eiY-znV5RY44ABRNPb_-clck7BWHMvi4ZKk_x1xnp4N2FFngvqXL5Hp3dzMj_9TVGi4jeISRoWxFfQL_i5M"/>
+<div class="w-12 h-12 rounded-DEFAULT bg-surface-container-low flex items-center justify-center text-primary font-label-md text-label-md font-semibold">
+              +4
+            </div>
+</div>
+</div>
+</div>
+<button aria-label="Edit Portfolio &amp; Licenses" class="w-9 h-9 rounded-full bg-surface-container-low hover:bg-surface-container text-primary flex items-center justify-center flex-shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Bank Account & Payout Setup Section -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant px-1">Settlement &amp; Direct Deposit</span>
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-11 h-11 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<h4 class="font-title-md text-title-md text-on-surface">HDFC Bank</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Account ending in <strong class="text-on-surface">•••• 4092</strong></span>
+</div>
+</div>
+<span class="bg-primary-container/40 text-on-primary-container px-space-sm py-1 rounded-full font-label-sm text-label-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span>Verified IFSC</span>
+</span>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded-DEFAULT flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">bolt</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Instant Escrow settlements enabled</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">IFSC: HDFC0001234</span>
+</div>
+</div>
+</div>
+<!-- Terms & Platform Verification Agreement -->
+<div class="bg-surface-container-low p-space-md rounded-lg flex flex-col gap-space-sm">
+<label class="flex items-start gap-space-sm cursor-pointer select-none">
+<input checked="" class="mt-1 w-5 h-5 rounded text-primary focus:ring-primary accent-primary" id="termsConsentCheckbox" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface leading-snug">
+        I agree to the <span class="text-primary font-semibold underline">Atelier Culinary Quality Standards</span>, 24-hour payout escrow terms, and spontaneous kitchen hygiene audit inspections.
+      </span>
+</label>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm pl-7">
+<span class="material-symbols-outlined text-[16px] text-primary">info</span>
+<span>Complies with Food Safety and Standards Authority of India regulations.</span>
+</div>
+</div>
+<!-- Final Submission Actions -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<button class="w-full min-h-[52px] bg-primary hover:bg-secondary active:scale-[0.99] text-on-primary font-label-md text-label-md font-semibold rounded-full shadow-[0_4px_14px_rgba(33,150,243,0.22)] flex items-center justify-center gap-space-xs transition-all" id="submitProfileBtn" type="button">
+<span>Submit Profile for Verification</span>
+<span class="text-[18px]">🚀</span>
+</button>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center px-space-md">
+      Profile approvals typically take <strong class="text-on-surface">4 to 12 business hours</strong>. You can preview and edit your culinary portfolio anytime from your Atelier portal.
+    </p>
+</div>
+</div>
+<script>
+  (function() {
+    const submitBtn = document.getElementById('submitProfileBtn');
+    const termsCheckbox = document.getElementById('termsConsentCheckbox');
+
+    if (termsCheckbox && submitBtn) {
+      termsCheckbox.addEventListener('change', (e) => {
+        if (!e.target.checked) {
+          submitBtn.classList.add('opacity-50', 'pointer-events-none');
+        } else {
+          submitBtn.classList.remove('opacity-50', 'pointer-events-none');
+        }
+      });
+    }
+
+    if (submitBtn) {
+      submitBtn.addEventListener('click', () => {
+        submitBtn.innerHTML = `
+          <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+          <span>Encrypting & Transmitting Dossier...</span>
+        `;
+        setTimeout(() => {
+          submitBtn.innerHTML = `
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            <span>Profile Submitted! Screening in Progress</span>
+          `;
+          submitBtn.classList.replace('bg-primary', 'bg-tertiary');
+        }, 1200);
+      });
+    }
+  })();
+</script></main><footer class="fixed bottom-0 inset-x-0 z-50 bg-surface/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(13,71,161,0.06)] pb-safe"><div class="h-20 px-gutter flex items-center justify-between gap-space-md"><button class="min-h-[48px] px-space-lg rounded-full font-label-md text-label-md text-secondary hover:bg-surface-container-low active:bg-surface-container flex items-center justify-center gap-space-xs transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[18px]">arrow_back</span><span>Back</span></button><button class="min-h-[48px] flex-1 max-w-[220px] px-space-lg bg-primary hover:bg-secondary active:bg-on-primary-fixed-variant text-on-primary rounded-full font-label-md text-label-md font-semibold flex items-center justify-center gap-space-xs shadow-[0_4px_14px_rgba(33,150,243,0.18)] transition-all" type="button"><span>Continue</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></button></div></footer></body></html>

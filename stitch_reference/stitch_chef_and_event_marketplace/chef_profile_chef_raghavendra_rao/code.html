@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary":"#2b5bb5","on-secondary-container":"#00355c","background":"#f9f9ff","primary":"#21638d","on-tertiary-fixed-variant":"#00429c","on-tertiary":"#ffffff","on-surface-variant":"#41474e","on-surface":"#121b2e","on-error":"#ffffff","inverse-surface":"#273044","primary-container":"#90caf9","on-primary":"#ffffff","surface-tint":"#21638d","tertiary-fixed":"#d9e2ff","on-tertiary-container":"#174ca6","on-secondary-fixed":"#001d36","secondary":"#0061a4","surface-dim":"#d1daf4","outline-variant":"#c1c7cf","on-error-container":"#93000a","secondary-fixed-dim":"#9ecaff","surface-container":"#e9edff","outline":"#71787f","tertiary-fixed-dim":"#b0c6ff","on-primary-fixed-variant":"#004b71","on-background":"#121b2e","on-secondary":"#ffffff","on-tertiary-fixed":"#001945","secondary-fixed":"#d1e4ff","primary-fixed":"#cbe6ff","inverse-primary":"#93cdfc","surface-variant":"#d9e2fc","surface-container-highest":"#d9e2fc","error-container":"#ffdad6","primary-fixed-dim":"#93cdfc","on-secondary-fixed-variant":"#00497d","on-primary-container":"#08557e","secondary-container":"#33a0fd","surface-bright":"#f9f9ff","surface-container-high":"#e1e8ff","surface-container-low":"#f1f3ff","on-primary-fixed":"#001e30","surface-container-lowest":"#ffffff","error":"#ba1a1a","tertiary-container":"#acc3ff","inverse-on-surface":"#edf0ff","surface":"#f9f9ff"},borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1rem","space-lg":"1.5rem","margin":"1rem","space-md":"1rem","space-xl":"2rem","space-sm":"0.5rem"},fontFamily:{"headline-xl":["Epilogue"],"body-md":["Inter"],"label-md":["Inter"],"title-md":["Epilogue"],"metric-price":["Epilogue"],"label-sm":["Inter"],"body-lg":["Inter"],"headline-md":["Epilogue"],"body-sm":["Inter"],"headline-lg":["Epilogue"],"headline-sm":["Epilogue"]},fontSize:{"headline-xl":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"400"}],"label-md":["13px",{lineHeight:"18px",fontWeight:"600"}],"title-md":["16px",{lineHeight:"22px",fontWeight:"600"}],"metric-price":["18px",{lineHeight:"22px",fontWeight:"700"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.02em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"400"}],"headline-md":["20px",{lineHeight:"28px",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"16px",fontWeight:"400"}],"headline-lg":["26px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"700"}],"headline-sm":["18px",{lineHeight:"24px",fontWeight:"600"}]}}}};</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface-container-lowest/85 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Go back" class="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate max-w-[170px]">Chef Profile</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Share profile" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[22px]">share</span></button><button aria-label="Save to favorites" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[22px]">favorite</span></button><div class="w-8 h-8 ml-space-xs rounded-full bg-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full pb-28">
+<!-- Hero & Cover Banner -->
+<div class="relative w-full h-52 bg-surface-container overflow-hidden">
+<div class="w-full h-full bg-cover bg-center" data-alt="Editorial close up cinematic photograph of a private master chef cooking an Andhra festive feast over flaming traditional copper handi with steam and spice aromatic vapors in high end kitchen, warm golden highlights and deep sapphire navy shadows" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrvUg95CtSVV6FR-1yi2siSZ0gBYFmg5PU7YCthmM9BiC4Et4Nrg8FFT10aN_fP_Y-CsuqtshJPGp_U0pctYAbMj_qaDDPCqLP9HErrzXhgvGdOtY2Vgrv2oWE1mB4gZUR_-PIiFMvQCTI5eBDfxRDx4tNgG79HdilTb46jgZ4irxfJCQu-0rcJJWgiZQPy2yCEr50mh5kYPpb-Wm7_EtWSBRwBH_WhhcgH2K_9x4')">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/30 to-transparent"></div>
+<!-- Top Action Badges -->
+<div class="absolute top-3 left-4 right-4 flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+        Elite Culinary Master
+      </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-inverse-surface/80 backdrop-blur-md text-on-primary font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Available Tomorrow
+      </span>
+</div>
+</div>
+<!-- Profile Identity Card (Overlapping) -->
+<div class="px-margin -mt-10 relative z-10">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-md">
+<div class="flex items-start gap-3.5">
+<!-- Avatar with Badge -->
+<div class="relative flex-shrink-0">
+<div class="w-20 h-20 rounded-full overflow-hidden p-0.5 bg-surface-container">
+<img class="w-full h-full object-cover rounded-full" data-alt="Distinguished professional Indian chef Raghavendra Rao in pristine white chef jacket with charcoal collar details, confident warm smile, studio culinary lighting, clean light background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9ywUXag6tULri6DDyXO6PHUuICuldzk9DvNoUxNJmPhspNqMuEuFI21h7CN57F-sSZ6GMZwhQOH2MT2GdQde3vrDqgnaQtd_YTYde7IkogXBWZwHgepf8weIROckUUulmhkwgmT7anWjPpRDQjmJDdJPkxJAyco3FOZjI5f-T_f3JkhTdQtJWO-6fMpWdQWhIKvphQGrhruRzmYrndDM27Ie4llQ4UWaNMX1SyL4"/>
+</div>
+<div class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-on-primary text-[15px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<!-- Identity Details -->
+<div class="flex-1 min-w-0 pt-1">
+<div class="flex items-center gap-1.5 flex-wrap">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Chef Raghavendra Rao</h2>
+</div>
+<p class="font-body-sm text-body-sm text-primary font-semibold mt-0.5 leading-snug">
+            Master Home Chef • Andhra &amp; Rayalaseema Specialist
+          </p>
+<div class="flex items-center gap-1 mt-1.5 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">location_on</span>
+<span class="truncate">Jubilee Hills, Hyderabad (up to 18 km)</span>
+</div>
+</div>
+</div>
+<!-- Quick Metrics Grid -->
+<div class="grid grid-cols-3 gap-2 mt-4 pt-3 bg-surface-container-low rounded-xl p-2.5">
+<div class="flex flex-col items-center justify-center text-center">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">4.9</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">128 Reviews</span>
+</div>
+<div class="flex flex-col items-center justify-center text-center">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">restaurant</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">12+</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Years Exp</span>
+</div>
+<div class="flex flex-col items-center justify-center text-center">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-emerald-600">bolt</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">&lt; 15m</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Fast Reply</span>
+</div>
+</div>
+<!-- Trust Ribbon Badges -->
+<div class="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-container font-label-sm text-label-sm whitespace-nowrap">
+<span class="material-symbols-outlined text-[14px]">verified_user</span>
+          FSSAI Certified
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-container font-label-sm text-label-sm whitespace-nowrap">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+          Atelier 7-Point Screened
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm whitespace-nowrap">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+          Live Charcoal Pro
+        </span>
+</div>
+</div>
+</div>
+<!-- Bio & Craftsmanship Note -->
+<div class="px-margin mt-4">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<h3 class="font-title-md text-title-md text-on-surface font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">psychology</span>
+        Culinary Philosophy &amp; Bio
+      </h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 leading-relaxed">
+        Former executive banquet sous chef specializing in authentic Andhra home-style banquets, traditional pooja feasts, Ugadi &amp; Sankranti spreads, and live charcoal dum biryanis. All dishes are crafted with cold-pressed sesame oils and freshly milled house spice blends.
+      </p>
+<div class="flex items-center justify-between mt-3 pt-3 bg-surface-container-low rounded-xl px-3 py-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">translate</span>
+          Languages Spoken:
+        </span>
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest text-on-surface font-label-sm text-label-sm">Telugu</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest text-on-surface font-label-sm text-label-sm">English</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest text-on-surface font-label-sm text-label-sm">Hindi</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Profile Tabs -->
+<div class="px-margin mt-5">
+<div class="flex items-center justify-between bg-surface-container-lowest p-1 rounded-full shadow-sm">
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all text-center bg-primary text-on-primary shadow-sm" id="tab-btn-packages" onclick="switchTab('packages')">
+        Packages
+      </button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all text-center text-on-surface-variant hover:text-on-surface" id="tab-btn-portfolio" onclick="switchTab('portfolio')">
+        Portfolio (18)
+      </button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all text-center text-on-surface-variant hover:text-on-surface" id="tab-btn-reviews" onclick="switchTab('reviews')">
+        Reviews
+      </button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all text-center text-on-surface-variant hover:text-on-surface" id="tab-btn-safety" onclick="switchTab('safety')">
+        Hygiene
+      </button>
+</div>
+</div>
+<!-- TAB CONTENT 1: Service Packages -->
+<div class="px-margin mt-4 flex flex-col gap-3.5" id="tab-content-packages">
+<!-- Service Delivery Formats -->
+<div class="bg-surface-container-lowest rounded-2xl p-3.5 shadow-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-2 font-bold">
+        Service Formats Supported
+      </span>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">skillet</span>
+          Chef Visits Home (Live Cooking)
+        </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">takeout_dining</span>
+          Cook &amp; Deliver (Hot Casseroles)
+        </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">outdoor_grill</span>
+          Banquet Venue Live Counters
+        </span>
+</div>
+</div>
+<!-- Package 1: Most Popular -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary text-on-primary font-label-sm text-label-sm px-3 py-1 rounded-bl-xl font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+        Most Popular
+      </div>
+<div class="flex items-start justify-between pr-24">
+<div>
+<h4 class="font-title-md text-title-md text-on-surface font-bold">Traditional Andhra Festive Banquet</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Authentic royal banana leaf spread</p>
+</div>
+</div>
+<div class="flex items-baseline gap-1 mt-3">
+<span class="font-metric-price text-metric-price text-tertiary font-bold">₹550</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ person</span>
+<span class="ml-2 font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md">Min. 15 guests</span>
+</div>
+<div class="mt-3 bg-surface-container-low rounded-xl p-3 flex flex-col gap-1.5">
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>4 Starters: Mirchi Bajji, Kothimeera Vada, Gongura Chicken Kebabs</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>5 Mains: Gongura Mutton/Pappu, Natu Kodi Pulao, Gutti Vankaya</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Desserts &amp; Welcome: Pootharekulu sweet, Rice, curd &amp; Panakam</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-3 mt-4">
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline" onclick="toggleMenu('menu-festive')">
+<span id="menu-festive-toggle-txt">View Full Menu Items</span>
+<span class="material-symbols-outlined text-[18px]" id="menu-festive-icon">expand_more</span>
+</button>
+<button class="h-10 px-5 rounded-full bg-primary hover:bg-tertiary transition-colors text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm" onclick="selectPackage('Andhra Festive Banquet', '₹550 / person')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+          Select Package
+        </button>
+</div>
+<!-- Expandable Menu Preview -->
+<div class="hidden mt-3 pt-3 bg-surface-container-lowest rounded-xl" id="menu-festive">
+<div class="p-3 bg-surface-container-low rounded-xl flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<div><strong class="text-on-surface">Welcome Drink:</strong> Traditional Bellam Panakam &amp; Neer Moru</div>
+<div><strong class="text-on-surface">Live Fryums:</strong> Vadiyalu, Appadalu &amp; Gongura Pickle batch</div>
+<div><strong class="text-on-surface">Dal &amp; Rasam:</strong> Mudda Pappu with ghee, Charu, and homemade Curd</div>
+<div><strong class="text-on-surface">Sweet Endings:</strong> Authentic Atreyapuram Pootharekulu &amp; Bobbatlu</div>
+</div>
+</div>
+</div>
+<!-- Package 2: Home Daily Gourmet / Intimate -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-start justify-between">
+<div>
+<h4 class="font-title-md text-title-md text-on-surface font-bold">Home Gourmet / Intimate Dinner</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Chef cooks exclusively in your home kitchen</p>
+</div>
+</div>
+<div class="flex items-baseline gap-1 mt-3">
+<span class="font-metric-price text-metric-price text-tertiary font-bold">₹1,800</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ visit</span>
+<span class="ml-2 font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md">4 to 8 family members</span>
+</div>
+<div class="mt-3 bg-surface-container-low rounded-xl p-3 flex flex-col gap-1.5">
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Fresh 4-course customized home meal tailored to dietary needs</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Host provides groceries (or request chef procured shopping)</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Kitchen prepped, counter sanitized, and utensils cleaned before departure</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-3 mt-4">
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline" onclick="toggleMenu('menu-home')">
+<span id="menu-home-toggle-txt">View Sample Dishes</span>
+<span class="material-symbols-outlined text-[18px]" id="menu-home-icon">expand_more</span>
+</button>
+<button class="h-10 px-5 rounded-full bg-primary hover:bg-tertiary transition-colors text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm" onclick="selectPackage('Home Gourmet Dinner', '₹1,800 / visit')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+          Select Package
+        </button>
+</div>
+<div class="hidden mt-3 pt-3 bg-surface-container-lowest rounded-xl" id="menu-home">
+<div class="p-3 bg-surface-container-low rounded-xl flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<div><strong class="text-on-surface">Curries:</strong> Bendakaya Fry, Tomato Pappu, Nellore Fish Pulusu</div>
+<div><strong class="text-on-surface">Breads:</strong> Jowar Rotis or Phulkas made live on your tawa</div>
+<div><strong class="text-on-surface">Pachadi:</strong> Fresh mortar-ground Dosakaya or Gongura chutney</div>
+</div>
+</div>
+</div>
+<!-- Package 3: Pooja & Sattvic Bhojanam -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-start justify-between">
+<div>
+<h4 class="font-title-md text-title-md text-on-surface font-bold">Special Pooja &amp; Sattvic Bhojanam</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">100% Pure Veg • No Onion &amp; Garlic option</p>
+</div>
+</div>
+<div class="flex items-baseline gap-1 mt-3">
+<span class="font-metric-price text-metric-price text-tertiary font-bold">₹400</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ person</span>
+<span class="ml-2 font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md">Min. 20 guests</span>
+</div>
+<div class="mt-3 bg-surface-container-low rounded-xl p-3 flex flex-col gap-1.5">
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Strict ritual madi-prepared bhojanam for temple poojas and rituals</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Banana leaf dining layout and pristine prasadam management</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span>Includes Pulihora, Daddojanam, Chakkara Pongali &amp; Medu Vada</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-3 mt-4">
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline" onclick="toggleMenu('menu-pooja')">
+<span id="menu-pooja-toggle-txt">View Prasadam Menu</span>
+<span class="material-symbols-outlined text-[18px]" id="menu-pooja-icon">expand_more</span>
+</button>
+<button class="h-10 px-5 rounded-full bg-primary hover:bg-tertiary transition-colors text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm" onclick="selectPackage('Sattvic Pooja Bhojanam', '₹400 / person')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+          Select Package
+        </button>
+</div>
+<div class="hidden mt-3 pt-3 bg-surface-container-lowest rounded-xl" id="menu-pooja">
+<div class="p-3 bg-surface-container-low rounded-xl flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<div><strong class="text-on-surface">Prasadams:</strong> Kovil Pulihora, Ghee Chakkara Pongal, Boorelu</div>
+<div><strong class="text-on-surface">Main Course:</strong> Aratikaya Vepudu, Majjiga Pulusu, Kandi Podi with Ghee</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB CONTENT 2: Portfolio & Visual Proof -->
+<div class="hidden px-margin mt-4 flex flex-col gap-4" id="tab-content-portfolio">
+<!-- Video Preview Card -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm">
+<div class="relative w-full h-44 bg-inverse-surface">
+<div class="w-full h-full bg-cover bg-center" data-alt="Cinematic still from 4K culinary documentary showing Chef Raghavendra plating a vibrant banana leaf banquet at Jubilee Hills Villa, slow motion turmeric smoke, elegant brass dinnerware" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDNxdnpOVg3AxY6x-xCdBJboj-wX4pp6LKvwJ0wYws5pOEE0i8MX2K_rcp5Qf4h9y0f_qd8Wcwrj-dXsEMZ4xmrS9Lpb-8DdEhfo8lxuCYrv4s-p1tZi8i2KAt_nvPkeckPBSS7eiVauZqC5dSig4my9lkvwBZZgO5XdCHoiwGYGcLTv0IinquuoJK2d8kattCqu00DdbJ6McPuesV5VDGY0mYkd3k4OJ2TiOJpuF8')">
+</div>
+<div class="absolute inset-0 bg-inverse-surface/40 flex items-center justify-center">
+<button class="w-14 h-14 rounded-full bg-surface-container-lowest/90 text-primary flex items-center justify-center shadow-lg transform active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[32px] ml-0.5" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 left-3 bg-inverse-surface/80 px-2 py-0.5 rounded text-on-primary font-label-sm text-label-sm">
+          2:15 min • 4K Reel
+        </div>
+</div>
+<div class="p-3.5">
+<h4 class="font-title-md text-title-md text-on-surface font-bold">Watch: Ugadi Grand Feast Prep</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Live catering showcase for 60 guests at Jubilee Hills Villa.</p>
+</div>
+</div>
+<!-- Photo Mosaic Grid -->
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="w-full h-32 bg-cover bg-center" data-alt="Overhead delicious food photograph of traditional Andhra banana leaf meal with Gutti Vankaya curry, spiced rice, Gongura pachadi, curd and crisps, vivid natural colors" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA3uUM7kvCoVhghG-x9c2ZpTilC0J_-uNW6eBPGnMPvwu8L6CxpBcKv7hfzbF_K_8r7pSjSaueBaXP48BKjwJ5bd9bYO4QcZ6SF5QwWC9ra0v6bgzrzPSKKUTsWZaqYRJZJXT0L054yFGNWeWrNb82h6PIgZPRk9WmUKHRDGlSi_Us-cT6qXuudS6FtFXcXyNLmUkmwe80cVKlo37GZxXSE36zcifm4zoR4F-vITt8')">
+</div>
+<div class="p-2.5">
+<span class="font-label-sm text-label-sm font-bold text-on-surface block truncate">Festive Banana Leaf</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Housewarming Banquet</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="w-full h-32 bg-cover bg-center" data-alt="Close up photograph of a charcoal dum clay pot sealed with dough showing fragrant basmati biryani with fried shallots and saffron tints in outdoor garden party" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCvW-PI_cILhz5QkQ6yTbjKkM1g6kBrlkmEDsZPVN9Q5m2eMgRtDzIpgwqvrfnBhWMT5PV_LOgDvWFj7F6J8zBfqAwc7GbmmmKtRXDDt2jU0jaVZHfTJKIWdjixBeNGlPHGKrmHBRXVYRPcpq_l2ElkzsLuK-LKsiCHJkAqy841ATgwwpD11fLuJD14ZssVwIh_jA5MNh4hrNDHSlAtLq2LeM9tuSRQcnq351kMYJ4')">
+</div>
+<div class="p-2.5">
+<span class="font-label-sm text-label-sm font-bold text-on-surface block truncate">Clay Pot Dum Biryani</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Live Outdoor Counter</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="w-full h-32 bg-cover bg-center" data-alt="Artisanal food photograph of traditional granite pestle and mortar stone grinding fresh red chilies and gongura leaves with mustard seeds, culinary craftsmanship" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBI_2-w0dIPrhEhcWz-FuqAWoJDLZZO3h3fHsEo-e1WeANagrJ3_lPqcNX5Q_S-AlGbQjgkDm4pDDBJ4glMMFoyA1xBWR-dGgyXF-PLlc_jFUwR966nxQlozFnXpFnC5r5gGb8ryUaGgyyb5qiDivGXVNy_HYwHD3Imbt2satfxKZMsOS5iYBly24N_LP6thuZ4X4Izg-VFZ-a9MCBMdXnuqJMSmZAnb8BRcIROU9I')">
+</div>
+<div class="p-2.5">
+<span class="font-label-sm text-label-sm font-bold text-on-surface block truncate">Hand-Ground Pachadi</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Zero Electric Grinding</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="w-full h-32 bg-cover bg-center" data-alt="Elegant dessert table display showing delicate rice paper wafer sweet Pootharekulu with pistachios and pure ghee along with decorative brass diyas" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAiyG4hv-SPNC4Oc18kpFpaC0OnMVQ879pLLIz7eiB876bSBOob-q9kSfgpvO-Qgggc4lMjG78SXeKuXfGgORN1l2LJkYCAZyaHYz6tXqYvtXoKyijgmVqxgSzwstTRoQ55qiPfM4T8rITvLrc7Xz99fxvCSB9qdoc88rOdPfgF0zWfzboFno14IjCxLxeoxa8zZOdQrUEz_5Hmkwny3h6ihTBOaoXU1h8Ai8_EImU')">
+</div>
+<div class="p-2.5">
+<span class="font-label-sm text-label-sm font-bold text-on-surface block truncate">Atreyapuram Sweets</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Ghee Pootharekulu</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB CONTENT 3: Reviews & Ratings -->
+<div class="hidden px-margin mt-4 flex flex-col gap-3.5" id="tab-content-reviews">
+<!-- Rating Summary Bento -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center justify-center bg-surface-container-low px-4 py-3 rounded-2xl text-center">
+<span class="font-headline-xl text-headline-xl text-on-surface font-extrabold">4.9</span>
+<div class="flex text-amber-500 my-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">128 Host Ratings</span>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-0.5">
+<span>Authentic Taste</span>
+<span class="font-bold text-on-surface">5.0</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-0.5">
+<span>Kitchen Hygiene</span>
+<span class="font-bold text-on-surface">4.9</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[96%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-0.5">
+<span>Punctuality</span>
+<span class="font-bold text-on-surface">4.8</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[92%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Verified Review Card 1 -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold">
+            SR
+          </div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface font-bold">Srinivas R.</h5>
+<span class="font-body-sm text-body-sm text-emerald-600 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">verified</span> Verified Host • Housewarming (25 guests)
+            </span>
+</div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">2d ago</span>
+</div>
+<div class="flex text-amber-500 mt-2">
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">
+        “Booked Chef Raghavendra for our housewarming with 25 guests. The Gongura Royyalu and Gutti Vankaya were sensational. Completely stress-free hosting experience! Everyone asked for his contact.”
+      </p>
+</div>
+<!-- Verified Review Card 2 -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold">
+            PV
+          </div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface font-bold">Dr. Priya V.</h5>
+<span class="font-body-sm text-body-sm text-emerald-600 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">verified</span> Verified Host • Birthday Dinner
+            </span>
+</div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1w ago</span>
+</div>
+<div class="flex text-amber-500 mt-2">
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">
+        “Extremely hygienic, arrived punctually with his assistant, and left our open kitchen spotless. The food tasted just like authentic grandmother cooking. 10/10 recommend!”
+      </p>
+</div>
+</div>
+<!-- TAB CONTENT 4: Trust & Hygiene -->
+<div class="hidden px-margin mt-4 flex flex-col gap-3.5" id="tab-content-safety">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-center gap-2.5 mb-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface font-bold">Atelier 7-Point Safety Verified</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Highest culinary &amp; host safety standards</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 pt-2">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">badge</span>
+<div>
+<strong class="font-label-md text-label-md text-on-surface block">Police Background &amp; Aadhaar Verified</strong>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Comprehensive criminal records screening passed on Jan 2025.</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">health_and_safety</span>
+<div>
+<strong class="font-label-md text-label-md text-on-surface block">Annual Medical Fitness Certified</strong>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Complete blood panel, communicable disease &amp; hygiene clearance.</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">sanitizer</span>
+<div>
+<strong class="font-label-md text-label-md text-on-surface block">FSSAI Kitchen Protocol Adherent</strong>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Clean chef apron, hair-net, silicone gloves, and sanitized tools kit.</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">lock</span>
+<div>
+<strong class="font-label-md text-label-md text-on-surface block">Escrow Protected Payments</strong>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Funds released only after banquet completion and host sign-off.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- FAQs / Quick Answers -->
+<div class="px-margin mt-4">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<h4 class="font-title-md text-title-md text-on-surface font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">help_center</span>
+        Booking FAQ
+      </h4>
+<div class="flex flex-col gap-2.5 font-body-sm text-body-sm">
+<div class="p-2.5 bg-surface-container-low rounded-xl">
+<p class="font-bold text-on-surface">Who buys the groceries?</p>
+<p class="text-on-surface-variant mt-0.5">You can either provide the ingredients per the chef checklist, or opt for Chef-Procured Fresh Farm Groceries at actual store bill.</p>
+</div>
+<div class="p-2.5 bg-surface-container-low rounded-xl">
+<p class="font-bold text-on-surface">What about utensils &amp; cooking gas?</p>
+<p class="text-on-surface-variant mt-0.5">For home visits, chef uses your burners &amp; basic cookware. For outdoor banquets, chef brings traditional copper handis and gas stoves.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Fixed Bottom Booking Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-lg px-margin py-3 shadow-[0_-4px_20px_rgba(13,71,161,0.08)] pb-safe">
+<div class="max-w-md mx-auto flex items-center justify-between gap-4">
+<div>
+<div class="flex items-baseline gap-1">
+<span class="font-metric-price text-metric-price text-tertiary font-bold" id="footer-price">₹1,800</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant" id="footer-unit">/ visit base fee</span>
+</div>
+<span class="font-label-sm text-label-sm text-emerald-600 block mt-0.5 font-medium truncate max-w-[140px]" id="footer-selection">
+          Chef Visits Home
+        </span>
+</div>
+<button class="h-12 px-6 rounded-full bg-primary hover:bg-tertiary active:scale-95 transition-all text-on-primary font-label-md text-label-md flex items-center gap-2 shadow-md" onclick="triggerBookingModal()">
+<span>Request Booking</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Interactive Booking Drawer / Modal -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm hidden items-end justify-center transition-opacity" id="booking-modal">
+<div class="bg-surface-container-lowest w-full max-w-md rounded-t-3xl p-5 pb-safe shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom">
+<div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-1"></div>
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Book Chef Raghavendra</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Instant availability check &amp; date lock</p>
+</div>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeBookingModal()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Selected Package Overview -->
+<div class="bg-surface-container-low p-3 rounded-xl flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Selected Package</span>
+<strong class="block font-label-md text-label-md text-on-surface" id="modal-package-title">Traditional Andhra Festive Banquet</strong>
+</div>
+<span class="font-metric-price text-metric-price text-tertiary" id="modal-package-price">₹550/person</span>
+</div>
+<!-- Quick Date & Guest Selection -->
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-low p-3 rounded-xl">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Event Date</label>
+<div class="flex items-center gap-1.5 text-on-surface font-bold text-label-md">
+<span class="material-symbols-outlined text-primary text-[18px]">calendar_today</span>
+<span>Tomorrow (18 May)</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Guest Count</label>
+<div class="flex items-center justify-between">
+<button class="w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface font-bold" onclick="adjustGuests(-5)">-</button>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold" id="guest-counter">20</span>
+<button class="w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface font-bold" onclick="adjustGuests(5)">+</button>
+</div>
+</div>
+</div>
+<!-- Special Food Preference Pills -->
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1.5">Dietary / Spice Profile</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm font-semibold">Standard Rayalaseema Spice</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">Mild Kid-Friendly</button>
+<button class="px-3 py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">Pure Veg Kitchen Only</button>
+</div>
+</div>
+<!-- Proceed Button -->
+<button class="w-full h-12 mt-2 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 shadow-md hover:bg-tertiary" onclick="confirmBookingToast()">
+<span>Proceed to Reserve Slot</span>
+<span class="material-symbols-outlined text-[18px]">lock</span>
+</button>
+<span class="font-body-sm text-body-sm text-center text-on-surface-variant">Zero cancellation fee up to 24 hrs prior.</span>
+</div>
+</div>
+<!-- Notification Toast -->
+<div class="fixed top-20 left-4 right-4 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none" id="booking-toast">
+<div class="bg-inverse-surface text-inverse-on-surface p-3.5 rounded-2xl shadow-xl flex items-center gap-3">
+<span class="material-symbols-outlined text-emerald-400 text-[24px]">check_circle</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md font-bold">Booking Request Sent!</p>
+<p class="font-body-sm text-body-sm text-surface-variant">Chef Raghavendra will confirm within 15 minutes.</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  let guestCount = 20;
+
+  function switchTab(tabId) {
+    const tabs = ['packages', 'portfolio', 'reviews', 'safety'];
+    tabs.forEach(t => {
+      const content = document.getElementById('tab-content-' + t);
+      const btn = document.getElementById('tab-btn-' + t);
+      if (content && btn) {
+        if (t === tabId) {
+          content.classList.remove('hidden');
+          btn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+          btn.classList.remove('text-on-surface-variant');
+        } else {
+          content.classList.add('hidden');
+          btn.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+          btn.classList.add('text-on-surface-variant');
+        }
+      }
+    });
+  }
+
+  function toggleMenu(menuId) {
+    const menuEl = document.getElementById(menuId);
+    const iconEl = document.getElementById(menuId + '-icon');
+    const txtEl = document.getElementById(menuId + '-toggle-txt');
+    if (!menuEl) return;
+
+    if (menuEl.classList.contains('hidden')) {
+      menuEl.classList.remove('hidden');
+      if (iconEl) iconEl.innerText = 'expand_less';
+      if (txtEl) txtEl.innerText = 'Hide Details';
+    } else {
+      menuEl.classList.add('hidden');
+      if (iconEl) iconEl.innerText = 'expand_more';
+      if (txtEl) txtEl.innerText = 'View Full Menu Items';
+    }
+  }
+
+  function selectPackage(name, price) {
+    const priceDisplay = document.getElementById('footer-price');
+    const unitDisplay = document.getElementById('footer-unit');
+    const selectionDisplay = document.getElementById('footer-selection');
+    const modalPkg = document.getElementById('modal-package-title');
+    const modalPrice = document.getElementById('modal-package-price');
+
+    if (priceDisplay && unitDisplay && selectionDisplay) {
+      const parts = price.split('/');
+      priceDisplay.innerText = parts[0].trim();
+      unitDisplay.innerText = '/' + (parts[1] || '').trim();
+      selectionDisplay.innerText = name;
+    }
+
+    if (modalPkg && modalPrice) {
+      modalPkg.innerText = name;
+      modalPrice.innerText = price;
+    }
+
+    triggerBookingModal();
+  }
+
+  function triggerBookingModal() {
+    const modal = document.getElementById('booking-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeBookingModal() {
+    const modal = document.getElementById('booking-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function adjustGuests(delta) {
+    guestCount = Math.max(5, guestCount + delta);
+    const el = document.getElementById('guest-counter');
+    if (el) el.innerText = guestCount;
+  }
+
+  function confirmBookingToast() {
+    closeBookingModal();
+    const toast = document.getElementById('booking-toast');
+    if (toast) {
+      toast.classList.remove('-translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('-translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+  }
+</script></main></body></html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;min-height:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"outline":"#71787f","on-secondary-container":"#00355c","primary-container":"#90caf9","on-secondary":"#ffffff","error":"#ba1a1a","primary-fixed-dim":"#93cdfc","surface-dim":"#d1daf4","secondary-container":"#33a0fd","on-tertiary":"#ffffff","surface-container-low":"#f1f3ff","on-secondary-fixed":"#001d36","on-primary-fixed-variant":"#004b71","surface-bright":"#f9f9ff","on-surface-variant":"#41474e","on-error":"#ffffff","on-error-container":"#93000a","surface":"#ffffff","tertiary-fixed-dim":"#b0c6ff","inverse-surface":"#273044","on-background":"#121b2e","background":"#ffffff","on-primary-container":"#08557e","secondary-fixed":"#d1e4ff","outline-variant":"#c1c7cf","secondary-fixed-dim":"#9ecaff","on-primary-fixed":"#001e30","primary-fixed":"#cbe6ff","surface-container-highest":"#d9e2fc","tertiary":"#2b5bb5","on-tertiary-container":"#174ca6","surface-tint":"#21638d","on-primary":"#ffffff","tertiary-container":"#acc3ff","secondary":"#0061a4","on-secondary-fixed-variant":"#00497d","tertiary-fixed":"#d9e2ff","surface-container-high":"#e1e8ff","on-tertiary-fixed-variant":"#00429c","surface-container-lowest":"#ffffff","inverse-on-surface":"#edf0ff","on-surface":"#121b2e","primary":"#21638d","on-tertiary-fixed":"#001945","inverse-primary":"#93cdfc","surface-container":"#e9edff","error-container":"#ffdad6","surface-variant":"#d9e2fc"},"borderRadius":{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},"spacing":{"gutter":"1rem","margin":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","space-md":"1rem","space-xl":"2rem","space-lg":"1.5rem"},"fontFamily":{"body-lg":["Inter"],"metric-price":["Epilogue"],"body-sm":["Inter"],"headline-lg":["Epilogue"],"label-sm":["Inter"],"headline-sm":["Epilogue"],"headline-xl":["Epilogue"],"headline-md":["Epilogue"],"label-md":["Inter"],"title-md":["Epilogue"],"body-md":["Inter"]},"fontSize":{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"metric-price":["18px",{"lineHeight":"22px","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-lg":["26px",{"lineHeight":"34px","letterSpacing":"-0.015em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}};</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-gutter flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs flex-1 min-w-0"><button aria-label="Go back" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low active:bg-surface-container transition-colors shrink-0" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface tracking-tight truncate">Event Day Live Checklist &amp; Status Tracking</h1></div><div class="flex items-center gap-space-xs shrink-0"><button class="min-h-[44px] px-3 py-1.5 rounded-full font-label-md text-label-md text-primary hover:bg-surface-container-low active:text-on-primary-container transition-colors" type="button">Options</button></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full pb-36">
+<!-- Live Pulsing Status Banner -->
+<div class="px-gutter pt-space-md">
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="inline-flex items-center gap-space-xs bg-surface-container-lowest px-3 py-1.5 rounded-full shadow-sm">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Service Day Live</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 bg-surface-container-highest/60 px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span> Today • Lunch Service
+        </span>
+</div>
+<div class="flex flex-col gap-1 mt-1">
+<h2 class="font-headline-md text-headline-md text-on-surface">Traditional Andhra Festive Banquet</h2>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">groups</span> 20 Guests
+          </span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">person</span> Host: Siddharth &amp; Priya Varma
+          </span>
+</div>
+</div>
+<!-- Venue Info Card -->
+<div class="bg-surface-container-lowest rounded-DEFAULT p-3 flex items-start gap-3 shadow-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">villa</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Villa 42, Palm Meadows</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Road No. 10, Jubilee Hills, Hyderabad</p>
+<p class="font-label-sm text-label-sm text-primary font-semibold mt-1">Serving Window: 11:30 AM – 3:30 PM</p>
+</div>
+</div>
+<!-- Quick Host Contacts Bar -->
+<div class="grid grid-cols-3 gap-2 pt-1">
+<a class="h-11 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-on-primary-container transition-all" href="tel:+919876543210">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call Host</span>
+</a>
+<button class="h-11 rounded-full bg-surface-container-lowest text-primary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-surface-container transition-all" onclick="alert('Launching Live Navigation to Palm Meadows, Jubilee Hills...')" type="button">
+<span class="material-symbols-outlined text-[18px]">near_me</span>
+<span>Directions</span>
+</button>
+<button class="h-11 rounded-full bg-error-container text-on-error-container font-label-md text-label-md flex items-center justify-center gap-1 shadow-sm active:opacity-80 transition-all" onclick="alert('Concierge SOS triggered. Atelier rapid support coordinator has been dispatched.')" type="button">
+<span class="material-symbols-outlined text-[18px]">sos</span>
+<span>SOS</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Live Transit Radar Pill Banner -->
+<div class="px-gutter mt-space-md">
+<div class="bg-primary-container/30 rounded-lg p-space-md flex flex-col gap-3 relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Chef Transit En Route</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Live Telematics Tracking Active</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-metric-price text-metric-price text-primary">10:25 AM</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Estimated ETA</p>
+</div>
+</div>
+<!-- Visual Commute Mini Visualizer -->
+<div class="bg-surface-container-lowest rounded-full p-2 flex items-center justify-between gap-3 shadow-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0">speed</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">3.8 km away • Jubilee Hills Checkpost</span>
+</div>
+<button class="shrink-0 px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-label-sm text-primary font-semibold hover:bg-surface-container transition-colors" type="button">
+          View GPS
+        </button>
+</div>
+</div>
+</div>
+<!-- Chronological Stepper Section -->
+<div class="px-gutter mt-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Service Timeline</h3>
+<span class="font-label-sm text-label-sm text-primary font-semibold bg-surface-container-low px-2.5 py-1 rounded-full">Step 3 of 7</span>
+</div>
+<!-- Stepper Container -->
+<div class="bg-surface-container-lowest rounded-lg p-space-md flex flex-col gap-space-md shadow-sm">
+<!-- Milestone 1 (Completed) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm z-10">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="w-0.5 flex-1 bg-primary my-1"></div>
+</div>
+<div class="flex-1 pb-space-sm">
+<div class="flex items-center justify-between">
+<h4 class="font-title-md text-title-md text-on-surface">Fresh Farm Procurement</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">6:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Ingredients &amp; heritage spices verified, weighted and cold-boxed.</p>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary mt-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> FSSAI Certified Batch
+          </span>
+</div>
+</div>
+<!-- Milestone 2 (Completed) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm z-10">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="w-0.5 flex-1 bg-primary my-1"></div>
+</div>
+<div class="flex-1 pb-space-sm">
+<div class="flex items-center justify-between">
+<h4 class="font-title-md text-title-md text-on-surface">Kitchen Prep &amp; Marinades</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">8:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Dum handis sealed with wheat dough; marinades chilled at 3.4°C.</p>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary mt-1">
+<span class="material-symbols-outlined text-[14px]">done_all</span> Central Atelier Passed
+          </span>
+</div>
+</div>
+<!-- Milestone 3 (ACTIVE NOW) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-md ring-4 ring-primary-container/40 z-10 animate-pulse">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+</div>
+<div class="w-0.5 flex-1 bg-surface-container-high my-1"></div>
+</div>
+<div class="flex-1 bg-surface-container-low p-space-sm rounded-DEFAULT">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h4 class="font-title-md text-title-md text-on-surface font-semibold">In Transit to Venue</h4>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-highest px-2 py-0.5 rounded-full text-secondary font-bold">ACTIVE NOW</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Departure 10:00 AM • Projected Arrival at Jubilee Hills by 10:25 AM.</p>
+<div class="mt-2 flex items-center gap-2">
+<button class="h-8 px-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center gap-1 shadow-sm" onclick="alert('GPS commute feed active. Dispatch notified.')" type="button">
+<span class="material-symbols-outlined text-[16px]">navigation</span> Live GPS Feed
+            </button>
+<span class="font-label-sm text-label-sm text-on-surface-variant">5.2 km traveled</span>
+</div>
+</div>
+</div>
+<!-- Milestone 4 (Upcoming) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[18px]">countertops</span>
+</div>
+<div class="w-0.5 flex-1 bg-surface-container-high my-1"></div>
+</div>
+<div class="flex-1 pb-space-sm opacity-80">
+<div class="flex items-center justify-between">
+<h4 class="font-title-md text-title-md text-on-surface">Venue Arrival &amp; Setup</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">10:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Kitchen inspection, gas burner calibration &amp; plating assembly.</p>
+</div>
+</div>
+<!-- Milestone 5 (Upcoming) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[18px]">outdoor_grill</span>
+</div>
+<div class="w-0.5 flex-1 bg-surface-container-high my-1"></div>
+</div>
+<div class="flex-1 pb-space-sm opacity-80">
+<div class="flex items-center justify-between">
+<h4 class="font-title-md text-title-md text-on-surface">Live Counter &amp; Cooking</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">11:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Live Mirchi Bajji station fire-up &amp; royal Gongura simmering.</p>
+</div>
+</div>
+<!-- Milestone 6 (Upcoming) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[18px]">dinner_dining</span>
+</div>
+<div class="w-0.5 flex-1 bg-surface-container-high my-1"></div>
+</div>
+<div class="flex-1 pb-space-sm opacity-80">
+<div class="flex items-center justify-between">
+<h4 class="font-title-md text-title-md text-on-surface">Banquet Service &amp; Plating</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">12:30 PM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Traditional 20 Banana leaf course-by-course feast sequence.</p>
+</div>
+</div>
+<!-- Milestone 7 (Final Release) -->
+<div class="flex gap-space-md relative">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[18px]">lock_reset</span>
+</div>
+</div>
+<div class="flex-1 opacity-80">
+<div class="flex items-center justify-between">
+<h4 class="font-title-md text-title-md text-on-surface">Kitchen Deep Clean &amp; Sign-off</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">3:00 PM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Digital OTP Host Sign-off releases <span class="font-semibold text-primary">₹14,840 final escrow</span>.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quality & Readiness Checklist -->
+<div class="px-gutter mt-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Execution Checklist</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Required protocols for Andhra Feast standard</p>
+</div>
+<span class="font-label-md text-label-md text-primary bg-primary-container/20 px-3 py-1 rounded-full" id="checklistCounter">9 / 11 Done</span>
+</div>
+<!-- Category A: Equipment & Gear Audit -->
+<details class="group bg-surface-container-lowest rounded-lg p-space-md mb-3 shadow-sm open" open="">
+<summary class="flex items-center justify-between cursor-pointer list-none select-none">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Equipment &amp; Gear Audit</h4>
+<p class="font-body-sm text-body-sm text-primary font-semibold">4 / 4 items verified</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="mt-space-md flex flex-col gap-2.5">
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Copper dum handis &amp; sealing dough</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">4 Heavy-gauge degs with brass weights</p>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">2 Portable LPG commercial burners &amp; regulator</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Leak-checked at prep facility with safety valve</p>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Brass ladles &amp; 30 fresh banana leaf cuts</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Washed and rolled in damp cotton canvas</p>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Chef aprons, gloves, hairnets &amp; sanitizers</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">3 Sous-chef sets packed in sterile kit</p>
+</div>
+</label>
+</div>
+</details>
+<!-- Category B: Cold Chain & Ingredient Freshness -->
+<details class="group bg-surface-container-lowest rounded-lg p-space-md mb-3 shadow-sm open" open="">
+<summary class="flex items-center justify-between cursor-pointer list-none select-none">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">ac_unit</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Cold Chain &amp; Ingredients</h4>
+<p class="font-body-sm text-body-sm text-primary font-semibold">3 / 3 items verified</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="mt-space-md flex flex-col gap-2.5">
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Country chicken (Natu Kodi) chilled &lt; 4°C</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cold box temperature sensor active at 3.1°C</p>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Cold-pressed sesame oil &amp; Guntur dry chillies</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Single-origin cold press oil batch #891</p>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Fresh Gongura leaves &amp; Pootharekulu sweet</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Direct from Atreyapuram cooperative, fresh rolled</p>
+</div>
+</label>
+</div>
+</details>
+<!-- Category C: On-site Safety & Cleanliness -->
+<details class="group bg-surface-container-lowest rounded-lg p-space-md mb-3 shadow-sm open" open="">
+<summary class="flex items-center justify-between cursor-pointer list-none select-none">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">sanitizer</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">On-site Safety &amp; Cleanliness</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant font-semibold">2 pending venue arrival</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="mt-space-md flex flex-col gap-2.5">
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Verify venue water purity &amp; cross-ventilation</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Inspect host outdoor courtyard kitchen corner</p>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input class="task-checkbox mt-0.5 h-5 w-5 rounded-full accent-primary" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface">Post-event kitchen sweep, wash &amp; compost bagging</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Mandatory zero-trace sign-off for Escrow release</p>
+</div>
+</label>
+</div>
+</details>
+</div>
+<!-- Chef Culinary Visual Proof -->
+<div class="px-gutter mt-space-sm mb-space-lg">
+<div class="bg-surface-container-lowest rounded-lg p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<span class="font-title-md text-title-md text-on-surface">Live Prep Documentation</span>
+<button class="font-label-sm text-label-sm text-primary flex items-center gap-1" onclick="alert('Camera trigger activated for dish timestamping.')" type="button">
+<span class="material-symbols-outlined text-[16px]">photo_camera</span> Add Photo
+        </button>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="relative h-32 rounded-DEFAULT overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Traditional Indian copper dum handis sealed with dough in a bright commercial kitchen. Steam rising subtly, warm morning sunlight highlighting polished brass spoons and fresh ingredients on a pristine stainless steel counter." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrVuPrgM6NUB1Kd33_5JB1aZEIHo1KKkjdUIjSEShnKy85ezMmaT9gj7GU6A-cQqZU1XTarOsNlnKHbGPDhWDt_7g28dC2bBN6S9hyd6gsge7Qq2Dgt2-bM33V00mTDbdHszVynXCnucxxdQIHucYKgK6w5kApYjDa5vG-05Yf977cVtfjkmyKX31nnjZI9aVj_CbxHRF1QH7hSztucSW2guaS9hGB9jcSDHHriTQ"/>
+<span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-inverse-surface/80 text-inverse-on-surface font-label-sm text-label-sm">Handis Sealed • 8:30 AM</span>
+</div>
+<div class="relative h-32 rounded-DEFAULT overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Fresh vibrant green banana leaves meticulously rolled and bound beside deep crimson marinated Andhra spices and golden cold pressed oil jars in an artisan kitchen prep box." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1pDdwblOwDgdcB05s9GvoY5Dzewp4tHKU4xb4anV0-WGkT3vEUFhf19DIEDtKa3vbgdZcR7gF2fVY4osAum8D9QYaDt2txnqixkmejTUCaFto5qRvE3rEiJwrcYHKFmAt_f5rlOe-ZZEqwQnmtuvfkJAK-9lVTU378N_7-TVMnJ33sJUKgswZMwlIBvUvxRg2_fkOICq0bGhUlOH8ctx9g2KHvFvLDWmz1WsXWFE"/>
+<span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-inverse-surface/80 text-inverse-on-surface font-label-sm text-label-sm">Banana Leaves • 7:15 AM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Action Tray (Level 3 Elevation) -->
+<div class="fixed bottom-0 inset-x-0 bg-surface/95 backdrop-blur-md p-gutter pb-safe shadow-[0_-4px_20px_rgba(13,71,161,0.08)] z-40">
+<div class="max-w-md mx-auto flex flex-col gap-2">
+<!-- Main Status Update CTA -->
+<button class="w-full min-h-[50px] rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md active:bg-secondary-container transition-transform active:scale-[0.99]" id="arrivedBtn" onclick="handleArriveVenue()" type="button">
+<span class="material-symbols-outlined text-[22px]">location_on</span>
+<span>Mark 'Arrived at Venue' 📍</span>
+</button>
+<!-- Host Notification Secondary Pill -->
+<button class="w-full min-h-[44px] rounded-full bg-surface-container-lowest text-primary font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm hover:bg-surface-container-low active:bg-surface-container transition-colors" onclick="handleShareHost()" type="button">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>Share Live Status with Host via WhatsApp / SMS</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  function updateCheckboxCounter() {
+    const total = document.querySelectorAll('.task-checkbox').length;
+    const checked = document.querySelectorAll('.task-checkbox:checked').length;
+    const counterEl = document.getElementById('checklistCounter');
+    if (counterEl) {
+      counterEl.textContent = `${checked} / ${total} Done`;
+    }
+  }
+
+  document.querySelectorAll('.task-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateCheckboxCounter);
+  });
+
+  function handleArriveVenue() {
+    const btn = document.getElementById('arrivedBtn');
+    btn.innerHTML = `<span class="material-symbols-outlined text-[22px] animate-spin">progress_activity</span><span>Updating Status...</span>`;
+    setTimeout(() => {
+      btn.innerHTML = `<span class="material-symbols-outlined text-[22px]">check_circle</span><span>Arrived at Venue &bull; 10:24 AM</span>`;
+      btn.classList.remove('bg-primary');
+      btn.classList.add('bg-tertiary');
+      alert("Host Siddharth & Priya Varma have been alerted of your arrival at Villa 42. Gate entry code: #4209");
+    }, 900);
+  }
+
+  function handleShareHost() {
+    alert("Live GPS link & checklist snapshot dispatched to Siddharth (+91 98765 43210) via Atelier Concierge WhatsApp.");
+  }
+</script></main></body></html>

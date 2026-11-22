@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700&amp;family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#ffffff;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-surface": "#273044", "primary": "#21638d", "on-surface": "#121b2e", "secondary-container": "#33a0fd", "on-error": "#ffffff", "outline": "#71787f", "surface-container": "#e9edff", "surface-tint": "#21638d", "secondary": "#0061a4", "primary-container": "#90caf9", "on-secondary-fixed-variant": "#00497d", "tertiary-fixed": "#d9e2ff", "tertiary-fixed-dim": "#b0c6ff", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#004b71", "surface-dim": "#d1daf4", "secondary-fixed": "#d1e4ff", "surface-variant": "#d9e2fc", "background": "#f9f9ff", "on-primary-fixed": "#001e30", "on-surface-variant": "#41474e", "outline-variant": "#c1c7cf", "on-tertiary-fixed-variant": "#00429c", "on-secondary-container": "#00355c", "surface-bright": "#f9f9ff", "on-secondary": "#ffffff", "error": "#ba1a1a", "surface-container-lowest": "#ffffff", "on-tertiary-container": "#174ca6", "primary-fixed": "#cbe6ff", "surface": "#f9f9ff", "inverse-on-surface": "#edf0ff", "inverse-primary": "#93cdfc", "on-secondary-fixed": "#001d36", "surface-container-high": "#e1e8ff", "on-background": "#121b2e", "primary-fixed-dim": "#93cdfc", "on-primary-container": "#08557e", "on-tertiary-fixed": "#001945", "surface-container-low": "#f1f3ff", "surface-container-highest": "#d9e2fc", "on-error-container": "#93000a", "secondary-fixed-dim": "#9ecaff", "on-primary": "#ffffff", "error-container": "#ffdad6", "tertiary": "#2b5bb5", "tertiary-container": "#acc3ff" }, "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, "spacing": { "gutter": "1rem", "space-md": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "space-xl": "2rem", "space-sm": "0.5rem", "margin": "1rem" }, "fontFamily": { "headline-lg": ["Epilogue"], "body-md": ["Inter"], "headline-md": ["Epilogue"], "label-sm": ["Inter"], "body-sm": ["Inter"], "metric-price": ["Epilogue"], "body-lg": ["Inter"], "label-md": ["Inter"], "title-md": ["Epilogue"], "headline-xl": ["Epilogue"], "headline-sm": ["Epilogue"] }, "fontSize": { "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "metric-price": ["18px", { "lineHeight": "22px", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "600" }], "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface-container-lowest text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(23,32,51,0.04)]"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Navigate back or close" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container-low transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface truncate">Customer Live Event Tracking</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Help and Options" class="w-11 h-11 rounded-full flex items-center justify-center text-secondary hover:bg-secondary-fixed/30 transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">support_agent</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 bg-surface-container-lowest pb-safe"><div class="flex flex-col w-full pb-28">
+<!-- Event Overview Context Card -->
+<section class="px-gutter pt-space-md">
+<div class="bg-surface-container-low rounded-lg p-space-md shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+          LIVE EVENT DAY
+        </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">#ATELIER-HYD-8421</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-1">Traditional Andhra Festive Banquet</h2>
+<div class="mt-3 flex flex-col gap-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md text-on-surface">Today, 11:30 AM – 3:30 PM <span class="text-on-surface-variant text-body-sm">(Lunch Banquet)</span></span>
+</div>
+<div class="flex items-start gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">location_on</span>
+<span class="font-body-md text-body-md text-on-surface">Villa 42, Palm Meadows, Jubilee Hills, Hyderabad</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Live Telematics & Map Card -->
+<section class="px-gutter mt-space-lg">
+<div class="bg-surface-container-lowest rounded-lg shadow-md overflow-hidden">
+<!-- Live Map Preview Area -->
+<div class="relative w-full h-56 bg-surface-container-high overflow-hidden" data-location="Jubilee Hills, Hyderabad, India" style="">
+<!-- Route overlay simulation -->
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/60 via-transparent to-transparent pointer-events-none"></div>
+<!-- Floating Status Pill -->
+<div class="absolute top-3 inset-x-3 flex items-center justify-between">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md shadow-sm">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Chef Raghavendra &amp; 2 Staff in Transit</span>
+</div>
+<div class="bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-1 rounded-full text-on-surface font-label-sm text-label-sm shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[16px]">speed</span>
+            28 km/h
+          </div>
+</div>
+<!-- Destination indicator on map representation -->
+<div class="absolute bottom-3 left-3 bg-surface-container-lowest/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-error text-[18px]">home_pin</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Host Villa • 3.8 km away</span>
+</div>
+</div>
+<!-- ETA Card & Telematics Metrics -->
+<div class="p-space-md bg-surface-container-lowest">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">Estimated Arrival</div>
+<div class="font-headline-lg text-headline-lg text-on-surface flex items-baseline gap-1 mt-0.5">
+              14 <span class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">mins</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Expected at your gate: 10:25 AM</div>
+</div>
+<div class="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[32px]">local_shipping</span>
+</div>
+</div>
+<!-- Telematics Mini Ribbon -->
+<div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-surface-container-high/40 text-center">
+<div class="bg-surface-container-low p-2 rounded">
+<div class="font-label-sm text-label-sm text-on-surface-variant">Origin</div>
+<div class="font-label-md text-label-md text-on-surface truncate font-semibold mt-0.5">Rd 36 Base</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded">
+<div class="font-label-sm text-label-sm text-on-surface-variant">Cold Seal</div>
+<div class="font-label-md text-label-md text-secondary truncate font-semibold mt-0.5">Audited 4°C</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded">
+<div class="font-label-sm text-label-sm text-on-surface-variant">Dispatched</div>
+<div class="font-label-md text-label-md text-on-surface truncate font-semibold mt-0.5">10:05 AM</div>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="grid grid-cols-3 gap-2 mt-4">
+<button class="h-11 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">call</span>
+            Call Chef
+          </button>
+<button class="h-11 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-md text-label-md flex items-center justify-center gap-1.5 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+            Message
+          </button>
+<button class="h-11 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+            Live Link
+          </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Chef & Team Profile Banner -->
+<section class="px-gutter mt-space-lg">
+<div class="bg-surface-container-lowest rounded-lg p-space-md shadow-sm">
+<div class="flex items-start gap-space-md">
+<div class="relative shrink-0">
+<img class="w-16 h-16 rounded-full object-cover shadow-sm" data-alt="Warm and dignified portrait of veteran executive chef Raghavendra Rao wearing crisp white culinary coat and chef hat with warm studio lighting and soft blue background tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuj7VKznBksPqjAUiqVVthdwvCwfyssHaY-sbJzCmcBNHfOfrVHJZ9Sqj3qqNCMXp4AYhHYgr2Ed3EWKVu4sOCI1IPWKJUOVvgDOyUEqf7EQnbRDimT3B36XAyLvEgaZc_fMJ4_dxs1pVXQCSWgDoqDt07rzNGPbyhQkjS4IALndwcD7q9m_HwoBwAPZUJdPOOp5-hB51W3hKKL5nFthBov6p37vdR1T58vqtWeYY"/>
+<div class="absolute -bottom-1 -right-1 bg-secondary-container text-on-secondary-container w-6 h-6 rounded-full flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Chef Raghavendra Rao</h3>
+</div>
+<div class="flex items-center gap-1 text-on-surface mt-0.5">
+<span class="material-symbols-outlined text-amber-500 text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md font-bold">4.9</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">(128 luxury banquets)</span>
+</div>
+<p class="font-body-sm text-body-sm text-primary font-medium mt-0.5">Master of Royal Coastal &amp; Rayalaseema Recipes</p>
+</div>
+</div>
+<!-- Trust Credentials Pill Array -->
+<div class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-surface-container-low">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-primary text-[14px]">shield</span>
+          FSSAI Lic #23619028001
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-secondary text-[14px]">thermostat</span>
+          Temp Logged 36.4°C
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-primary text-[14px]">vaccines</span>
+          Vaccinated Team
+        </span>
+</div>
+<!-- Assigned Brigade Team -->
+<div class="mt-3 bg-surface-container-low rounded p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-7 w-7 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-label-sm text-label-sm font-bold">A</div>
+<div class="inline-block h-7 w-7 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-label-sm text-label-sm font-bold">K</div>
+</div>
+<div class="text-on-surface font-label-md text-label-md">
+<span class="font-semibold">Anand</span> (Sous Chef) &amp; <span class="font-semibold">Kiran</span> (Banquet Server)
+          </div>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">2 Staff</span>
+</div>
+</div>
+</section>
+<!-- Real-time Milestone Progress Stepper -->
+<section class="px-gutter mt-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Kitchen &amp; Service Telematics</h3>
+<span class="font-label-sm text-label-sm text-primary bg-primary-fixed px-2.5 py-0.5 rounded-full font-semibold">Step 3 of 7</span>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-space-md shadow-sm">
+<div class="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-surface-container-highest">
+<!-- Step 1 (Completed) -->
+<div class="relative flex items-start group">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center ring-4 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface font-semibold">Ingredients Procured &amp; Cold Box Audited</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">6:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Farm fresh produce, Guntur chillies &amp; A2 cow ghee verified.</p>
+</div>
+</div>
+<!-- Step 2 (Completed) -->
+<div class="relative flex items-start group">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center ring-4 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface font-semibold">Kitchen Prep &amp; Handi Sealing Passed</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">8:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Slow simmer bases completed, brass handis sealed hermetically.</p>
+</div>
+</div>
+<!-- Step 3 (ACTIVE NOW) -->
+<div class="relative flex items-start group">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center ring-4 ring-surface-container-lowest animate-pulse">
+<span class="material-symbols-outlined text-[14px]">directions_car</span>
+</div>
+<div class="flex-1 bg-surface-container-low p-3 rounded-lg">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-bold uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+                ACTIVE NOW
+              </span>
+<span class="font-label-sm text-label-sm text-secondary font-bold">10:11 AM Live</span>
+</div>
+<p class="font-title-md text-title-md text-on-surface font-semibold mt-1">In Transit to Host Venue</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Catering van moving via Road No 45 Flyover toward Palm Meadows.</p>
+<div class="mt-2 flex items-center gap-2 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">sensors</span>
+<span>GPS Telematics synced with vehicle unit</span>
+</div>
+</div>
+</div>
+<!-- Step 4 (Upcoming) -->
+<div class="relative flex items-start opacity-70">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center ring-4 ring-surface-container-lowest">
+<span class="font-label-sm text-label-sm">4</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface font-medium">Venue Setup &amp; Gas Calibration</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Est. 10:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Buffet burner setup, brass chaffing warmth check, banana leaf arrangement.</p>
+</div>
+</div>
+<!-- Step 5 (Upcoming) -->
+<div class="relative flex items-start opacity-70">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center ring-4 ring-surface-container-lowest">
+<span class="font-label-sm text-label-sm">5</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface font-medium">Live Mirchi Bajji Station &amp; Cooking</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Est. 11:30 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Sizzling starters fried on patio station as guests arrive.</p>
+</div>
+</div>
+<!-- Step 6 (Upcoming) -->
+<div class="relative flex items-start opacity-70">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center ring-4 ring-surface-container-lowest">
+<span class="font-label-sm text-label-sm">6</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface font-medium">Banana Leaf Course Plating &amp; Service</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Est. 12:30 PM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Traditional 14-item seated Andhra feast sequence.</p>
+</div>
+</div>
+<!-- Step 7 (Upcoming) -->
+<div class="relative flex items-start opacity-70">
+<div class="absolute -left-6 top-0.5 w-5 h-5 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center ring-4 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface font-medium">Kitchen Deep Clean &amp; Escrow OTP</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Est. 3:00 PM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Sanitization sign-off, waste disposal, host OTP verification.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Host Preparation Checklist Card -->
+<section class="px-gutter mt-space-lg">
+<div class="bg-surface-container-lowest rounded-lg p-space-md shadow-sm">
+<div class="flex items-center gap-2 mb-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">checklist</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Quick Host Readiness</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Help the team begin setup immediately upon arrival</p>
+</div>
+</div>
+<div class="space-y-2 mt-2">
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface-container-low cursor-pointer">
+<input checked="" class="mt-0.5 h-4 w-4 rounded accent-primary" type="checkbox"/>
+<div class="min-w-0 flex-1">
+<div class="font-label-md text-label-md text-on-surface font-semibold">2x 15A Power Outlets in Patio</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Required for live frying and plate warmers</div>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface-container-low cursor-pointer">
+<input checked="" class="mt-0.5 h-4 w-4 rounded accent-primary" type="checkbox"/>
+<div class="min-w-0 flex-1">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Clear Outdoor Washing Area</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Access to running water tap for vegetable rinses</div>
+</div>
+</label>
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface-container-low cursor-pointer">
+<input class="mt-0.5 h-4 w-4 rounded accent-primary" type="checkbox"/>
+<div class="min-w-0 flex-1">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Dining Table Cleared for 20 Guests</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Wiped and ready for banana leaf spread alignment</div>
+</div>
+</label>
+</div>
+</div>
+</section>
+<!-- Safety & Escrow Badge -->
+<section class="px-gutter mt-space-lg mb-4">
+<div class="bg-surface-container-low rounded-lg p-space-md shadow-sm relative overflow-hidden">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">verified_user</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface font-bold">100% Atelier Escrow Protection</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            Your final 70% payment of <strong class="text-on-surface font-headline-sm text-headline-sm">₹14,840</strong> is safely locked in escrow. Funds will <span class="text-primary font-semibold">ONLY</span> release when you provide your 4-digit verification OTP to Chef Raghavendra after complete banquet service and kitchen restoration.
+          </p>
+<div class="mt-3 inline-flex items-center gap-1.5 text-secondary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+            Escrow ID: ESC-9921-HYD
+          </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sticky Bottom Bar -->
+<div class="fixed bottom-0 inset-x-0 bg-surface-container-lowest/95 backdrop-blur-xl shadow-lg p-gutter z-40">
+<div class="max-w-md mx-auto flex items-center gap-3">
+<button class="h-12 px-4 rounded-full bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:scale-95 transition-transform shrink-0" type="button">
+<span class="material-symbols-outlined text-secondary text-[20px]">sos</span>
+        Concierge SOS
+      </button>
+<button class="h-12 flex-1 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform font-semibold" type="button">
+<span class="material-symbols-outlined text-[20px]">restaurant_menu</span>
+<span>View Full Andhra Menu</span>
+</button>
+</div>
+</div>
+</div></main></body></html>

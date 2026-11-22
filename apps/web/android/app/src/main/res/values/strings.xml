@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BOOK MY CHEF</string>
+    <string name="title_activity_main">BOOK MY CHEF</string>
+    <string name="package_name">com.bookmychef.app</string>
+    <string name="custom_url_scheme">com.bookmychef.app</string>
+</resources>

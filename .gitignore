@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+jspm_packages/
+
+# Production builds
+dist/
+dist-ssr/
+build/
+out/
+target/
+
+# Java & Maven
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+!apps/web/android/gradle/wrapper/gradle-wrapper.jar
+
+# Gradle & Android
+.gradle/
+apps/web/android/.gradle/
+apps/web/android/app/build/
+apps/web/android/build/
+local.properties
+*.apk
+*.aab
+
+# Logs & temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.system_generated/
+tmp/
+temp/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDE & OS
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Docker & local data
+postgres_data/
