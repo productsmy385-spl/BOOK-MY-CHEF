@@ -57,45 +57,45 @@ export default function HostReviewSubmission() {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-28 pt-2 bg-white">
+    <div className="flex flex-col w-full min-h-screen pb-28 pt-2 bg-white font-sora">
       {/* Top Header */}
       <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-xs font-sora font-semibold text-[#64748B] hover:text-[#172033]">
+        <button onClick={() => navigate(-1)} className="btn-ghost p-1 flex items-center gap-1 text-xs">
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>Back</span>
         </button>
         <span className="font-sora text-xs font-bold text-[#0D47A1]">Host Review &amp; Rating</span>
-        <span className="font-sora text-xs text-[#2196F3] font-semibold">{bookingRef}</span>
+        <span className="badge-sharp bg-[#E3F2FD] border border-[#90CAF9] text-[#2196F3]">{bookingRef}</span>
       </div>
 
-      <form onSubmit={handleSubmit} className="px-4 mt-4 flex flex-col gap-5">
+      <form onSubmit={handleSubmit} className="px-4 mt-4 flex flex-col gap-4 font-inter">
         {submitted && (
-          <div className="p-4 rounded-2xl bg-[#10B981]/15 border border-[#10B981] text-[#047857] font-sora text-xs font-bold animate-in fade-in flex items-center gap-2">
+          <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-800 font-sora text-xs font-bold animate-in fade-in flex items-center gap-2">
             <span className="material-symbols-outlined text-[20px]">check_circle</span>
             <span>Thank you! Your verified rating was submitted and escrow released.</span>
           </div>
         )}
 
         {errorMsg && (
-          <div className="p-3 rounded-xl bg-red-50 text-red-700 text-xs font-sora font-semibold border border-red-200">
+          <div className="p-3 rounded-md bg-red-50 text-red-700 text-xs font-sora font-semibold border border-red-200">
             {errorMsg}
           </div>
         )}
 
         {/* Chef Summary */}
-        <div className="p-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] flex items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-[#90CAF9] flex-shrink-0">
+        <div className="card-sharp p-4 flex items-center gap-3">
+          <div className="w-14 h-14 rounded-md overflow-hidden ring-1 ring-[#CBD5E1] shrink-0">
             <img src={provider.avatar} alt={provider.name} className="w-full h-full object-cover" />
           </div>
           <div>
-            <h4 className="font-sora font-bold text-sm text-[#172033]">{provider.name}</h4>
-            <p className="font-sora text-xs text-[#64748B]">{provider.cuisines}</p>
-            <span className="text-[10px] font-sora font-semibold text-[#2196F3]">Event Delivered: 28 Nov 2026</span>
+            <h4 className="heading-4 text-sm">{provider.name}</h4>
+            <p className="font-inter text-xs text-[#64748B]">{provider.cuisines}</p>
+            <span className="text-[11px] font-sora font-semibold text-[#2196F3]">Event Delivered: 28 Nov 2026</span>
           </div>
         </div>
 
-        {/* Overall Star Rating (Stitch Interactive Stepper) */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col items-center justify-center text-center">
+        {/* Overall Star Rating (Sharp Geometry: card-sharp) */}
+        <div className="card-sharp p-4 flex flex-col items-center justify-center text-center font-sora">
           <span className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider mb-2">
             Overall Culinary Experience
           </span>
@@ -106,8 +106,9 @@ export default function HostReviewSubmission() {
                 type="button"
                 onClick={() => setOverallRating(star)}
                 className="text-amber-400 hover:scale-110 active:scale-95 transition-transform"
+                aria-label={`Rate ${star} star`}
               >
-                <span className={`material-symbols-outlined text-[36px] ${star <= overallRating ? 'fill-1 text-[#FFB300]' : 'text-[#E5E7EB]'}`}>
+                <span className={`material-symbols-outlined text-[36px] ${star <= overallRating ? 'fill-1 text-[#D97706]' : 'text-[#E5E7EB]'}`}>
                   star
                 </span>
               </button>
@@ -118,20 +119,20 @@ export default function HostReviewSubmission() {
           </span>
         </div>
 
-        {/* Detailed Criteria Sliders */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-3.5">
+        {/* Detailed Criteria */}
+        <div className="card-sharp p-4 flex flex-col gap-3.5 font-sora">
           <span className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
             Granular Hospitality Feedback
           </span>
 
-          <div className="flex flex-col gap-3 text-xs font-sora">
+          <div className="flex flex-col gap-3 text-xs font-inter">
             {/* Taste */}
             <div className="flex items-center justify-between">
               <span className="text-[#64748B] font-medium">Food Taste &amp; Authenticity:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" onClick={() => setTasteRating(s)}>
-                    <span className={`material-symbols-outlined text-[20px] ${s <= tasteRating ? 'fill-1 text-[#FFB300]' : 'text-[#E5E7EB]'}`}>star</span>
+                  <button key={s} type="button" onClick={() => setTasteRating(s)} aria-label={`Taste ${s}`}>
+                    <span className={`material-symbols-outlined text-[20px] ${s <= tasteRating ? 'fill-1 text-[#D97706]' : 'text-[#CBD5E1]'}`}>star</span>
                   </button>
                 ))}
               </div>
@@ -142,8 +143,8 @@ export default function HostReviewSubmission() {
               <span className="text-[#64748B] font-medium">Kitchen Hygiene &amp; Cleanliness:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" onClick={() => setHygieneRating(s)}>
-                    <span className={`material-symbols-outlined text-[20px] ${s <= hygieneRating ? 'fill-1 text-[#FFB300]' : 'text-[#E5E7EB]'}`}>star</span>
+                  <button key={s} type="button" onClick={() => setHygieneRating(s)} aria-label={`Hygiene ${s}`}>
+                    <span className={`material-symbols-outlined text-[20px] ${s <= hygieneRating ? 'fill-1 text-[#D97706]' : 'text-[#CBD5E1]'}`}>star</span>
                   </button>
                 ))}
               </div>
@@ -154,8 +155,8 @@ export default function HostReviewSubmission() {
               <span className="text-[#64748B] font-medium">Punctuality &amp; Kitchen Readiness:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" onClick={() => setPunctualityRating(s)}>
-                    <span className={`material-symbols-outlined text-[20px] ${s <= punctualityRating ? 'fill-1 text-[#FFB300]' : 'text-[#E5E7EB]'}`}>star</span>
+                  <button key={s} type="button" onClick={() => setPunctualityRating(s)} aria-label={`Punctuality ${s}`}>
+                    <span className={`material-symbols-outlined text-[20px] ${s <= punctualityRating ? 'fill-1 text-[#D97706]' : 'text-[#CBD5E1]'}`}>star</span>
                   </button>
                 ))}
               </div>
@@ -166,8 +167,8 @@ export default function HostReviewSubmission() {
               <span className="text-[#64748B] font-medium">Hospitality &amp; Guest Courtesies:</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" onClick={() => setHospitalityRating(s)}>
-                    <span className={`material-symbols-outlined text-[20px] ${s <= hospitalityRating ? 'fill-1 text-[#FFB300]' : 'text-[#E5E7EB]'}`}>star</span>
+                  <button key={s} type="button" onClick={() => setHospitalityRating(s)} aria-label={`Hospitality ${s}`}>
+                    <span className={`material-symbols-outlined text-[20px] ${s <= hospitalityRating ? 'fill-1 text-[#D97706]' : 'text-[#CBD5E1]'}`}>star</span>
                   </button>
                 ))}
               </div>
@@ -176,28 +177,29 @@ export default function HostReviewSubmission() {
         </div>
 
         {/* Written Review */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-2">
-          <label className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
+        <div className="card-sharp p-4 flex flex-col gap-2">
+          <label htmlFor="review-text" className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
             Share Your Experience with Other Hosts
           </label>
           <textarea
+            id="review-text"
             rows={4}
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-            className="w-full p-3 rounded-xl bg-[#f1f3ff] border border-[#E5E7EB] font-sora text-xs text-[#172033] outline-none focus:ring-2 focus:ring-[#90CAF9] focus:bg-white resize-none"
+            className="w-full p-3 rounded-md bg-[#F8FAFC] border border-[#CBD5E1] font-inter text-xs text-[#172033] outline-none focus:border-[#2196F3] focus:ring-2 focus:ring-[#2196F3]/25 focus:bg-white resize-none"
           ></textarea>
         </div>
 
-        {/* Submit Review CTA */}
+        {/* Submit Review CTA (Sharp Geometry: btn-primary) */}
         <button
           type="submit"
           disabled={isSubmitting || submitted}
-          className="w-full py-3.5 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-sm font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="btn-primary w-full py-3.5 text-xs font-bold"
         >
           {isSubmitting ? (
             <span className="inline-block animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-1"></span>
           ) : (
-            <span className="material-symbols-outlined text-[20px]">rate_review</span>
+            <span className="material-symbols-outlined text-[18px]">rate_review</span>
           )}
           <span>{isSubmitting ? 'Publishing Review...' : 'Publish Verified Review & Release Escrow'}</span>
         </button>

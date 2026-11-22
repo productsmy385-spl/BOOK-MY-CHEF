@@ -4,7 +4,10 @@ import { getClerkPublishableKey } from '../components/auth/ClerkAuthProvider';
 
 /**
  * Custom Hook: useClerkOtp
- * Production-ready Clerk custom flow for Phone SMS OTP verification
+ * Production-ready Clerk custom flows for:
+ * 1. Email OTP (Verification code sent to email inbox)
+ * 2. Password Sign-In (Instant password-based login)
+ * 3. Dual factor resolution
  */
 export function useClerkOtp() {
   const hasClerkKey = Boolean(getClerkPublishableKey());
@@ -18,7 +21,7 @@ export function useClerkOtp() {
     signInHook = useSignIn();
     clerk = useClerk();
   } catch (e) {
-    // Thrown if rendered outside ClerkProvider
+    // Graceful fallback if rendered outside ClerkProvider
   }
 
   const [isLoading, setIsLoading] = useState(false);
@@ -37,52 +40,53 @@ export function useClerkOtp() {
       '';
     const code = err?.errors?.[0]?.code || '';
 
-    // Error 1: Phone number disabled in Clerk Dashboard
-    if (
-      rawMsg.includes('phone_number is not a valid parameter') ||
-      rawMsg.includes('phoneNumber is not a valid parameter') ||
-      rawMsg.includes('form_param_unknown') ||
-      code === 'form_param_unknown'
-    ) {
-      return 'Phone number authentication is not enabled in your Clerk Dashboard. Go to Clerk Dashboard → User & authentication → Email, Phone, Username and enable "Phone number" and "SMS verification code".';
+    // Error 1: Email already in use
+    if (code === 'form_identifier_exists' || rawMsg.includes('already exists') || rawMsg.includes('taken')) {
+      return 'An account with this email address already exists. Please switch to "Sign In" to continue.';
     }
 
     // Error 2: Identifier invalid / Account not found on sign-in
     if (
-      rawMsg.includes('Identifier is invalid') ||
       code === 'form_identifier_not_found' ||
-      code === 'identifier_invalid'
+      code === 'identifier_invalid' ||
+      rawMsg.includes('Identifier is invalid') ||
+      rawMsg.includes('Couldn\'t find your account')
     ) {
-      return 'No registered account found with this mobile number. Please switch to "Sign Up" to register your account first.';
+      return 'No registered account found with this email. Please switch to "Sign Up" to register first.';
     }
 
-    // Error 3: SMS country restriction / allowlist
-    if (rawMsg.includes('SMS country') || rawMsg.includes('country code') || code === 'sms_country_not_allowed') {
-      return 'SMS OTP delivery is restricted for this country code. Ensure India (+91) is enabled in Clerk Dashboard → SMS → Settings.';
-    }
-
-    // Error 4: Invalid verification code
+    // Error 3: Invalid verification code
     if (rawMsg.includes('verification code') || code === 'form_code_incorrect') {
-      return 'Incorrect verification code. Please check your SMS and enter the 6-digit code again.';
+      return 'Incorrect 6-digit verification code. Please check your email inbox (and spam folder) and enter the code again.';
     }
 
-    // Error 5: Code expired
+    // Error 4: Code expired
     if (rawMsg.includes('expired') || code === 'verification_expired') {
-      return 'This verification code has expired. Please click "Resend OTP" to receive a new code.';
+      return 'This verification code has expired. Please click "Resend Code" to receive a new OTP.';
     }
 
-    // Error 6: Rate limit
+    // Error 5: Password incorrect
+    if (code === 'form_password_incorrect' || rawMsg.includes('Password is incorrect')) {
+      return 'Incorrect password. Please try again or switch to "Sign In via Email OTP".';
+    }
+
+    // Error 6: Password too weak
+    if (code === 'form_password_pwned' || code === 'form_password_length_too_short' || rawMsg.includes('password')) {
+      return rawMsg || 'Password must be at least 8 characters long.';
+    }
+
+    // Error 7: Rate limit
     if (code === 'too_many_requests' || rawMsg.includes('Too many requests')) {
-      return 'Too many verification attempts. Please wait 60 seconds before trying again.';
+      return 'Too many attempts. Please wait 60 seconds before trying again.';
     }
 
     return rawMsg || defaultMsg;
   };
 
   /**
-   * 1. Send SMS OTP for Sign-Up
+   * 1. Send Email Verification Code for Sign-Up
    */
-  const sendSignUpOtp = async (formattedPhone) => {
+  const sendSignUpEmailOtp = async (email, password = '') => {
     setIsLoading(true);
     setErrorMessage('');
 
@@ -95,25 +99,25 @@ export function useClerkOtp() {
 
       const { signUp } = signUpHook;
 
-      // Create sign up with normalized E.164 phone number
-      await signUp.create({
-        phoneNumber: formattedPhone,
-      });
-
-      // Prepare phone code verification (dispatches genuine Clerk SMS OTP)
-      if (signUp.verifications?.sendPhoneCode) {
-        const sendRes = await signUp.verifications.sendPhoneCode({ strategy: 'phone_code' });
-        if (sendRes?.error) throw sendRes.error;
-      } else if (typeof signUp.preparePhoneNumberVerification === 'function') {
-        await signUp.preparePhoneNumberVerification({
-          strategy: 'phone_code',
-        });
+      // Prepare payload with emailAddress and optional password
+      const payload = {
+        emailAddress: email.trim().toLowerCase(),
+      };
+      if (password && password.trim().length >= 8) {
+        payload.password = password.trim();
       }
+
+      await signUp.create(payload);
+
+      // Trigger Clerk Email Verification Code
+      await signUp.prepareEmailAddressVerification({
+        strategy: 'email_code',
+      });
 
       setIsLoading(false);
       return { success: true };
     } catch (err) {
-      const msg = formatClerkError(err, 'Failed to send SMS OTP. Please check your mobile number and try again.', 'SIGN_UP');
+      const msg = formatClerkError(err, 'Failed to send verification code. Please check your email address and try again.', 'SIGN_UP');
       setErrorMessage(msg);
       setIsLoading(false);
       return { success: false, error: msg };
@@ -121,9 +125,9 @@ export function useClerkOtp() {
   };
 
   /**
-   * 2. Verify SMS OTP for Sign-Up
+   * 2. Verify Email OTP Code for Sign-Up
    */
-  const verifySignUpOtp = async (code) => {
+  const verifySignUpEmailOtp = async (code) => {
     setIsLoading(true);
     setErrorMessage('');
 
@@ -133,25 +137,10 @@ export function useClerkOtp() {
       }
 
       const { signUp, setActive } = signUpHook;
-      let result;
 
-      // Verify using available SDK method
-      if (signUp.verifications?.verifyPhoneCode) {
-        const verifyRes = await signUp.verifications.verifyPhoneCode({ code });
-        if (verifyRes?.error) throw verifyRes.error;
-        result = signUp;
-      } else if (typeof signUp.attemptVerification === 'function') {
-        result = await signUp.attemptVerification({
-          strategy: 'phone_code',
-          code,
-        });
-      } else if (typeof signUp.attemptPhoneNumberVerification === 'function') {
-        result = await signUp.attemptPhoneNumberVerification({
-          code,
-        });
-      } else {
-        throw new Error('No supported phone verification method found on Clerk signUp resource.');
-      }
+      const result = await signUp.attemptEmailAddressVerification({
+        code: code.trim(),
+      });
 
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
@@ -165,7 +154,7 @@ export function useClerkOtp() {
         throw new Error(`Sign-up incomplete (status: ${result.status})`);
       }
     } catch (err) {
-      const msg = formatClerkError(err, 'Invalid or expired verification code. Please check SMS and try again.', 'VERIFY_SIGN_UP');
+      const msg = formatClerkError(err, 'Invalid or expired verification code. Please check your email and try again.', 'VERIFY_SIGN_UP');
       setErrorMessage(msg);
       setIsLoading(false);
       return { success: false, error: msg };
@@ -173,9 +162,9 @@ export function useClerkOtp() {
   };
 
   /**
-   * 3. Send SMS OTP for Sign-In
+   * 3. Send Email OTP Code for Sign-In
    */
-  const sendSignInOtp = async (formattedPhone) => {
+  const sendSignInEmailOtp = async (email) => {
     setIsLoading(true);
     setErrorMessage('');
 
@@ -187,33 +176,34 @@ export function useClerkOtp() {
       }
 
       const { signIn } = signInHook;
+      const normalizedEmail = email.trim().toLowerCase();
 
-      // Initiate sign-in with phone number identifier
+      // Initiate sign-in with email identifier
       const signInAttempt = await signIn.create({
-        identifier: formattedPhone,
+        identifier: normalizedEmail,
       });
 
-      // Find the phone_code factor
-      const phoneCodeFactor = signInAttempt.supportedFirstFactors?.find(
-        (factor) => factor.strategy === 'phone_code'
+      // Find the email_code first factor
+      const emailFactor = signInAttempt.supportedFirstFactors?.find(
+        (factor) => factor.strategy === 'email_code'
       );
 
-      if (!phoneCodeFactor) {
+      if (!emailFactor) {
         throw new Error(
-          'SMS verification factor is not available for this account. Ensure phone sign-in is enabled in Clerk Dashboard.'
+          'Email code verification factor is not available for this account. Ensure email code is enabled in Clerk Dashboard.'
         );
       }
 
-      // Dispatch real SMS OTP via Clerk
+      // Dispatch genuine Clerk Email OTP
       await signIn.prepareFirstFactor({
-        strategy: 'phone_code',
-        phoneNumberId: phoneCodeFactor.phoneNumberId,
+        strategy: 'email_code',
+        emailAddressId: emailFactor.emailAddressId,
       });
 
       setIsLoading(false);
       return { success: true };
     } catch (err) {
-      const msg = formatClerkError(err, 'Could not initiate SMS sign-in. Ensure this mobile number is already registered.', 'SIGN_IN');
+      const msg = formatClerkError(err, 'Could not initiate email sign-in. Ensure this email address is already registered.', 'SIGN_IN');
       setErrorMessage(msg);
       setIsLoading(false);
       return { success: false, error: msg };
@@ -221,9 +211,9 @@ export function useClerkOtp() {
   };
 
   /**
-   * 4. Verify SMS OTP for Sign-In
+   * 4. Verify Email OTP Code for Sign-In
    */
-  const verifySignInOtp = async (code) => {
+  const verifySignInEmailOtp = async (code) => {
     setIsLoading(true);
     setErrorMessage('');
 
@@ -235,8 +225,8 @@ export function useClerkOtp() {
       const { signIn, setActive } = signInHook;
 
       const result = await signIn.attemptFirstFactor({
-        strategy: 'phone_code',
-        code,
+        strategy: 'email_code',
+        code: code.trim(),
       });
 
       if (result.status === 'complete') {
@@ -251,18 +241,68 @@ export function useClerkOtp() {
         throw new Error(`Sign-in incomplete (status: ${result.status})`);
       }
     } catch (err) {
-      const msg = formatClerkError(err, 'Invalid or expired verification code. Please check SMS and try again.', 'VERIFY_SIGN_IN');
+      const msg = formatClerkError(err, 'Invalid or expired verification code. Please check your email and try again.', 'VERIFY_SIGN_IN');
       setErrorMessage(msg);
       setIsLoading(false);
       return { success: false, error: msg };
     }
   };
 
+  /**
+   * 5. Sign In with Password (Instant)
+   */
+  const signInWithPassword = async (email, password) => {
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      if (!hasClerkKey || !signInHook?.signIn) {
+        throw new Error('Clerk authentication is not initialized.');
+      }
+
+      const { signIn, setActive } = signInHook;
+      const normalizedEmail = email.trim().toLowerCase();
+
+      const result = await signIn.create({
+        identifier: normalizedEmail,
+        password: password.trim(),
+      });
+
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        setIsLoading(false);
+        return {
+          success: true,
+          clerkUserId: result.createdUserId || clerk?.user?.id,
+          sessionId: result.createdSessionId,
+        };
+      } else {
+        throw new Error(`Sign-in incomplete (status: ${result.status})`);
+      }
+    } catch (err) {
+      const msg = formatClerkError(err, 'Sign-in failed. Please check your credentials.', 'SIGN_IN_PASSWORD');
+      setErrorMessage(msg);
+      setIsLoading(false);
+      return { success: false, error: msg };
+    }
+  };
+
+  // Backward-compatibility wrappers
+  const sendSignUpOtp = (identifier, password) => sendSignUpEmailOtp(identifier, password);
+  const verifySignUpOtp = (code) => verifySignUpEmailOtp(code);
+  const sendSignInOtp = (identifier) => sendSignInEmailOtp(identifier);
+  const verifySignInOtp = (code) => verifySignInEmailOtp(code);
+
   return {
     isConfigured: hasClerkKey,
     isLoading,
     errorMessage,
     setErrorMessage,
+    sendSignUpEmailOtp,
+    verifySignUpEmailOtp,
+    sendSignInEmailOtp,
+    verifySignInEmailOtp,
+    signInWithPassword,
     sendSignUpOtp,
     verifySignUpOtp,
     sendSignInOtp,

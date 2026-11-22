@@ -9,9 +9,15 @@
     padding: 0;
     background-color: #ffffff !important;
     color: #172033;
-    font-family: 'Sora', sans-serif;
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', sans-serif;
+    color: #172033;
+    letter-spacing: -0.02em;
   }
 
   .pt-safe {
@@ -45,13 +51,136 @@
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Sharp Geometry Design System Utilities */
+/* ==========================================================================
+   GLOBAL TYPOGRAPHY HIERARCHY TOKENS (Sora for Headings, Inter for Body)
+   ========================================================================== */
+.heading-1 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 2rem; /* 32px */
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: #172033;
+}
+@media (min-width: 640px) {
+  .heading-1 {
+    font-size: 2.5rem; /* 40px */
+  }
+}
+
+.heading-2 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: #172033;
+}
+@media (min-width: 640px) {
+  .heading-2 {
+    font-size: 1.875rem; /* 30px */
+  }
+}
+
+.heading-3 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #172033;
+}
+@media (min-width: 640px) {
+  .heading-3 {
+    font-size: 1.375rem; /* 22px */
+  }
+}
+
+.heading-4 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  font-size: 1rem; /* 16px */
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: #172033;
+}
+
+.body-base {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.6;
+  color: #172033;
+}
+
+.body-sm {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.5;
+  color: #64748B;
+}
+
+.caption {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.4;
+  color: #64748B;
+}
+
+.label-micro {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 0.6875rem; /* 11px */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #0D47A1;
+}
+
+/* ==========================================================================
+   HIGH-CONTRAST TOKENS FOR BLUE BACKGROUNDS (#0D47A1 & #2196F3)
+   Mandatory WCAG AAA/AA Compliance (> 4.5:1 ratio)
+   ========================================================================== */
+.text-on-navy-primary {
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+.text-on-navy-secondary {
+  color: #E3F2FD !important;
+  font-weight: 400;
+}
+
+.text-on-navy-accent {
+  color: #90CAF9 !important;
+  font-weight: 600;
+}
+
+.card-on-navy {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+  backdrop-filter: blur(8px);
+}
+
+.card-on-navy-solid {
+  background-color: #0A3880 !important;
+  border: 1px solid rgba(144, 202, 249, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   SHARP GEOMETRY DESIGN SYSTEM TOKENS (No Pill Buttons, 4-8px Radii)
+   ========================================================================== */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  height: 2.875rem; /* 46px */
+  min-height: 44px;
+  padding: 0 1.25rem;
   background-color: #2196F3;
   color: #ffffff;
   font-family: 'Sora', sans-serif;
@@ -60,6 +189,7 @@
   border-radius: 6px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.15s ease-in-out;
+  cursor: pointer;
 }
 .btn-primary:hover:not(:disabled) {
   background-color: #0D47A1;
@@ -72,12 +202,43 @@
   cursor: not-allowed;
 }
 
+.btn-navy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.875rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
+  background-color: #0D47A1;
+  color: #ffffff;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.btn-navy:hover:not(:disabled) {
+  background-color: #1565C0;
+}
+.btn-navy:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn-navy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  height: 2.875rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
   background-color: #ffffff;
   border: 1px solid #2196F3;
   color: #2196F3;
@@ -86,6 +247,7 @@
   font-weight: 600;
   border-radius: 6px;
   transition: all 0.15s ease-in-out;
+  cursor: pointer;
 }
 .btn-secondary:hover:not(:disabled) {
   background-color: #E3F2FD;
@@ -104,7 +266,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
+  height: 2.5rem;
+  padding: 0 0.875rem;
   background-color: transparent;
   color: #64748B;
   font-family: 'Sora', sans-serif;
@@ -112,6 +275,7 @@
   font-weight: 500;
   border-radius: 6px;
   transition: all 0.15s ease-in-out;
+  cursor: pointer;
 }
 .btn-ghost:hover:not(:disabled) {
   background-color: #E3F2FD;
@@ -127,7 +291,9 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  height: 2.875rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
   background-color: #DC2626;
   color: #ffffff;
   font-family: 'Sora', sans-serif;
@@ -135,6 +301,7 @@
   font-weight: 600;
   border-radius: 6px;
   transition: all 0.15s ease-in-out;
+  cursor: pointer;
 }
 .btn-destructive:hover:not(:disabled) {
   background-color: #B91C1C;
@@ -144,14 +311,14 @@
   background-color: #ffffff;
   border: 1px solid #E5E7EB;
   border-radius: 8px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
 
 .input-sharp {
-  height: 2.75rem;
+  height: 3rem; /* 48px standard input height */
   padding: 0 0.875rem;
   background-color: #ffffff;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #CBD5E1;
   border-radius: 6px;
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
@@ -161,7 +328,20 @@
 }
 .input-sharp:focus {
   border-color: #2196F3;
-  box-shadow: 0 0 0 1px #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.badge-sharp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* Custom Scrollbar hiding */

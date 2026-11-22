@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useClerkOtp } from '../../hooks/useClerkOtp';
 import OtpInput6 from '../../components/auth/OtpInput6';
+import PhoneInput from '../../components/common/PhoneInput';
 import { formatToE164, isValidIndianMobile } from '../../lib/clerkAuthService';
 
 export default function AdminLogin() {
@@ -87,27 +88,27 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 font-sora">
-      <div className="w-full max-w-md bg-white rounded-lg p-8 shadow-md border border-[#E5E7EB] flex flex-col gap-6">
+      <div className="w-full max-w-md bg-white rounded-lg p-8 shadow-sm border border-[#E5E7EB] flex flex-col gap-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-12 h-12 rounded-md bg-[#0D47A1] text-white flex items-center justify-center shadow-sm mb-3">
+          <div className="w-12 h-12 rounded-md bg-[#0D47A1] text-white flex items-center justify-center shadow-xs mb-3">
             <span className="material-symbols-outlined text-[26px] text-[#90CAF9]">shield</span>
           </div>
-          <h1 className="font-extrabold text-xl text-[#172033]">Platform Administration</h1>
-          <p className="text-xs text-[#64748B] mt-1 font-inter">Culinary &amp; Event Atelier Governance Portal</p>
+          <h1 className="heading-3">Platform Administration</h1>
+          <p className="body-sm mt-1">Culinary &amp; Event Atelier Governance Portal</p>
         </div>
 
         {/* Invitation-Only Warning Alert (Section 6 Mandate) */}
-        <div className="p-3.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5 font-inter">
+        <div className="p-3.5 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5 font-inter">
           <span className="material-symbols-outlined text-[18px] text-amber-600 flex-shrink-0 mt-0.5">lock</span>
           <p className="leading-relaxed">
-            <strong>Restricted Access:</strong> Administrator accounts require an existing authorization record in PostgreSQL. Public registration is permanently disabled.
+            <strong className="font-semibold">Restricted Access:</strong> Administrator accounts require an existing authorization record in PostgreSQL. Public registration is permanently disabled.
           </p>
         </div>
 
         {/* Error Notification */}
         {errorMessage && step === 'CREDENTIALS' && (
-          <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2 font-inter">
+          <div className="p-3.5 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2 font-inter">
             <span className="material-symbols-outlined text-[18px] text-red-500 flex-shrink-0">error</span>
             <span>{errorMessage}</span>
           </div>
@@ -116,30 +117,24 @@ export default function AdminLogin() {
         {step === 'CREDENTIALS' ? (
           <form onSubmit={handleSendAdminOtp} className="flex flex-col gap-4 text-xs font-inter">
             <div>
-              <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+              <label htmlFor="admin-phone" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                 Invited Administrator Mobile Number *
               </label>
-              <div className="relative flex items-center">
-                <div className="absolute left-3.5 flex items-center gap-1.5 border-r border-[#CBD5E1] pr-2">
-                  <span className="text-sm">🇮🇳</span>
-                  <span className="font-sora font-bold text-xs text-[#0D47A1]">+91</span>
-                </div>
-                <input
-                  type="tel"
-                  required
-                  value={mobileNumber.replace(/^\+91/, '')}
-                  onChange={(e) => setMobileNumber(`+91${e.target.value.replace(/[^0-9]/g, '').slice(0, 10)}`)}
-                  placeholder="98765 43212"
-                  className="input-sharp w-full pl-20 font-mono font-bold tracking-wider"
-                />
-              </div>
+              <PhoneInput
+                id="admin-phone"
+                required
+                value={mobileNumber}
+                onChange={setMobileNumber}
+                placeholder="98765 43212"
+              />
             </div>
 
             <div>
-              <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+              <label htmlFor="admin-email" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                 Authorized Corporate Email *
               </label>
               <input
+                id="admin-email"
                 type="email"
                 required
                 value={email}
@@ -152,7 +147,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary w-full py-3 mt-2"
+              className="btn-navy w-full py-3.5 mt-2"
             >
               {isLoading ? (
                 <>
@@ -162,7 +157,7 @@ export default function AdminLogin() {
               ) : (
                 <>
                   <span>Send Administrator SMS OTP</span>
-                  <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </>
               )}
             </button>

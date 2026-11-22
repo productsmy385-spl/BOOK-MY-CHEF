@@ -39,8 +39,16 @@ public class AuthService {
 
         User user = userRepository.findByClerkId(clerkId)
                 .orElseGet(() -> {
-                    // Check if phone or email already registered with another account
-                    if (userRepository.existsByPhone(req.getPhone())) {
+                    // Check if email already registered with another account
+                    if (req.getEmail() != null && !req.getEmail().isBlank() && userRepository.existsByEmail(req.getEmail())) {
+                        log.info("Email {} exists, updating clerk mapping", req.getEmail());
+                        User existingByEmail = userRepository.findByEmail(req.getEmail()).get();
+                        existingByEmail.setClerkId(clerkId);
+                        return userRepository.save(existingByEmail);
+                    }
+
+                    // Check if phone already registered with another account
+                    if (req.getPhone() != null && !req.getPhone().isBlank() && userRepository.existsByPhone(req.getPhone())) {
                         log.info("Phone {} exists, updating clerk mapping", req.getPhone());
                         User existingByPhone = userRepository.findByPhone(req.getPhone()).get();
                         existingByPhone.setClerkId(clerkId);
@@ -48,9 +56,13 @@ public class AuthService {
                     }
 
                     String role = "PROVIDER".equalsIgnoreCase(req.getIntendedRole()) ? "PROVIDER" : "CUSTOMER";
+                    String resolvedPhone = (req.getPhone() != null && !req.getPhone().isBlank())
+                            ? req.getPhone()
+                            : "usr_" + UUID.randomUUID().toString().substring(0, 12);
+
                     User newUser = User.builder()
                             .clerkId(clerkId)
-                            .phone(req.getPhone())
+                            .phone(resolvedPhone)
                             .email(req.getEmail())
                             .userType(role)
                             .accountStatus("ACTIVE")

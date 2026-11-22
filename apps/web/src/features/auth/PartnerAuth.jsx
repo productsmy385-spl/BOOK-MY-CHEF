@@ -4,8 +4,8 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { useProviderStore } from '../../stores/useProviderStore';
 import { useClerkOtp } from '../../hooks/useClerkOtp';
 import OtpInput6 from '../../components/auth/OtpInput6';
+import PhoneInput from '../../components/common/PhoneInput';
 import { formatToE164, isValidIndianMobile, syncUserWithPostgres } from '../../lib/clerkAuthService';
-import { ASSETS } from '../../assets/assetCatalog';
 
 export default function PartnerAuth() {
   const navigate = useNavigate();
@@ -167,8 +167,8 @@ export default function PartnerAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col lg:grid lg:grid-cols-12">
-      {/* Desktop Left Brand & Editorial Section (Sharp Geometry) */}
+    <div className="min-h-screen bg-white flex flex-col lg:grid lg:grid-cols-12 font-sora">
+      {/* Desktop Left Brand & Editorial Section (Sharp Geometry + WCAG AAA High Contrast) */}
       <div className="hidden lg:flex lg:col-span-5 bg-[#0D47A1] text-white flex-col justify-between p-12 relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center gap-3">
@@ -186,29 +186,29 @@ export default function PartnerAuth() {
           </div>
 
           <div className="mt-16">
-            <span className="inline-block px-3 py-1 bg-white/10 border border-white/20 text-[#90CAF9] text-xs font-semibold rounded-md uppercase tracking-wider mb-4">
+            <span className="inline-block px-3 py-1 bg-white/15 border border-white/30 text-[#E3F2FD] text-xs font-semibold rounded-md uppercase tracking-wider mb-4">
               Service Partner Ecosystem
             </span>
-            <h2 className="font-sora font-bold text-3xl leading-snug text-white">
+            <h2 className="heading-1 text-white leading-tight">
               Direct booking leads, calendar slot locks, and zero-delay escrow payouts.
             </h2>
-            <p className="font-inter text-sm text-white/80 mt-4 leading-relaxed max-w-md">
+            <p className="font-inter text-sm text-[#E3F2FD] mt-4 leading-relaxed max-w-md">
               Whether you are an independent masterchef, a boutique catering kitchen, or a full event styling atelier, manage all your bookings with 100% pricing autonomy.
             </p>
           </div>
         </div>
 
         <div className="relative z-10 mt-8">
-          <div className="card-sharp overflow-hidden border border-white/20 bg-white/5 backdrop-blur-sm p-4">
+          <div className="card-on-navy rounded-lg p-5">
             <h4 className="font-sora font-bold text-sm text-white">Multi-Role Enablement</h4>
-            <p className="font-inter text-xs text-[#90CAF9] mt-1 leading-relaxed">
+            <p className="font-inter text-xs text-[#E3F2FD] mt-1 leading-relaxed">
               Operate as a Chef, Caterer, and Event Manager concurrently under one unified atelier profile.
             </p>
           </div>
-          <div className="mt-6 flex items-center justify-between text-xs text-[#90CAF9] border-t border-white/10 pt-4 font-inter">
+          <div className="mt-6 flex items-center justify-between text-xs text-[#E3F2FD] border-t border-white/20 pt-4 font-inter">
             <span>Razorpay Route Escrow Settlements</span>
-            <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">verified</span>
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="material-symbols-outlined text-[16px] text-[#90CAF9]">verified</span>
               FSSAI Verified Network
             </span>
           </div>
@@ -231,15 +231,15 @@ export default function PartnerAuth() {
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
               <span>{step === 'OTP' ? 'Change Number' : (step === 'DETAILS' ? 'Change Roles' : 'Back')}</span>
             </button>
-            <div className="flex items-center gap-1.5 bg-[#E3F2FD] border border-[#90CAF9] px-3 py-1 rounded-md">
+            <div className="badge-sharp bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1]">
               <span className="material-symbols-outlined text-[14px] text-[#0D47A1]">storefront</span>
-              <span className="font-sora text-xs font-bold text-[#0D47A1]">Partner Studio</span>
+              <span>Partner Studio</span>
             </div>
           </div>
 
           {/* Heading */}
           <div className="mt-6 mb-5">
-            <h1 className="font-sora font-extrabold text-2xl text-[#172033] tracking-tight">
+            <h1 className="heading-2">
               {step === 'ROLE_FIRST' && mode === 'REGISTER'
                 ? 'Select Your Service Categories'
                 : step === 'OTP'
@@ -248,7 +248,7 @@ export default function PartnerAuth() {
                 ? 'Partner Profile Details'
                 : 'Partner Studio Sign In'}
             </h1>
-            <p className="font-inter text-xs text-[#64748B] mt-1.5 leading-relaxed">
+            <p className="body-sm mt-1.5">
               {step === 'ROLE_FIRST' && mode === 'REGISTER'
                 ? 'Select your primary role and any additional services you provide. You can configure individual pricing for each.'
                 : step === 'OTP'
@@ -261,7 +261,7 @@ export default function PartnerAuth() {
 
           {/* Tabs: Sign Up / Sign In (Sharp Geometry) */}
           {(step === 'ROLE_FIRST' || step === 'DETAILS') && (
-            <div className="flex bg-[#f1f3ff] p-1 mb-6 border border-[#E5E7EB] rounded-md">
+            <div className="flex bg-[#F8FAFC] p-1 mb-6 border border-[#E5E7EB] rounded-md">
               <button
                 type="button"
                 onClick={() => {
@@ -271,7 +271,7 @@ export default function PartnerAuth() {
                 }}
                 className={`flex-1 py-2 font-sora text-xs font-bold rounded transition-all ${
                   mode === 'REGISTER'
-                    ? 'bg-white text-[#0D47A1] shadow-xs'
+                    ? 'bg-white text-[#0D47A1] shadow-xs border border-[#CBD5E1]'
                     : 'text-[#64748B] hover:text-[#172033]'
                 }`}
               >
@@ -286,7 +286,7 @@ export default function PartnerAuth() {
                 }}
                 className={`flex-1 py-2 font-sora text-xs font-bold rounded transition-all ${
                   mode === 'LOGIN'
-                    ? 'bg-white text-[#0D47A1] shadow-xs'
+                    ? 'bg-white text-[#0D47A1] shadow-xs border border-[#CBD5E1]'
                     : 'text-[#64748B] hover:text-[#172033]'
                 }`}
               >
@@ -306,7 +306,7 @@ export default function PartnerAuth() {
           {/* STAGE A: Role Selection First (Mandatory Multi-Role Feature) */}
           {mode === 'REGISTER' && step === 'ROLE_FIRST' && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between p-3 bg-[#E3F2FD] border border-[#90CAF9] rounded-md">
+              <div className="flex items-center justify-between p-3.5 bg-[#E3F2FD] border border-[#90CAF9] rounded-md">
                 <span className="font-sora text-xs font-bold text-[#0D47A1]">
                   {selectedRoles.length} Service Role{selectedRoles.length === 1 ? '' : 's'} Selected
                 </span>
@@ -325,13 +325,13 @@ export default function PartnerAuth() {
                       onClick={() => toggleRole(role.id)}
                       className={`p-3.5 border rounded-md text-left transition-all flex items-start gap-3 active:scale-[0.99] ${
                         isSelected
-                          ? 'bg-[#E3F2FD]/50 border-[#2196F3] shadow-xs'
+                          ? 'bg-[#E3F2FD]/60 border-[#2196F3] shadow-xs ring-1 ring-[#2196F3]'
                           : 'bg-white border-[#E5E7EB] hover:border-[#90CAF9]'
                       }`}
                     >
                       <div
                         className={`w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0 transition-colors ${
-                          isSelected ? 'bg-[#0D47A1] text-white' : 'bg-[#f1f3ff] text-[#64748B]'
+                          isSelected ? 'bg-[#0D47A1] text-white' : 'bg-[#F8FAFC] text-[#64748B]'
                         }`}
                       >
                         <span className="material-symbols-outlined text-[20px]">{role.icon}</span>
@@ -341,7 +341,7 @@ export default function PartnerAuth() {
                           <span className="font-sora font-bold text-xs text-[#172033]">{role.label}</span>
                           <span
                             className={`w-4 h-4 rounded-sm flex items-center justify-center text-[11px] ${
-                              isSelected ? 'bg-[#2196F3] text-white' : 'border border-[#CBD5E1]'
+                              isSelected ? 'bg-[#2196F3] text-white font-bold' : 'border border-[#CBD5E1]'
                             }`}
                           >
                             {isSelected && '✓'}
@@ -378,14 +378,15 @@ export default function PartnerAuth() {
               {mode === 'REGISTER' && (
                 <>
                   <div>
-                    <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                    <label htmlFor="partner-name" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                       Professional Name *
                     </label>
                     <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
+                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
                         person
                       </span>
                       <input
+                        id="partner-name"
                         type="text"
                         required
                         value={fullName}
@@ -397,14 +398,15 @@ export default function PartnerAuth() {
                   </div>
 
                   <div>
-                    <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                    <label htmlFor="partner-brand" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                       Culinary Brand / Studio Name (Optional)
                     </label>
                     <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
+                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
                         storefront
                       </span>
                       <input
+                        id="partner-brand"
                         type="text"
                         value={businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
@@ -415,14 +417,15 @@ export default function PartnerAuth() {
                   </div>
 
                   <div>
-                    <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                    <label htmlFor="partner-email" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                       Email Address *
                     </label>
                     <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
+                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
                         mail
                       </span>
                       <input
+                        id="partner-email"
                         type="email"
                         required
                         value={email}
@@ -434,14 +437,15 @@ export default function PartnerAuth() {
                   </div>
 
                   <div>
-                    <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                    <label htmlFor="partner-location" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                       Operating Base City *
                     </label>
                     <div className="relative flex items-center">
-                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px]">
+                      <span className="material-symbols-outlined text-[#64748B] absolute left-3.5 text-[18px] pointer-events-none">
                         location_on
                       </span>
                       <input
+                        id="partner-location"
                         type="text"
                         required
                         value={location}
@@ -455,24 +459,18 @@ export default function PartnerAuth() {
               )}
 
               <div>
-                <label className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
+                <label htmlFor="partner-phone" className="block text-[#172033] font-sora font-bold uppercase text-[10px] mb-1.5">
                   Indian Mobile Number *
                 </label>
-                <div className="relative flex items-center">
-                  <div className="absolute left-3.5 flex items-center gap-1.5 border-r border-[#CBD5E1] pr-2">
-                    <span className="text-sm">🇮🇳</span>
-                    <span className="font-sora font-bold text-xs text-[#0D47A1]">+91</span>
-                  </div>
-                  <input
-                    type="tel"
-                    required
-                    value={mobileNumber.replace(/^\+91/, '')}
-                    onChange={(e) => setMobileNumber(`+91${e.target.value.replace(/[^0-9]/g, '').slice(0, 10)}`)}
-                    placeholder="Enter 10-digit mobile number"
-                    className="input-sharp w-full pl-20 font-mono font-bold tracking-wider"
-                  />
-                </div>
-                <span className="text-[11px] text-[#64748B] mt-1 block">
+                {/* Architectural Standard: PhoneInput (pure flexbox, zero overlap) */}
+                <PhoneInput
+                  id="partner-phone"
+                  required
+                  value={mobileNumber}
+                  onChange={setMobileNumber}
+                  placeholder="Enter 10-digit mobile number"
+                />
+                <span className="text-[11px] text-[#64748B] mt-1.5 block">
                   A genuine SMS OTP code will be sent to this number.
                 </span>
               </div>
