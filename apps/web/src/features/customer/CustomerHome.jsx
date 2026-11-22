@@ -1,15 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ASSETS } from '../../assets/assetCatalog';
+import { useBookingStore } from '../../stores/useBookingStore';
+import { api } from '../../services/api';
 
 export default function CustomerHome() {
   const navigate = useNavigate();
+  const { setProvider } = useBookingStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [favorites, setFavorites] = useState({ 'raghavendra': true, 'utsav': false });
+  const [realProviders, setRealProviders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchProviders() {
+      setIsLoading(true);
+      try {
+        const res = await api.providers.search({ query: searchQuery.trim() || undefined });
+        if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          setRealProviders(res.data);
+        }
+      } catch (err) {
+        console.warn('Could not fetch real providers, using curated catalog:', err.message);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+    fetchProviders();
+    return () => { isMounted = false; };
+  }, [searchQuery]);
 
   const toggleFav = (id) => {
     setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleSelectChef = (chef, target = '/chef') => {
+    setProvider({
+      id: chef.id,
+      name: chef.professionalName || chef.businessName || chef.name || 'Masterchef',
+      avatar: chef.avatarUrl || chef.image || ASSETS.chefRaghavendraStudio,
+      title: chef.primaryRole ? `${chef.primaryRole} • ${chef.experienceYears || 15}+ Yrs Exp` : 'Masterchef • 18+ Yrs Exp',
+      cuisines: Array.isArray(chef.cuisines) ? chef.cuisines.join(' • ') : (chef.cuisines || 'Andhra Royal • Telangana Home-Style'),
+      rating: chef.averageRating || chef.rating || 4.95,
+      reviewsCount: chef.totalReviews || chef.reviewsCount || 124,
+      baseFee: chef.startingPrice ? Number(chef.startingPrice) : 1500,
+      perPersonRate: 350,
+    });
+    if (target === '/booking') {
+      navigate('/booking/step-1');
+    } else {
+      navigate(`/chef/${chef.id}`);
+    }
   };
 
   const categories = [
@@ -213,158 +256,273 @@ export default function CustomerHome() {
           </button>
         </div>
 
-        {/* Masterchef Card 1: Chef Raghavendra Rao */}
-        <div className="w-full bg-white rounded-2xl shadow-subtle border border-[#E5E7EB] overflow-hidden flex flex-col mb-4 group hover:shadow-card transition-all">
-          <div className="relative h-52 w-full">
-            <img
-              src={ASSETS.chefRaghavendraStudio}
-              alt="Chef Raghavendra Rao"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#172033]/85 via-transparent to-transparent"></div>
-
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-full shadow-xs border border-[#90CAF9]/40">
-              <span className="material-symbols-outlined text-[#0D47A1] text-[16px] fill-1">verified</span>
-              <span className="font-sora text-[11px] font-bold text-[#0D47A1]">Masterchef Verified</span>
-            </div>
-
-            <button
-              onClick={() => toggleFav('raghavendra')}
-              aria-label="Add to favourites"
-              className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#64748B] transition-transform active:scale-75 shadow-sm"
+        {/* Masterchef Cards: Dynamically Rendered from Database with Catalog Fallback */}
+        {realProviders.length > 0 ? (
+          realProviders.map((chef) => (
+            <div
+              key={chef.id}
+              className="w-full bg-white rounded-2xl shadow-subtle border border-[#E5E7EB] overflow-hidden flex flex-col mb-4 group hover:shadow-card transition-all"
             >
-              <span className={`material-symbols-outlined text-[20px] ${favorites['raghavendra'] ? 'text-red-500 fill-1' : ''}`}>
-                favorite
-              </span>
-            </button>
+              <div className="relative h-52 w-full">
+                <img
+                  src={chef.avatarUrl || chef.coverImageUrl || ASSETS.chefRaghavendraStudio}
+                  alt={chef.professionalName || chef.businessName}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#172033]/85 via-transparent to-transparent"></div>
 
-            {/* Title & Rating on Cover */}
-            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
-              <div>
-                <span className="font-sora text-[11px] text-[#90CAF9] uppercase tracking-wider font-semibold">
-                  Jubilee Hills • 3.8 km away
-                </span>
-                <h4 className="font-sora font-bold text-lg leading-tight drop-shadow-sm text-white">
-                  Chef Raghavendra Rao
-                </h4>
-              </div>
-              <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full text-[#172033] shadow-sm">
-                <span className="material-symbols-outlined text-[#FFB300] text-[15px] fill-1">star</span>
-                <span className="font-sora text-xs font-bold">4.95</span>
-                <span className="text-[10px] text-[#64748B]">(1.2k)</span>
-              </div>
-            </div>
-          </div>
+                {/* Badges */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-full shadow-xs border border-[#90CAF9]/40">
+                  <span className="material-symbols-outlined text-[#0D47A1] text-[16px] fill-1">verified</span>
+                  <span className="font-sora text-[11px] font-bold text-[#0D47A1]">
+                    {chef.verificationStatus === 'VERIFIED' ? 'Masterchef Verified' : 'Atelier Verified'}
+                  </span>
+                </div>
 
-          {/* Details & Actions */}
-          <div className="p-4 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
-                Andhra Royal
-              </span>
-              <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
-                Telangana Heritage
-              </span>
-              <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
-                Coastal Seafood
-              </span>
-              <span className="px-2.5 py-0.5 bg-[#E3F2FD] rounded-full font-sora text-[11px] font-semibold text-[#2196F3]">
-                18+ Yrs Exp
-              </span>
-            </div>
+                <button
+                  onClick={() => toggleFav(chef.id)}
+                  aria-label="Add to favourites"
+                  className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#64748B] transition-transform active:scale-75 shadow-sm"
+                >
+                  <span className={`material-symbols-outlined text-[20px] ${favorites[chef.id] ? 'text-red-500 fill-1' : ''}`}>
+                    favorite
+                  </span>
+                </button>
 
-            <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
-              <div className="flex flex-col">
-                <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Starting from</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-sora font-extrabold text-lg text-[#172033]">₹1,499</span>
-                  <span className="font-sora text-xs text-[#64748B]">/ person</span>
+                {/* Title & Rating on Cover */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
+                  <div>
+                    <span className="font-sora text-[11px] text-[#90CAF9] uppercase tracking-wider font-semibold">
+                      {chef.businessName || 'Culinary Atelier'} • {chef.distanceKm || 3.8} km away
+                    </span>
+                    <h4 className="font-sora font-bold text-lg leading-tight drop-shadow-sm text-white">
+                      {chef.professionalName || chef.businessName}
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full text-[#172033] shadow-sm">
+                    <span className="material-symbols-outlined text-[#FFB300] text-[15px] fill-1">star</span>
+                    <span className="font-sora text-xs font-bold">{chef.averageRating || 4.95}</span>
+                    <span className="text-[10px] text-[#64748B]">({chef.totalReviews || 84})</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Details & Actions */}
+              <div className="p-4 flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {(chef.cuisines || ['Andhra Royal', 'Telangana Heritage']).map((c, i) => (
+                    <span key={i} className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                      {c}
+                    </span>
+                  ))}
+                  {chef.experienceYears && (
+                    <span className="px-2.5 py-0.5 bg-[#E3F2FD] rounded-full font-sora text-[11px] font-semibold text-[#2196F3]">
+                      {chef.experienceYears}+ Yrs Exp
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
+                  <div className="flex flex-col">
+                    <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Starting from</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-sora font-extrabold text-lg text-[#172033]">
+                        ₹{Number(chef.startingPrice || 1500).toLocaleString('en-IN')}
+                      </span>
+                      <span className="font-sora text-xs text-[#64748B]">/ {chef.pricingModel === 'PER_PERSON' ? 'person' : 'service'}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSelectChef(chef, '/chef')}
+                      className="px-3.5 py-2 bg-white border border-[#2196F3] text-[#2196F3] hover:bg-[#E3F2FD] rounded-full font-sora text-xs font-semibold active:scale-95 transition-all"
+                    >
+                      View Profile
+                    </button>
+                    <button
+                      onClick={() => handleSelectChef(chef, '/booking')}
+                      className="px-4 py-2 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                    >
+                      <span>Book Chef</span>
+                      <span className="material-symbols-outlined text-[15px]">restaurant_menu</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <>
+            {/* Masterchef Card 1: Chef Raghavendra Rao */}
+            <div className="w-full bg-white rounded-2xl shadow-subtle border border-[#E5E7EB] overflow-hidden flex flex-col mb-4 group hover:shadow-card transition-all">
+              <div className="relative h-52 w-full">
+                <img
+                  src={ASSETS.chefRaghavendraStudio}
+                  alt="Chef Raghavendra Rao"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#172033]/85 via-transparent to-transparent"></div>
+
+                {/* Badges */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-full shadow-xs border border-[#90CAF9]/40">
+                  <span className="material-symbols-outlined text-[#0D47A1] text-[16px] fill-1">verified</span>
+                  <span className="font-sora text-[11px] font-bold text-[#0D47A1]">Masterchef Verified</span>
+                </div>
+
                 <button
-                  onClick={() => navigate('/chef/raghavendra-rao')}
-                  className="px-3.5 py-2 bg-white border border-[#2196F3] text-[#2196F3] hover:bg-[#E3F2FD] rounded-full font-sora text-xs font-semibold active:scale-95 transition-all"
+                  onClick={() => toggleFav('raghavendra')}
+                  aria-label="Add to favourites"
+                  className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#64748B] transition-transform active:scale-75 shadow-sm"
                 >
-                  View Profile
+                  <span className={`material-symbols-outlined text-[20px] ${favorites['raghavendra'] ? 'text-red-500 fill-1' : ''}`}>
+                    favorite
+                  </span>
                 </button>
-                <button
-                  onClick={() => navigate('/booking/step-1')}
-                  className="px-4 py-2 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-sm active:scale-95 transition-all flex items-center gap-1"
-                >
-                  <span>Book Chef</span>
-                  <span className="material-symbols-outlined text-[15px]">restaurant_menu</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Masterchef Card 2: Chef Anupama Joshi */}
-        <div className="w-full bg-white rounded-2xl shadow-subtle border border-[#E5E7EB] overflow-hidden flex flex-col mb-4 group hover:shadow-card transition-all">
-          <div className="relative h-48 w-full">
-            <img
-              src={ASSETS.chefFemaleMaharashtrian}
-              alt="Chef Anupama Joshi"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#172033]/85 via-transparent to-transparent"></div>
-
-            <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-full shadow-xs border border-[#90CAF9]/40">
-              <span className="material-symbols-outlined text-[#0D47A1] text-[16px] fill-1">verified</span>
-              <span className="font-sora text-[11px] font-bold text-[#0D47A1]">Gourmet Specialist</span>
-            </div>
-
-            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
-              <div>
-                <span className="font-sora text-[11px] text-[#90CAF9] uppercase tracking-wider font-semibold">
-                  Banjara Hills • 5.2 km away
-                </span>
-                <h4 className="font-sora font-bold text-lg leading-tight drop-shadow-sm text-white">
-                  Chef Anupama Joshi
-                </h4>
-              </div>
-              <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full text-[#172033] shadow-sm">
-                <span className="material-symbols-outlined text-[#FFB300] text-[15px] fill-1">star</span>
-                <span className="font-sora text-xs font-bold">4.92</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
-                Maharashtrian Royal
-              </span>
-              <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
-                Bespoke Plating
-              </span>
-              <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
-                Pure Vegetarian
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
-              <div className="flex flex-col">
-                <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Starting from</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-sora font-extrabold text-lg text-[#172033]">₹1,800</span>
-                  <span className="font-sora text-xs text-[#64748B]">/ person</span>
+                {/* Title & Rating on Cover */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
+                  <div>
+                    <span className="font-sora text-[11px] text-[#90CAF9] uppercase tracking-wider font-semibold">
+                      Jubilee Hills • 3.8 km away
+                    </span>
+                    <h4 className="font-sora font-bold text-lg leading-tight drop-shadow-sm text-white">
+                      Chef Raghavendra Rao
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full text-[#172033] shadow-sm">
+                    <span className="material-symbols-outlined text-[#FFB300] text-[15px] fill-1">star</span>
+                    <span className="font-sora text-xs font-bold">4.95</span>
+                    <span className="text-[10px] text-[#64748B]">(1.2k)</span>
+                  </div>
                 </div>
               </div>
 
-              <button
-                onClick={() => navigate('/booking/step-1')}
-                className="px-4 py-2 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-sm active:scale-95 transition-all flex items-center gap-1"
-              >
-                <span>Reserve Tasting</span>
-                <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
-              </button>
+              {/* Details & Actions */}
+              <div className="p-4 flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                    Andhra Royal
+                  </span>
+                  <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                    Telangana Heritage
+                  </span>
+                  <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                    Coastal Seafood
+                  </span>
+                  <span className="px-2.5 py-0.5 bg-[#E3F2FD] rounded-full font-sora text-[11px] font-semibold text-[#2196F3]">
+                    18+ Yrs Exp
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
+                  <div className="flex flex-col">
+                    <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Starting from</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-sora font-extrabold text-lg text-[#172033]">₹1,499</span>
+                      <span className="font-sora text-xs text-[#64748B]">/ person</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSelectChef({
+                        id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+                        name: 'Chef Raghavendra Rao',
+                        avatar: ASSETS.chefRaghavendraStudio,
+                        baseFee: 1500
+                      }, '/chef')}
+                      className="px-3.5 py-2 bg-white border border-[#2196F3] text-[#2196F3] hover:bg-[#E3F2FD] rounded-full font-sora text-xs font-semibold active:scale-95 transition-all"
+                    >
+                      View Profile
+                    </button>
+                    <button
+                      onClick={() => handleSelectChef({
+                        id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+                        name: 'Chef Raghavendra Rao',
+                        avatar: ASSETS.chefRaghavendraStudio,
+                        baseFee: 1500
+                      }, '/booking')}
+                      className="px-4 py-2 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                    >
+                      <span>Book Chef</span>
+                      <span className="material-symbols-outlined text-[15px]">restaurant_menu</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+
+            {/* Masterchef Card 2: Chef Anupama Joshi */}
+            <div className="w-full bg-white rounded-2xl shadow-subtle border border-[#E5E7EB] overflow-hidden flex flex-col mb-4 group hover:shadow-card transition-all">
+              <div className="relative h-48 w-full">
+                <img
+                  src={ASSETS.chefFemaleMaharashtrian}
+                  alt="Chef Anupama Joshi"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#172033]/85 via-transparent to-transparent"></div>
+
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/95 backdrop-blur-md rounded-full shadow-xs border border-[#90CAF9]/40">
+                  <span className="material-symbols-outlined text-[#0D47A1] text-[16px] fill-1">verified</span>
+                  <span className="font-sora text-[11px] font-bold text-[#0D47A1]">Gourmet Specialist</span>
+                </div>
+
+                <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
+                  <div>
+                    <span className="font-sora text-[11px] text-[#90CAF9] uppercase tracking-wider font-semibold">
+                      Banjara Hills • 5.2 km away
+                    </span>
+                    <h4 className="font-sora font-bold text-lg leading-tight drop-shadow-sm text-white">
+                      Chef Anupama Joshi
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full text-[#172033] shadow-sm">
+                    <span className="material-symbols-outlined text-[#FFB300] text-[15px] fill-1">star</span>
+                    <span className="font-sora text-xs font-bold">4.92</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                    Maharashtrian Royal
+                  </span>
+                  <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                    Bespoke Plating
+                  </span>
+                  <span className="px-2.5 py-0.5 bg-[#f1f3ff] rounded-full font-sora text-[11px] font-medium text-[#0D47A1]">
+                    Pure Vegetarian
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
+                  <div className="flex flex-col">
+                    <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Starting from</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-sora font-extrabold text-lg text-[#172033]">₹1,800</span>
+                      <span className="font-sora text-xs text-[#64748B]">/ person</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleSelectChef({
+                      id: 'a96bf862-9c43-4d14-aa0a-cc0251428ca4',
+                      name: 'Chef Anupama Joshi',
+                      avatar: ASSETS.chefFemaleMaharashtrian,
+                      baseFee: 1800
+                    }, '/booking')}
+                    className="px-4 py-2 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                  >
+                    <span>Reserve Tasting</span>
+                    <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       {/* 6. Grand Event Services (Utsav Event Planners & Decor) */}

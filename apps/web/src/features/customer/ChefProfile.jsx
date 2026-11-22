@@ -1,13 +1,57 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ASSETS } from '../../assets/assetCatalog';
 import { useBookingStore } from '../../stores/useBookingStore';
+import { api } from '../../services/api';
 
 export default function ChefProfile() {
   const navigate = useNavigate();
-  const { provider } = useBookingStore();
+  const { id } = useParams();
+  const { provider, setProvider } = useBookingStore();
   const [activeTab, setActiveTab] = useState('PACKAGES');
   const [selectedPackage, setSelectedPackage] = useState(1);
+  const [chefDetail, setChefDetail] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadChef() {
+      if (id && id.length > 20) {
+        try {
+          const res = await api.providers.getById(id);
+          if (isMounted && res?.data) {
+            setChefDetail(res.data);
+            setProvider({
+              id: res.data.id,
+              name: res.data.professionalName || res.data.businessName,
+              avatar: res.data.avatarUrl || ASSETS.chefRaghavendraStudio,
+              title: `${res.data.primaryRole || 'Masterchef'} • ${res.data.experienceYears || 18}+ Yrs Exp`,
+              cuisines: Array.isArray(res.data.cuisines) ? res.data.cuisines.join(' • ') : (res.data.cuisines || 'Andhra Royal'),
+              rating: res.data.averageRating || 4.95,
+              reviewsCount: res.data.totalReviews || 124,
+              baseFee: res.data.minBookingAmount ? Number(res.data.minBookingAmount) : 1500,
+              perPersonRate: 350,
+            });
+          }
+        } catch (err) {
+          console.warn('Could not load chef from API, using default store provider:', err.message);
+        }
+      }
+    }
+    loadChef();
+    return () => { isMounted = false; };
+  }, [id, setProvider]);
+
+  const displayChef = chefDetail || {
+    professionalName: provider.name || 'Chef Raghavendra Rao',
+    businessName: 'Royal Dakshin Culinary Studio',
+    experienceYears: 18,
+    averageRating: provider.rating || 4.95,
+    totalReviews: provider.reviewsCount || 1240,
+    avatarUrl: provider.avatar || ASSETS.chefRaghavendraStudio,
+    coverImageUrl: ASSETS.bannerAndhraHomeFeast,
+    bio: 'Celebrated across Telangana and Andhra Pradesh for bringing heirloom aristocratic recipes back to the modern banquet. Trained in classical Nizam and Kakatiya heritage cooking, specializing in zero-preservative, fresh ground spice masalas, cooking in authentic copper and clay pots.',
+    cuisines: ['Andhra Royal', 'Telangana Heritage', 'Coastal Seafood', 'Traditional Banana Leaf'],
+  };
 
   const packages = [
     {
@@ -74,8 +118,8 @@ export default function ChefProfile() {
         <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3.5">
           <div className="w-20 h-20 rounded-2xl ring-4 ring-white overflow-hidden shadow-xl flex-shrink-0 bg-white">
             <img
-              src={ASSETS.chefRaghavendraStudio}
-              alt="Chef Raghavendra Rao"
+              src={displayChef.avatarUrl || ASSETS.chefRaghavendraStudio}
+              alt={displayChef.professionalName}
               className="w-full h-full object-cover"
             />
           </div>
@@ -85,10 +129,10 @@ export default function ChefProfile() {
               <span className="font-sora text-xs font-bold text-[#90CAF9] tracking-wider uppercase">FSSAI Certified</span>
             </div>
             <h1 className="font-sora font-extrabold text-xl sm:text-2xl leading-tight text-white truncate drop-shadow-sm">
-              Chef Raghavendra Rao
+              {displayChef.professionalName}
             </h1>
             <p className="font-sora text-xs text-white/90 truncate">
-              Former Executive Chef, Taj Falaknuma • Jubilee Hills
+              {displayChef.businessName || 'Royal Atelier'} • Jubilee Hills
             </p>
           </div>
         </div>
@@ -97,15 +141,15 @@ export default function ChefProfile() {
       {/* Metrics Row (Stitch Exact Cards) */}
       <section className="px-4 py-4 grid grid-cols-3 gap-2.5 bg-white border-b border-[#E5E7EB]">
         <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB]">
-          <span className="font-sora font-extrabold text-base text-[#172033]">18+ Yrs</span>
+          <span className="font-sora font-extrabold text-base text-[#172033]">{displayChef.experienceYears || 18}+ Yrs</span>
           <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">Experience</span>
         </div>
         <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB]">
           <div className="flex items-center gap-1">
             <span className="material-symbols-outlined text-[#FFB300] text-[16px] fill-1">star</span>
-            <span className="font-sora font-extrabold text-base text-[#172033]">4.95</span>
+            <span className="font-sora font-extrabold text-base text-[#172033]">{displayChef.averageRating || 4.95}</span>
           </div>
-          <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">1,240 Reviews</span>
+          <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">{displayChef.totalReviews || 124} Reviews</span>
         </div>
         <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#E3F2FD] border border-[#90CAF9]/50">
           <span className="font-sora font-extrabold text-base text-[#0D47A1]">350+</span>
@@ -117,23 +161,16 @@ export default function ChefProfile() {
       <section className="px-4 py-4 border-b border-[#E5E7EB]">
         <h3 className="font-sora font-bold text-sm text-[#172033] mb-1.5">Culinary Biography</h3>
         <p className="font-sora text-xs text-[#64748B] leading-relaxed">
-          Celebrated across Telangana and Andhra Pradesh for bringing heirloom aristocratic recipes back to the modern banquet. Trained in classical Nizam and Kakatiya heritage cooking, Chef Raghavendra specializes in zero-preservative, fresh ground spice masalas, cooking in authentic copper and clay pots.
+          {displayChef.bio}
         </p>
 
         {/* Cuisines */}
         <div className="flex flex-wrap items-center gap-1.5 mt-3">
-          <span className="px-3 py-1 bg-[#f1f3ff] rounded-full font-sora text-xs font-medium text-[#0D47A1]">
-            Andhra Royal
-          </span>
-          <span className="px-3 py-1 bg-[#f1f3ff] rounded-full font-sora text-xs font-medium text-[#0D47A1]">
-            Telangana Heritage
-          </span>
-          <span className="px-3 py-1 bg-[#f1f3ff] rounded-full font-sora text-xs font-medium text-[#0D47A1]">
-            Coastal Seafood
-          </span>
-          <span className="px-3 py-1 bg-[#f1f3ff] rounded-full font-sora text-xs font-medium text-[#0D47A1]">
-            Traditional Banana Leaf
-          </span>
+          {(displayChef.cuisines || ['Andhra Royal', 'Telangana Heritage']).map((c, i) => (
+            <span key={i} className="px-3 py-1 bg-[#f1f3ff] rounded-full font-sora text-xs font-medium text-[#0D47A1]">
+              {c}
+            </span>
+          ))}
         </div>
       </section>
 
@@ -240,16 +277,28 @@ export default function ChefProfile() {
           <div className="flex flex-col">
             <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Chef Visiting Fee</span>
             <div className="flex items-baseline gap-1">
-              <span className="font-sora font-extrabold text-xl text-[#172033]">₹1,500</span>
+              <span className="font-sora font-extrabold text-xl text-[#172033]">
+                ₹{Number(displayChef.startingPrice || 1500).toLocaleString('en-IN')}
+              </span>
               <span className="font-sora text-xs text-[#64748B]">+ ₹350/guest</span>
             </div>
           </div>
 
           <button
-            onClick={() => navigate('/booking/step-1')}
+            onClick={() => {
+              const selectedPkg = packages.find(p => p.id === selectedPackage);
+              setProvider({
+                id: displayChef.id || provider.id,
+                name: displayChef.professionalName || provider.name,
+                avatar: displayChef.avatarUrl || provider.avatar,
+                baseFee: Number(displayChef.startingPrice || 1500),
+                perPersonRate: selectedPkg ? selectedPkg.price : 350,
+              });
+              navigate('/booking/step-1');
+            }}
             className="flex-1 py-3 px-6 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-sm font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5"
           >
-            <span>Reserve Chef Raghavendra</span>
+            <span>Reserve {displayChef.professionalName || 'Chef'}</span>
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
         </div>

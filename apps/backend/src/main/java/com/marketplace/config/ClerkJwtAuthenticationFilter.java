@@ -29,7 +29,7 @@ public class ClerkJwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
 
-    @Value("${clerk.issuer:https://comic-reptile-34.clerk.accounts.dev}")
+    @Value("${clerk.issuer:https://causal-turtle-7435.clerk.accounts.dev}")
     private String expectedIssuer;
 
     @Override

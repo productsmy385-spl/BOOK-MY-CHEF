@@ -10,12 +10,13 @@ export const CLERK_KEY_STORAGE = 'book_my_chef_clerk_pub_key';
  * 3. Local development storage override (Dev only)
  */
 export function getClerkPublishableKey() {
-  const runtimeKey = typeof window !== 'undefined' && window.__ENV__?.VITE_CLERK_PUBLISHABLE_KEY;
+  const runtimeKey = typeof window !== 'undefined' && 
+    (window.__ENV__?.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || window.__ENV__?.VITE_CLERK_PUBLISHABLE_KEY);
   if (runtimeKey && !runtimeKey.startsWith('${') && runtimeKey.trim() !== '') {
     return runtimeKey.trim();
   }
 
-  const buildTimeKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  const buildTimeKey = import.meta.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
   if (buildTimeKey && buildTimeKey.trim() !== '' && !buildTimeKey.includes('YOUR_CLERK_PUBLISHABLE_KEY')) {
     return buildTimeKey.trim();
   }

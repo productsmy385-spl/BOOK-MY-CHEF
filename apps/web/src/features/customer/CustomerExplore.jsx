@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ASSETS } from '../../assets/assetCatalog';
+import { useBookingStore } from '../../stores/useBookingStore';
+import { api } from '../../services/api';
 
 export default function CustomerExplore() {
   const navigate = useNavigate();
+  const { setProvider } = useBookingStore();
   const [selectedCuisine, setSelectedCuisine] = useState('ALL');
   const [selectedBudget, setSelectedBudget] = useState('ALL');
   const [instantOnly, setInstantOnly] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
+  const [dbProviders, setDbProviders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const cuisines = [
     { id: 'ALL', label: 'All Cuisines' },
@@ -19,9 +24,9 @@ export default function CustomerExplore() {
     { id: 'VEGAN', label: 'Pure Vegan' },
   ];
 
-  const providers = [
+  const catalogProviders = [
     {
-      id: 'raghavendra-rao',
+      id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
       name: 'Chef Raghavendra Rao',
       image: ASSETS.chefRaghavendraStudio,
       category: 'PRO_CHEF',
@@ -37,7 +42,7 @@ export default function CustomerExplore() {
       deliveryModes: ['Chef Visits Home', 'Cook & Deliver'],
     },
     {
-      id: 'anupama-joshi',
+      id: 'a96bf862-9c43-4d14-aa0a-cc0251428ca4',
       name: 'Chef Anupama Joshi',
       image: ASSETS.chefFemaleMaharashtrian,
       category: 'PRO_CHEF',
@@ -86,7 +91,51 @@ export default function CustomerExplore() {
     },
   ];
 
-  const filteredProviders = providers.filter((p) => {
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchFromBackend() {
+      setIsLoading(true);
+      try {
+        const queryParams = {};
+        if (searchFilter.trim()) queryParams.query = searchFilter.trim();
+        if (selectedCuisine !== 'ALL') queryParams.cuisine = selectedCuisine;
+        const res = await api.providers.search(queryParams);
+        if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped = res.data.map(item => ({
+            id: item.id,
+            name: item.professionalName || item.businessName,
+            image: item.avatarUrl || item.coverImageUrl || ASSETS.chefRaghavendraStudio,
+            category: item.primaryRole || 'PRO_CHEF',
+            roleTitle: `${item.primaryRole || 'Masterchef'} • ${item.experienceYears || 15}+ Yrs Exp`,
+            location: `${item.businessName || 'Jubilee Hills'} • ${item.distanceKm || 3.8} km`,
+            cuisines: Array.isArray(item.cuisines) ? item.cuisines : ['Andhra Royal', 'Telangana Heritage'],
+            rating: item.averageRating || 4.9,
+            reviewsCount: item.totalReviews || 84,
+            price: item.startingPrice ? Number(item.startingPrice) : 1500,
+            priceUnit: item.pricingModel === 'PER_PERSON' ? 'person' : 'service',
+            verified: item.verificationStatus === 'VERIFIED',
+            instantAvailable: Boolean(item.isAcceptingBookings),
+            deliveryModes: ['Chef Visits Home', 'Cook & Deliver'],
+          }));
+          setDbProviders(mapped);
+        } else {
+          setDbProviders([]);
+        }
+      } catch (err) {
+        console.warn('Backend search error in Explore, using catalog:', err.message);
+        setDbProviders([]);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+    fetchFromBackend();
+    return () => { isMounted = false; };
+  }, [searchFilter, selectedCuisine]);
+
+  // Combine DB providers with catalog fallbacks if DB returned fewer items
+  const allProviders = dbProviders.length > 0 ? dbProviders : catalogProviders;
+
+  const filteredProviders = allProviders.filter((p) => {
     if (selectedCuisine !== 'ALL' && !p.cuisines.some(c => c.toUpperCase().includes(selectedCuisine))) {
       return false;
     }
@@ -98,6 +147,25 @@ export default function CustomerExplore() {
     }
     return true;
   });
+
+  const handleSelectChef = (provider, target = '/chef') => {
+    setProvider({
+      id: provider.id,
+      name: provider.name,
+      avatar: provider.image,
+      title: provider.roleTitle,
+      cuisines: Array.isArray(provider.cuisines) ? provider.cuisines.join(' • ') : provider.cuisines,
+      rating: provider.rating,
+      reviewsCount: provider.reviewsCount,
+      baseFee: provider.price,
+      perPersonRate: 350,
+    });
+    if (target === '/booking') {
+      navigate('/booking/step-1');
+    } else {
+      navigate(`/chef/${provider.id}`);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full pb-28 pt-2">
@@ -239,13 +307,13 @@ export default function CustomerExplore() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => navigate(`/chef/${provider.id}`)}
+                    onClick={() => handleSelectChef(provider, '/chef')}
                     className="px-3.5 py-2 bg-white border border-[#2196F3] text-[#2196F3] hover:bg-[#E3F2FD] rounded-full font-sora text-xs font-semibold active:scale-95 transition-all"
                   >
                     View Atelier
                   </button>
                   <button
-                    onClick={() => navigate('/booking/step-1')}
+                    onClick={() => handleSelectChef(provider, '/booking')}
                     className="px-4 py-2 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-sm active:scale-95 transition-all flex items-center gap-1"
                   >
                     <span>Book Now</span>
