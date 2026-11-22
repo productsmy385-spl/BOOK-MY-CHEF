@@ -37,7 +37,7 @@ export default function ProviderServices() {
         </div>
         <button
           onClick={() => navigate('/provider/onboarding/step-4')}
-          className="px-3.5 py-1.5 bg-[#2196F3] text-white rounded-full font-sora text-xs font-bold shadow-xs flex items-center gap-1 active:scale-95"
+          className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1"
         >
           <span className="material-symbols-outlined text-[16px]">add</span>
           <span>Add New</span>
@@ -46,16 +46,16 @@ export default function ProviderServices() {
 
       <div className="mt-4 flex flex-col gap-3">
         {services.map((svc) => (
-          <div key={svc.id} className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-2">
+          <div key={svc.id} className="p-4 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <h4 className="font-sora font-bold text-sm text-[#172033]">{svc.title}</h4>
-              <span className="px-2 py-0.5 rounded-full bg-[#10B981]/15 text-[#10B981] font-sora text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-sm bg-[#10B981]/15 text-[#10B981] font-sans text-[10px] font-bold">
                 ACTIVE
               </span>
             </div>
-            <p className="font-sora text-xs text-[#64748B]">{svc.desc}</p>
-            <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs font-sora">
-              <span className="font-extrabold text-[#0D47A1]">{svc.price}</span>
+            <p className="font-sans text-xs text-[#64748B]">{svc.desc}</p>
+            <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs font-sans">
+              <span className="font-extrabold text-[#0D47A1] font-sora">{svc.price}</span>
               <button
                 onClick={() => navigate('/provider/onboarding/step-5')}
                 className="text-[#2196F3] font-bold hover:underline"

@@ -10,8 +10,8 @@ export default function ProviderProfile() {
   return (
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 px-4 bg-white">
       {/* Profile Header */}
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-[#E3F2FD] via-white to-[#E3F2FD] border border-[#90CAF9]/50 shadow-subtle flex flex-col items-center text-center mt-2">
-        <div className="w-20 h-20 rounded-2xl ring-4 ring-[#2196F3] overflow-hidden shadow-md mb-3 bg-white">
+      <div className="p-6 rounded-lg bg-gradient-to-br from-[#E3F2FD] via-white to-[#E3F2FD] border border-[#90CAF9]/50 shadow-sm flex flex-col items-center text-center mt-2">
+        <div className="w-20 h-20 rounded-md ring-2 ring-[#2196F3] overflow-hidden shadow-md mb-3 bg-white">
           <img src={ASSETS.chefRaghavendraStudio} alt="Chef Profile" className="w-full h-full object-cover" />
         </div>
         <div className="flex items-center gap-1.5 mb-0.5">
@@ -19,8 +19,8 @@ export default function ProviderProfile() {
           <span className="font-sora text-xs font-bold text-[#0D47A1]">Masterchef Verified</span>
         </div>
         <h2 className="font-sora font-extrabold text-lg text-[#172033]">{onboarding.basicInfo.fullName}</h2>
-        <span className="font-sora text-xs text-[#2196F3] font-semibold">{onboarding.basicInfo.brandName}</span>
-        <span className="font-sora text-[11px] text-[#64748B] mt-1">FSSAI: {onboarding.basicInfo.fssaiLicense}</span>
+        <span className="font-sans text-xs text-[#2196F3] font-semibold">{onboarding.basicInfo.brandName}</span>
+        <span className="font-sans text-[11px] text-[#64748B] mt-1">FSSAI: {onboarding.basicInfo.fssaiLicense}</span>
       </div>
 
       {/* Provider Business Options */}
@@ -37,7 +37,7 @@ export default function ProviderProfile() {
           <button
             key={idx}
             onClick={() => navigate(item.path)}
-            className="w-full p-4 rounded-2xl bg-white border border-[#E5E7EB] hover:bg-[#f1f3ff] transition-colors flex items-center justify-between text-left text-xs font-sora shadow-xs"
+            className="w-full p-4 rounded-md bg-white border border-[#E5E7EB] hover:bg-[#f8faff] transition-colors flex items-center justify-between text-left text-xs font-sans shadow-xs"
           >
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-[#2196F3] text-[20px]">{item.icon}</span>

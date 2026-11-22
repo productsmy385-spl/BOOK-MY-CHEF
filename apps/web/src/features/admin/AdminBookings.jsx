@@ -99,7 +99,7 @@ export default function AdminBookings() {
       </div>
 
       {actionAlert && (
-        <div className="p-3.5 rounded-2xl bg-[#0D47A1] text-white font-sora text-xs font-bold animate-in fade-in">
+        <div className="p-3.5 rounded-md bg-[#0D47A1] text-white font-sans text-xs font-bold animate-in fade-in">
           ℹ {actionAlert}
         </div>
       )}
@@ -110,9 +110,9 @@ export default function AdminBookings() {
           <button
             key={st}
             onClick={() => setFilterStatus(st)}
-            className={`px-4 py-2 rounded-full font-sora text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-md font-sans text-xs font-semibold whitespace-nowrap transition-all ${
               filterStatus === st
-                ? 'bg-[#2196F3] text-white shadow-sm'
+                ? 'bg-[#2196F3] text-white shadow-xs'
                 : 'bg-white border border-[#E5E7EB] text-[#64748B] hover:border-[#90CAF9]'
             }`}
           >
@@ -122,11 +122,11 @@ export default function AdminBookings() {
       </div>
 
       {/* Bookings Table */}
-      <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-4">
+      <div className="p-5 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sora text-xs">
+          <table className="w-full text-left font-sans text-xs">
             <thead>
-              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider">
+              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider font-sora">
                 <th className="pb-3">Booking Ref</th>
                 <th className="pb-3">Host / Customer</th>
                 <th className="pb-3">Provider</th>
@@ -139,17 +139,17 @@ export default function AdminBookings() {
             </thead>
             <tbody className="divide-y divide-[#E5E7EB]">
               {filtered.map((b) => (
-                <tr key={b.id} className="hover:bg-[#f1f3ff]/40 transition-colors">
-                  <td className="py-3.5 font-bold text-[#0D47A1]">{b.id}</td>
+                <tr key={b.id} className="hover:bg-[#f8faff] transition-colors">
+                  <td className="py-3.5 font-bold text-[#0D47A1] font-sora">{b.id}</td>
                   <td className="py-3.5 font-semibold text-[#172033]">{b.host}</td>
                   <td className="py-3.5 text-[#172033]">{b.provider}</td>
                   <td className="py-3.5 text-[#64748B]">{b.date}</td>
-                  <td className="py-3.5 font-extrabold text-[#172033]">{b.total}</td>
+                  <td className="py-3.5 font-extrabold text-[#172033] font-sora">{b.total}</td>
                   <td className="py-3.5">
                     <span className="font-semibold text-[#0D47A1]">{b.escrow}</span>
                   </td>
                   <td className="py-3.5">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2.5 py-0.5 rounded-sm text-[10px] font-bold ${
                       b.status === 'CONFIRMED'
                         ? 'bg-[#10B981]/15 text-[#10B981]'
                         : b.status === 'DISPUTED'
@@ -166,13 +166,13 @@ export default function AdminBookings() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleResolveDispute(b.id, 'Refund 50% to Host')}
-                          className="px-2.5 py-1 bg-[#EF4444] text-white rounded-full text-[10px] font-bold shadow-xs hover:bg-red-700"
+                          className="px-2.5 py-1 bg-[#EF4444] text-white rounded-md text-[10px] font-bold shadow-xs hover:bg-red-700"
                         >
                           Partial Refund
                         </button>
                         <button
                           onClick={() => handleResolveDispute(b.id, 'Release Escrow to Provider')}
-                          className="px-2.5 py-1 bg-[#10B981] text-white rounded-full text-[10px] font-bold shadow-xs hover:bg-emerald-700"
+                          className="px-2.5 py-1 bg-[#10B981] text-white rounded-md text-[10px] font-bold shadow-xs hover:bg-emerald-700"
                         >
                           Release Escrow
                         </button>
@@ -180,7 +180,7 @@ export default function AdminBookings() {
                     ) : (
                       <button
                         onClick={() => handleResolveDispute(b.id, 'Audit Inspected')}
-                        className="px-3 py-1 bg-[#f1f3ff] text-[#0D47A1] rounded-full text-[11px] font-bold hover:bg-[#E3F2FD]"
+                        className="px-3 py-1 bg-[#f1f3ff] text-[#0D47A1] rounded-md text-[11px] font-bold hover:bg-[#E3F2FD]"
                       >
                         Details
                       </button>

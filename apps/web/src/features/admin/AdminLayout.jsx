@@ -44,9 +44,9 @@ export default function AdminLayout() {
                 to={link.path}
                 end={link.end}
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all ${
+                  `flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs transition-all ${
                     isActive
-                      ? 'bg-[#2196F3] text-white font-bold shadow-md'
+                      ? 'bg-[#2196F3] text-white font-bold shadow-sm'
                       : 'text-white/80 hover:bg-white/10 hover:text-white'
                   }`
                 }
@@ -56,7 +56,7 @@ export default function AdminLayout() {
                   <span>{link.label}</span>
                 </div>
                 {link.badge && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#EF4444] text-white text-[10px] font-bold">
+                  <span className="px-2 py-0.5 rounded-sm bg-[#EF4444] text-white text-[10px] font-bold">
                     {link.badge}
                   </span>
                 )}
@@ -68,7 +68,7 @@ export default function AdminLayout() {
         {/* Admin User Footer with Logout */}
         <div className="p-4 border-t border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold text-white">
+            <div className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center text-xs font-bold text-white">
               SA
             </div>
             <div className="truncate">
@@ -79,7 +79,7 @@ export default function AdminLayout() {
           <button
             onClick={handleAdminLogout}
             title="Log Out of Admin Portal"
-            className="text-white/70 hover:text-red-300 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+            className="text-white/70 hover:text-red-300 p-1.5 rounded-md hover:bg-white/10 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">logout</span>
           </button>

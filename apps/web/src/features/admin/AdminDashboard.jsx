@@ -93,7 +93,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2">
           <button 
             onClick={() => navigate('/admin/verification')}
-            className="px-4 py-2 bg-[#2196F3] text-white rounded-full font-sora text-xs font-semibold shadow-sm hover:bg-[#0D47A1] transition-all flex items-center gap-1.5"
+            className="btn-primary text-xs flex items-center gap-1.5"
           >
             <span className="material-symbols-outlined text-[16px]">verified_user</span>
             <span>Verify KYC Queue ({metricsData.pendingVerificationsCount})</span>
@@ -104,53 +104,53 @@ export default function AdminDashboard() {
       {/* 4 Primary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m, idx) => (
-          <div key={idx} className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col justify-between">
+          <div key={idx} className="p-5 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className={`w-10 h-10 rounded-xl ${m.bg} ${m.color} flex items-center justify-center`}>
+              <span className={`w-10 h-10 rounded-md ${m.bg} ${m.color} flex items-center justify-center`}>
                 <span className="material-symbols-outlined text-[22px]">{m.icon}</span>
               </span>
-              <span className="text-[11px] font-sora font-bold text-[#10B981]">{m.change}</span>
+              <span className="text-[11px] font-sans font-bold text-[#10B981]">{m.change}</span>
             </div>
             <div className="mt-3">
               <span className="font-sora font-extrabold text-xl text-[#172033]">{m.value}</span>
-              <span className="font-sora text-xs text-[#64748B] block mt-0.5">{m.title}</span>
+              <span className="font-sans text-xs text-[#64748B] block mt-0.5">{m.title}</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Verification Alert Banner */}
-      <div className="p-4 rounded-2xl bg-[#E3F2FD] border border-[#90CAF9] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="p-4 rounded-lg bg-[#E3F2FD] border border-[#90CAF9] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#0D47A1] text-white flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-md bg-[#0D47A1] text-white flex items-center justify-center flex-shrink-0">
             <span className="material-symbols-outlined text-[20px]">badge</span>
           </div>
           <div>
             <h4 className="font-sora font-bold text-sm text-[#0D47A1]">Provider KYC Documents Awaiting Approval</h4>
-            <p className="font-sora text-xs text-[#172033]">FSSAI licenses and culinary diplomas need manual verification before go-live.</p>
+            <p className="font-sans text-xs text-[#172033]">FSSAI licenses and culinary diplomas need manual verification before go-live.</p>
           </div>
         </div>
         <button
           onClick={() => navigate('/admin/verification')}
-          className="px-4 py-2 bg-[#0D47A1] text-white rounded-full font-sora text-xs font-semibold shadow-xs hover:bg-[#2196F3] transition-all flex-shrink-0"
+          className="btn-primary text-xs flex-shrink-0"
         >
           Review Documents
         </button>
       </div>
 
       {/* Recent Bookings Table */}
-      <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-4">
+      <div className="p-5 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h3 className="font-sora font-bold text-sm text-[#172033]">Live Marketplace Bookings</h3>
-          <button onClick={() => navigate('/admin/bookings')} className="text-xs font-sora font-bold text-[#2196F3] hover:underline">
+          <button onClick={() => navigate('/admin/bookings')} className="text-xs font-sans font-bold text-[#2196F3] hover:underline">
             View All Bookings
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sora text-xs">
+          <table className="w-full text-left font-sans text-xs">
             <thead>
-              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider">
+              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider font-sora">
                 <th className="pb-3">Reference</th>
                 <th className="pb-3">Customer / Host</th>
                 <th className="pb-3">Service Partner</th>
@@ -163,14 +163,14 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-[#E5E7EB]">
               {recentBookings.map((b) => (
                 <tr key={b.id} className="hover:bg-[#F8FAFC] transition-colors">
-                  <td className="py-3 font-bold text-[#2196F3]">{b.id}</td>
+                  <td className="py-3 font-bold text-[#2196F3] font-sora">{b.id}</td>
                   <td className="py-3 font-medium text-[#172033]">{b.host}</td>
                   <td className="py-3 text-[#64748B]">{b.provider}</td>
                   <td className="py-3 text-[#64748B]">{b.date}</td>
-                  <td className="py-3 font-bold text-[#172033]">{b.amount}</td>
+                  <td className="py-3 font-bold text-[#172033] font-sora">{b.amount}</td>
                   <td className="py-3">
                     <span
-                      className={`inline-block px-2.5 py-0.5 rounded-full font-sora text-[10px] font-bold ${
+                      className={`inline-block px-2.5 py-0.5 rounded-sm font-sans text-[10px] font-bold ${
                         b.status === 'CONFIRMED'
                           ? 'bg-[#10B981]/15 text-[#10B981]'
                           : b.status === 'PENDING_PAYMENT'
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                   <td className="py-3 text-right">
                     <button
                       onClick={() => navigate('/admin/bookings')}
-                      className="px-2.5 py-1 rounded-full bg-[#f1f3ff] text-[#0D47A1] font-bold text-[11px] hover:bg-[#E3F2FD] transition-colors"
+                      className="px-2.5 py-1 rounded-md bg-[#f1f3ff] text-[#0D47A1] font-bold text-[11px] hover:bg-[#E3F2FD] transition-colors"
                     >
                       Audit
                     </button>

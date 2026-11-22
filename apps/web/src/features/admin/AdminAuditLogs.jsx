@@ -47,11 +47,11 @@ export default function AdminAuditLogs() {
         <p className="font-sora text-xs text-[#64748B]">Immutable chronological record of administrative overrides, status transitions, and escrow releases.</p>
       </div>
 
-      <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-4">
+      <div className="p-5 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sora text-xs">
+          <table className="w-full text-left font-sans text-xs">
             <thead>
-              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider">
+              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider font-sora">
                 <th className="pb-3">Log ID</th>
                 <th className="pb-3">Action Type</th>
                 <th className="pb-3">Target Entity</th>
@@ -63,10 +63,10 @@ export default function AdminAuditLogs() {
             </thead>
             <tbody className="divide-y divide-[#E5E7EB]">
               {auditLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-[#f1f3ff]/40 transition-colors">
-                  <td className="py-3 font-bold text-[#0D47A1]">{log.id}</td>
+                <tr key={log.id} className="hover:bg-[#f8faff] transition-colors">
+                  <td className="py-3 font-bold text-[#0D47A1] font-sora">{log.id}</td>
                   <td className="py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-[#E3F2FD] text-[#0D47A1] font-bold text-[10px]">
+                    <span className="px-2 py-0.5 rounded-sm bg-[#E3F2FD] text-[#0D47A1] font-bold text-[10px] font-sora">
                       {log.action}
                     </span>
                   </td>

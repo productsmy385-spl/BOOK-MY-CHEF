@@ -21,11 +21,11 @@ export default function AdminUsers() {
         <p className="font-sora text-xs text-[#64748B]">Manage verified host accounts, review booking history, and enforce platform safety rules.</p>
       </div>
 
-      <div className="p-5 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-4">
+      <div className="p-5 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sora text-xs">
+          <table className="w-full text-left font-sans text-xs">
             <thead>
-              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider">
+              <tr className="border-b border-[#E5E7EB] text-[#64748B] font-bold text-[11px] uppercase tracking-wider font-sora">
                 <th className="pb-3">User ID</th>
                 <th className="pb-3">Full Name</th>
                 <th className="pb-3">Contact Mobile</th>
@@ -38,15 +38,15 @@ export default function AdminUsers() {
             </thead>
             <tbody className="divide-y divide-[#E5E7EB]">
               {customers.map((user) => (
-                <tr key={user.id} className="hover:bg-[#f1f3ff]/40 transition-colors">
-                  <td className="py-3 font-bold text-[#0D47A1]">{user.id}</td>
+                <tr key={user.id} className="hover:bg-[#f8faff] transition-colors">
+                  <td className="py-3 font-bold text-[#0D47A1] font-sora">{user.id}</td>
                   <td className="py-3 font-semibold text-[#172033]">{user.name}</td>
                   <td className="py-3 text-[#172033]">{user.phone}</td>
                   <td className="py-3 text-[#64748B]">{user.email}</td>
-                  <td className="py-3 font-bold text-[#0D47A1]">{user.bookingsCount} Events</td>
-                  <td className="py-3 font-extrabold text-[#172033]">{user.totalSpent}</td>
+                  <td className="py-3 font-bold text-[#0D47A1] font-sora">{user.bookingsCount} Events</td>
+                  <td className="py-3 font-extrabold text-[#172033] font-sora">{user.totalSpent}</td>
                   <td className="py-3">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2.5 py-0.5 rounded-sm text-[10px] font-bold ${
                       user.status === 'ACTIVE' ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-[#EF4444]/15 text-[#EF4444]'
                     }`}>
                       {user.status}
@@ -55,10 +55,10 @@ export default function AdminUsers() {
                   <td className="py-3 text-right">
                     <button
                       onClick={() => toggleStatus(user.id)}
-                      className={`px-3 py-1 rounded-full text-[11px] font-bold transition-colors ${
+                      className={`px-3 py-1 rounded-md text-[11px] font-bold transition-colors ${
                         user.status === 'ACTIVE'
-                          ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                          : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                          ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
+                          : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'
                       }`}
                     >
                       {user.status === 'ACTIVE' ? 'Suspend' : 'Reactivate'}
