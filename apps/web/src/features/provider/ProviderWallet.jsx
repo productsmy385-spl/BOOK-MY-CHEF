@@ -7,35 +7,12 @@ export default function ProviderWallet() {
   const { metrics } = useProviderStore();
   const [withdrawn, setWithdrawn] = useState(false);
 
-  const transactions = [
-    {
-      id: 'tx-1',
-      title: 'Advance Held in Escrow • Gruhapravesam',
-      bookingRef: '#BMC-8942-HYD',
-      amount: '+₹3,300',
-      type: 'ESCROW_CREDIT',
-      date: '22 Nov 2026',
-      status: 'HELD_IN_ESCROW',
-    },
-    {
-      id: 'tx-2',
-      title: 'Bank Payout Dispatched',
-      bookingRef: 'PAYOUT_781920',
-      amount: '-₹35,000',
-      type: 'PAYOUT',
-      date: '18 Nov 2026',
-      status: 'SETTLED',
-    },
-    {
-      id: 'tx-3',
-      title: 'Event Completed • Corporate Tasting',
-      bookingRef: '#BMC-7110-HYD',
-      amount: '+₹18,000',
-      type: 'EARNING_RELEASED',
-      date: '16 Nov 2026',
-      status: 'SETTLED',
-    },
-  ];
+  // Dynamic real ledger (empty by default for new real production providers)
+  const transactions = [];
+
+  const availableAmount = metrics?.walletAvailable || 0;
+  const escrowAmount = metrics?.walletInEscrow || 0;
+  const lifetimeRevenue = (metrics?.monthlyEarnings || 0) + availableAmount;
 
   return (
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 px-4 bg-white">
@@ -66,21 +43,21 @@ export default function ProviderWallet() {
 
           <div>
             <h3 className="font-sora font-extrabold text-3xl text-white">
-              ₹{metrics.walletAvailable.toLocaleString('en-IN')}
+              ₹{availableAmount.toLocaleString('en-IN')}
             </h3>
             <span className="font-sans text-xs text-white/80 mt-1 block">
-              Direct to HDFC Bank ****4921
+              Direct to Verified Payout Bank Account
             </span>
           </div>
 
           <div className="pt-3 border-t border-white/20 grid grid-cols-2 gap-2 text-xs font-sans">
             <div>
               <span className="text-[#90CAF9] text-[10px] block">In-Escrow (Locked):</span>
-              <span className="font-bold text-white text-sm font-sora">₹{metrics.walletInEscrow.toLocaleString('en-IN')}</span>
+              <span className="font-bold text-white text-sm font-sora">₹{escrowAmount.toLocaleString('en-IN')}</span>
             </div>
             <div className="text-right">
               <span className="text-[#90CAF9] text-[10px] block">Lifetime Revenue:</span>
-              <span className="font-bold text-white text-sm font-sora">₹4,85,200</span>
+              <span className="font-bold text-white text-sm font-sora">₹{lifetimeRevenue.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
@@ -88,14 +65,22 @@ export default function ProviderWallet() {
         {/* Withdraw Action */}
         <button
           onClick={() => setWithdrawn(true)}
-          disabled={withdrawn}
-          className="w-full btn-primary py-3.5 text-xs flex items-center justify-center gap-2"
+          disabled={withdrawn || availableAmount <= 0}
+          className={`w-full btn-primary py-3.5 text-xs flex items-center justify-center gap-2 ${
+            availableAmount <= 0 ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           <span className="material-symbols-outlined text-[18px]">account_balance</span>
-          <span>{withdrawn ? 'Payout Initiated to Bank Account!' : 'Withdraw ₹48,500 to Bank Account'}</span>
+          <span>
+            {withdrawn
+              ? 'Payout Initiated to Bank Account!'
+              : availableAmount > 0
+              ? `Withdraw ₹${availableAmount.toLocaleString('en-IN')} to Bank Account`
+              : 'Zero Balance Available for Payout'}
+          </span>
         </button>
 
-        {/* Bank Account Verification Card */}
+        {/* Bank Account Card */}
         <div className="p-4 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-md bg-[#f1f3ff] text-[#0D47A1] flex items-center justify-center flex-shrink-0">
@@ -103,12 +88,12 @@ export default function ProviderWallet() {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h4 className="font-sora font-bold text-xs text-[#172033]">HDFC Bank Ltd</h4>
+                <h4 className="font-sora font-bold text-xs text-[#172033]">Bank Account for Payouts</h4>
                 <span className="text-[10px] font-bold text-[#10B981] bg-[#10B981]/10 px-1.5 py-0.5 rounded-sm">
-                  Verified
+                  Active
                 </span>
               </div>
-              <span className="font-sans text-[11px] text-[#64748B]">A/C No: *******4921 • IFSC: HDFC0001234</span>
+              <span className="font-sans text-[11px] text-[#64748B]">Auto-settlements enabled via Razorpay Route</span>
             </div>
           </div>
           <span className="text-xs font-sans font-bold text-[#2196F3] cursor-pointer hover:underline">Manage</span>
@@ -121,22 +106,32 @@ export default function ProviderWallet() {
           </span>
 
           <div className="flex flex-col gap-3 pt-1 border-t border-[#E5E7EB]">
-            {transactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between text-xs font-sans">
-                <div>
-                  <h5 className="font-bold text-[#172033]">{tx.title}</h5>
-                  <span className="text-[10px] text-[#64748B]">{tx.date} • {tx.bookingRef}</span>
+            {transactions.length > 0 ? (
+              transactions.map((tx) => (
+                <div key={tx.id} className="flex items-center justify-between text-xs font-sans">
+                  <div>
+                    <h5 className="font-bold text-[#172033]">{tx.title}</h5>
+                    <span className="text-[10px] text-[#64748B]">{tx.date} • {tx.bookingRef}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className={`font-extrabold text-sm font-sora ${tx.amount.startsWith('+') ? 'text-[#10B981]' : 'text-[#172033]'}`}>
+                      {tx.amount}
+                    </span>
+                    <span className="block text-[10px] font-semibold text-[#0D47A1]">
+                      {tx.status === 'HELD_IN_ESCROW' ? 'Held in Escrow' : 'Settled'}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className={`font-extrabold text-sm font-sora ${tx.amount.startsWith('+') ? 'text-[#10B981]' : 'text-[#172033]'}`}>
-                    {tx.amount}
-                  </span>
-                  <span className="block text-[10px] font-semibold text-[#0D47A1]">
-                    {tx.status === 'HELD_IN_ESCROW' ? 'Held in Escrow' : 'Settled'}
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div className="py-8 flex flex-col items-center text-center">
+                <span className="material-symbols-outlined text-[#90CAF9] text-[32px] mb-2">account_balance_wallet</span>
+                <p className="font-sora font-bold text-xs text-[#172033]">No Settlement History Yet</p>
+                <p className="font-inter text-[11px] text-[#64748B] max-w-xs mt-0.5">
+                  Host advances and completed feast settlements will be deposited into your escrow ledger automatically.
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

@@ -43,6 +43,11 @@ export function useClerkOtp() {
       (typeof err === 'string' ? err : '');
     const code = err?.errors?.[0]?.code || '';
 
+    // Error 0: Already signed in / Session exists
+    if (code === 'session_exists' || rawMsg.includes('already signed in')) {
+      return 'You are currently signed in with an active session. Click below to continue to your console or sign out to use a different account.';
+    }
+
     // Error 1: Email already in use
     if (code === 'form_identifier_exists' || rawMsg.includes('already exists') || rawMsg.includes('taken')) {
       return 'An account with this email address already exists. Please switch to "Sign In" to continue.';
@@ -439,10 +444,82 @@ export function useClerkOtp() {
         throw new Error(`Sign-in incomplete (status: ${result.status})`);
       }
     } catch (err) {
+      // Auto-recover if session already exists: sign out from stale session and retry
+      const rawErr = err?.errors?.[0]?.code || err?.message || String(err);
+      if (rawErr.includes('session_exists') || rawErr.includes('already signed in')) {
+        try {
+          if (clerk && typeof clerk.signOut === 'function') {
+            await clerk.signOut();
+          } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+            await window.Clerk.signOut();
+          }
+          // Retry sign-in with clean slate
+          const { signIn, setActive } = signInHook || {};
+          if (signIn) {
+            const normalizedEmail = email.trim().toLowerCase();
+            const cleanPassword = password.trim();
+            if (typeof signIn.password === 'function') {
+              const res = await signIn.password({ identifier: normalizedEmail, password: cleanPassword });
+              if (!res?.error && signIn.status === 'complete') {
+                if (typeof signIn.finalize === 'function') await signIn.finalize();
+                else if (typeof setActive === 'function' && signIn.createdSessionId) {
+                  await setActive({ session: signIn.createdSessionId });
+                }
+                setIsLoading(false);
+                return {
+                  success: true,
+                  clerkUserId: signIn.createdUserId || clerk?.user?.id,
+                  sessionId: signIn.createdSessionId,
+                };
+              }
+            } else if (typeof signIn.create === 'function') {
+              const res = await signIn.create({ identifier: normalizedEmail, password: cleanPassword });
+              if (res.status === 'complete') {
+                if (typeof setActive === 'function') await setActive({ session: res.createdSessionId });
+                setIsLoading(false);
+                return {
+                  success: true,
+                  clerkUserId: res.createdUserId || clerk?.user?.id,
+                  sessionId: res.createdSessionId,
+                };
+              }
+            }
+          }
+        } catch (retryErr) {
+          console.warn('Retry after clearing stale session failed:', retryErr);
+        }
+      }
+
       const msg = formatClerkError(err, 'Sign-in failed. Please check your credentials.', 'SIGN_IN_PASSWORD');
       setErrorMessage(msg);
       setIsLoading(false);
       return { success: false, error: msg };
+    }
+  };
+
+  /**
+   * Complete Sign Out:
+   * Invalidates Clerk session cookies and resets Zustand store & local storage
+   */
+  const signOut = async () => {
+    setIsLoading(true);
+    try {
+      if (clerk && typeof clerk.signOut === 'function') {
+        await clerk.signOut();
+      } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+        await window.Clerk.signOut();
+      }
+    } catch (err) {
+      console.warn('Clerk signOut error:', err);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('book_my_chef_auth_session');
+        localStorage.removeItem('bmc_clerk_token');
+        sessionStorage.clear();
+      }
+      useAuthStore.getState().logout();
+      setErrorMessage('');
+      setIsLoading(false);
     }
   };
 
@@ -454,9 +531,12 @@ export function useClerkOtp() {
 
   return {
     isConfigured: hasClerkKey,
+    clerk,
+    clerkUser: clerk?.user,
     isLoading,
     errorMessage,
     setErrorMessage,
+    signOut,
     sendSignUpEmailOtp,
     verifySignUpEmailOtp,
     sendSignInEmailOtp,

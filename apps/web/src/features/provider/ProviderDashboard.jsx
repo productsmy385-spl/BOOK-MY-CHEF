@@ -56,7 +56,7 @@ export default function ProviderDashboard() {
         cuisine: b.serviceType || 'Standard',
         deliveryMode: 'On-Site Live Counter',
       }))
-    : leads;
+    : (leads || []);
 
   const activeEventToday = dbBookings.find(b => b.status === 'CONFIRMED' || b.status === 'IN_PROGRESS');
 
@@ -174,91 +174,133 @@ export default function ProviderDashboard() {
 
       {/* Live Event Today Quick Trigger (Sharp Geometry) */}
       <section className="mt-4">
-        <div className="p-4 rounded-lg bg-[#0D47A1] text-white shadow-xs flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-              <span className="font-sora text-[10px] font-bold text-[#90CAF9] uppercase tracking-wider">
-                Event Active Today
-              </span>
+        {activeEventToday ? (
+          <div className="p-4 rounded-lg bg-[#0D47A1] text-white shadow-xs flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                <span className="font-sora text-[10px] font-bold text-[#90CAF9] uppercase tracking-wider">
+                  Event Active Today
+                </span>
+              </div>
+              <h4 className="heading-4 text-white text-sm mt-1">
+                {activeEventToday.eventType} • {activeEventToday.customerName || 'Host'}
+              </h4>
+              <p className="font-inter text-xs text-[#E3F2FD] mt-0.5">
+                {activeEventToday.serviceCity || 'Hyderabad'} • {activeEventToday.guestCount} Guests ({activeEventToday.timeSlot})
+              </p>
             </div>
-            <h4 className="heading-4 text-white text-sm mt-1">
-              {activeEventToday ? `${activeEventToday.eventType} • ${activeEventToday.hostName}` : 'Gruhapravesam Feast • Meera Nambiar'}
-            </h4>
-            <p className="font-inter text-xs text-[#E3F2FD] mt-0.5">
-              {activeEventToday ? `${activeEventToday.location} • ${activeEventToday.guestCount} Guests (${activeEventToday.timeSlot})` : 'Jubilee Hills • 25 Guests (Lunch)'}
-            </p>
+            <button
+              onClick={() => navigate(`/provider/event-day?bookingId=${activeEventToday.id}`)}
+              className="px-4 py-2 bg-white text-[#0D47A1] rounded-md font-sora text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1 shrink-0"
+            >
+              <span>Live Checklist</span>
+              <span className="material-symbols-outlined text-[16px]">checklist</span>
+            </button>
           </div>
-          <button
-            onClick={() => navigate(`/provider/event-day?bookingId=${activeEventToday?.id || '5f154cff-3dcf-43ad-b22a-793b3fac436a'}`)}
-            className="px-4 py-2 bg-white text-[#0D47A1] rounded-md font-sora text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1 shrink-0"
-          >
-            <span>Live Checklist</span>
-            <span className="material-symbols-outlined text-[16px]">checklist</span>
-          </button>
-        </div>
+        ) : (
+          <div className="p-4 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] shadow-xs flex items-center justify-between text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-md bg-[#E3F2FD] text-[#0D47A1] flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[20px]">event_busy</span>
+              </div>
+              <div>
+                <h4 className="font-sora font-bold text-xs text-[#172033]">No Feasts Scheduled for Today</h4>
+                <p className="font-inter text-[11px] text-[#64748B] mt-0.5">
+                  Your kitchen schedule is clear today. View your calendar for upcoming dates.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/provider/calendar')}
+              className="btn-ghost py-1.5 px-3 text-xs font-bold text-[#0D47A1] shrink-0"
+            >
+              Calendar
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Incoming Booking Requests (Sharp Geometry) */}
       <section className="mt-6 flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h3 className="heading-4">Incoming Event Leads</h3>
-          <span className="text-xs font-sora font-semibold text-[#2196F3]">{leadsToDisplay.length} Urgent</span>
+          <h3 className="heading-4 text-[#172033]">Incoming Event Leads</h3>
+          <span className="text-xs font-sora font-semibold text-[#2196F3]">{leadsToDisplay.length} Active</span>
         </div>
 
-        {leadsToDisplay.map((lead) => (
-          <div
-            key={lead.id}
-            className="card-sharp p-4 flex flex-col gap-3 hover:border-[#90CAF9] transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="label-micro text-[#2196F3]">
-                  {lead.eventType}
-                </span>
-                <h4 className="heading-4 text-sm mt-0.5">{lead.hostName}</h4>
+        {leadsToDisplay.length > 0 ? (
+          leadsToDisplay.map((lead) => (
+            <div
+              key={lead.id}
+              className="card-sharp p-4 flex flex-col gap-3 hover:border-[#90CAF9] transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="label-micro text-[#2196F3]">
+                    {lead.eventType}
+                  </span>
+                  <h4 className="heading-4 text-sm mt-0.5 text-[#172033]">{lead.hostName}</h4>
+                </div>
+                <div className="text-right">
+                  <span className="font-sora font-extrabold text-base text-[#0D47A1]">
+                    ₹{lead.estimatedAmount.toLocaleString('en-IN')}
+                  </span>
+                  <span className="block font-inter text-[10px] text-[#64748B]">Est. Total</span>
+                </div>
               </div>
-              <div className="text-right">
-                <span className="font-sora font-extrabold text-base text-[#0D47A1]">
-                  ₹{lead.estimatedAmount.toLocaleString('en-IN')}
-                </span>
-                <span className="block font-inter text-[10px] text-[#64748B]">Est. Total</span>
-              </div>
-            </div>
 
-            <div className="p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB] grid grid-cols-2 gap-2 text-xs font-inter">
-              <div>
-                <span className="text-[#64748B] block text-[10px]">Date &amp; Time:</span>
-                <span className="font-semibold text-[#172033]">{lead.eventDate} • {lead.timeSlot}</span>
+              <div className="p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB] grid grid-cols-2 gap-2 text-xs font-inter">
+                <div>
+                  <span className="text-[#64748B] block text-[10px]">Date &amp; Time:</span>
+                  <span className="font-semibold text-[#172033]">{lead.eventDate} • {lead.timeSlot}</span>
+                </div>
+                <div>
+                  <span className="text-[#64748B] block text-[10px]">Guest Count:</span>
+                  <span className="font-semibold text-[#172033]">{lead.guestCount} Guests</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-[#64748B] block text-[10px]">Cuisine &amp; Mode:</span>
+                  <span className="font-semibold text-[#172033]">{lead.cuisine} ({lead.deliveryMode})</span>
+                </div>
               </div>
-              <div>
-                <span className="text-[#64748B] block text-[10px]">Guest Count:</span>
-                <span className="font-semibold text-[#172033]">{lead.guestCount} Guests</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-[#64748B] block text-[10px]">Cuisine &amp; Mode:</span>
-                <span className="font-semibold text-[#172033]">{lead.cuisine} ({lead.deliveryMode})</span>
-              </div>
-            </div>
 
-            {/* Actions: Accept, Custom Quote, Decline */}
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                onClick={() => handleAcceptLead(lead)}
-                className="btn-primary flex-1 py-2.5 text-xs font-bold shadow-xs flex items-center justify-center gap-1"
-              >
-                <span>Accept &amp; Lock Slot</span>
-                <span className="material-symbols-outlined text-[14px]">check</span>
-              </button>
-              <button
-                onClick={() => navigate('/provider/chat')}
-                className="btn-secondary px-3.5 py-2.5 text-xs font-semibold"
-              >
-                Custom Quote
-              </button>
+              {/* Actions: Accept, Custom Quote, Decline */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  onClick={() => handleAcceptLead(lead)}
+                  className="btn-primary flex-1 py-2.5 text-xs font-bold shadow-xs flex items-center justify-center gap-1"
+                >
+                  <span>Accept &amp; Lock Slot</span>
+                  <span className="material-symbols-outlined text-[14px]">check</span>
+                </button>
+                <button
+                  onClick={() => navigate('/provider/chat')}
+                  className="btn-secondary px-3.5 py-2.5 text-xs font-semibold"
+                >
+                  Custom Quote
+                </button>
+              </div>
             </div>
+          ))
+        ) : (
+          /* Real Production Empty State for Provider Leads */
+          <div className="p-6 rounded-lg card-sharp border-[#CBD5E1] bg-white flex flex-col items-center text-center my-2">
+            <div className="w-12 h-12 rounded-lg bg-[#E3F2FD] border border-[#90CAF9] flex items-center justify-center text-[#0D47A1] mb-3">
+              <span className="material-symbols-outlined text-[24px]">inbox</span>
+            </div>
+            <h4 className="font-sora font-bold text-sm text-[#172033]">No Pending Event Leads</h4>
+            <p className="font-inter text-xs text-[#64748B] max-w-sm mt-1 leading-relaxed">
+              You currently have no unresponded host requests. As hosts in your service areas search for chefs and caterers, new booking leads will appear here in real-time.
+            </p>
+            <button
+              onClick={() => navigate('/provider/calendar')}
+              className="btn-secondary py-2 px-4 text-xs mt-4 flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+              <span>Manage Availability Calendar</span>
+            </button>
           </div>
-        ))}
+        )}
       </section>
     </div>
   );

@@ -137,6 +137,10 @@ export const useAuthStore = create(
           if (typeof window !== 'undefined') {
             localStorage.removeItem('book_my_chef_auth_session');
             localStorage.removeItem('bmc_clerk_token');
+            sessionStorage.clear();
+            if (window.Clerk && typeof window.Clerk.signOut === 'function') {
+              window.Clerk.signOut().catch((e) => console.warn('Global Clerk signOut warning:', e));
+            }
           }
         } catch (e) {
           // ignore

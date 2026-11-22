@@ -1,12 +1,29 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/react';
 import { useAuthStore } from '../../stores/useAuthStore';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
-  const handleAdminLogout = () => {
+  let clerk = null;
+  try {
+    clerk = useClerk();
+  } catch (e) {
+    // Graceful fallback
+  }
+
+  const handleAdminLogout = async () => {
+    try {
+      if (clerk && typeof clerk.signOut === 'function') {
+        await clerk.signOut();
+      } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+        await window.Clerk.signOut();
+      }
+    } catch (e) {
+      console.warn('Clerk admin signOut error:', e);
+    }
     logout();
     navigate('/admin/login', { replace: true });
   };
@@ -47,7 +64,7 @@ export default function AdminLayout() {
                   `flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs transition-all ${
                     isActive
                       ? 'bg-[#2196F3] text-white font-bold shadow-sm'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      : 'text-[#E3F2FD] hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -66,7 +83,7 @@ export default function AdminLayout() {
         </div>
 
         {/* Admin User Footer with Logout */}
-        <div className="p-4 border-t border-white/10 flex items-center justify-between">
+        <div className="p-4 border-t border-white/15 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center text-xs font-bold text-white">
               SA
@@ -79,7 +96,7 @@ export default function AdminLayout() {
           <button
             onClick={handleAdminLogout}
             title="Log Out of Admin Portal"
-            className="text-white/70 hover:text-red-300 p-1.5 rounded-md hover:bg-white/10 transition-colors"
+            className="text-[#90CAF9] hover:text-red-300 p-1.5 rounded-md hover:bg-white/10 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">logout</span>
           </button>

@@ -60,7 +60,7 @@ export default function AuthWelcome() {
                 </p>
               </div>
             </div>
-            <span className="material-symbols-outlined text-[20px] text-white/80 group-hover:translate-x-1 transition-transform">
+            <span className="material-symbols-outlined text-[20px] text-white group-hover:translate-x-1 transition-transform">
               arrow_forward
             </span>
           </button>

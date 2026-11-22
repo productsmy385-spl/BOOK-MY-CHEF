@@ -5,35 +5,8 @@ export default function ProviderAlerts() {
   const navigate = useNavigate();
   const [showUrgentModal, setShowUrgentModal] = useState(false);
 
-  const alerts = [
-    {
-      id: 1,
-      type: 'BOOKING_LEAD',
-      title: 'New Event Lead: Gruhapravesam Feast',
-      desc: 'Meera Nambiar requested an Andhra Royal Feast for 25 Guests on 28 Nov 2026.',
-      time: '10 mins ago',
-      urgent: true,
-      action: '/provider/chat',
-    },
-    {
-      id: 2,
-      type: 'ESCROW',
-      title: 'Escrow Advance Deposited: ₹3,300',
-      desc: 'Host advance payment successfully secured in escrow wallet for Booking #BMC-7820.',
-      time: '1 hour ago',
-      urgent: false,
-      action: '/provider/wallet',
-    },
-    {
-      id: 3,
-      type: 'SYSTEM',
-      title: 'FSSAI Hygiene Certificate Verified',
-      desc: 'Your regulatory compliance badge is active and visible on your public atelier profile.',
-      time: '1 day ago',
-      urgent: false,
-      action: '/provider/profile',
-    },
-  ];
+  // Dynamic real alerts (empty for clean production accounts)
+  const alerts = [];
 
   return (
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 px-4 bg-white font-sora">
@@ -45,33 +18,52 @@ export default function ProviderAlerts() {
       </div>
 
       <div className="mt-4 flex flex-col gap-3 font-inter">
-        {alerts.map((alert) => (
-          <div
-            key={alert.id}
-            onClick={() => navigate(alert.action)}
-            className={`p-4 rounded-lg card-sharp cursor-pointer flex items-start gap-3.5 transition-all ${
-              alert.urgent
-                ? 'border-2 border-[#2196F3] bg-[#E3F2FD]/20 shadow-xs'
-                : 'hover:border-[#90CAF9]'
-            }`}
-          >
-            <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${
-              alert.urgent ? 'bg-[#2196F3] text-white' : 'bg-[#F8FAFC] text-[#0D47A1] border border-[#CBD5E1]'
-            }`}>
-              <span className="material-symbols-outlined text-[20px]">
-                {alert.type === 'BOOKING_LEAD' ? 'event_available' : alert.type === 'ESCROW' ? 'shield' : 'info'}
-              </span>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <h4 className="font-sora font-bold text-xs text-[#172033] truncate">{alert.title}</h4>
-                <span className="font-inter text-[11px] text-[#64748B] shrink-0">{alert.time}</span>
+        {alerts.length > 0 ? (
+          alerts.map((alert) => (
+            <div
+              key={alert.id}
+              onClick={() => navigate(alert.action)}
+              className={`p-4 rounded-lg card-sharp cursor-pointer flex items-start gap-3.5 transition-all ${
+                alert.urgent
+                  ? 'border-2 border-[#2196F3] bg-[#E3F2FD]/20 shadow-xs'
+                  : 'hover:border-[#90CAF9]'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${
+                alert.urgent ? 'bg-[#2196F3] text-white' : 'bg-[#F8FAFC] text-[#0D47A1] border border-[#CBD5E1]'
+              }`}>
+                <span className="material-symbols-outlined text-[20px]">
+                  {alert.type === 'BOOKING_LEAD' ? 'event_available' : alert.type === 'ESCROW' ? 'shield' : 'info'}
+                </span>
               </div>
-              <p className="font-inter text-xs text-[#64748B] mt-0.5 leading-relaxed">{alert.desc}</p>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-sora font-bold text-xs text-[#172033] truncate">{alert.title}</h4>
+                  <span className="font-inter text-[11px] text-[#64748B] shrink-0">{alert.time}</span>
+                </div>
+                <p className="font-inter text-xs text-[#64748B] mt-0.5 leading-relaxed">{alert.desc}</p>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="p-8 rounded-lg card-sharp border-[#CBD5E1] bg-white flex flex-col items-center text-center my-6">
+            <div className="w-14 h-14 rounded-lg bg-[#E3F2FD] border border-[#90CAF9] flex items-center justify-center text-[#0D47A1] mb-3">
+              <span className="material-symbols-outlined text-[28px]">notifications_paused</span>
+            </div>
+            <h4 className="font-sora font-bold text-sm text-[#172033]">All Caught Up!</h4>
+            <p className="font-inter text-xs text-[#64748B] max-w-sm mt-1 leading-relaxed">
+              You have no unread notifications. Direct requests from hosts, reservation lock alerts, and escrow releases will notify you here in real-time.
+            </p>
+            <button
+              onClick={() => navigate('/provider/dashboard')}
+              className="btn-primary py-2.5 px-5 text-xs mt-4 flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[16px]">dashboard</span>
+              <span>Back to Dashboard</span>
+            </button>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Urgent Booking Request Modal (Sharp Geometry: rounded-lg) */}

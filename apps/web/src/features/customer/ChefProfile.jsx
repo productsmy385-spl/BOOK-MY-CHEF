@@ -131,7 +131,7 @@ export default function ChefProfile() {
             <h1 className="font-sora font-extrabold text-xl sm:text-2xl leading-tight text-white truncate drop-shadow-sm">
               {displayChef.professionalName}
             </h1>
-            <p className="font-sans text-xs text-white/90 truncate">
+            <p className="font-sans text-xs text-[#E3F2FD] truncate font-medium">
               {displayChef.businessName || 'Royal Atelier'} • Jubilee Hills
             </p>
           </div>

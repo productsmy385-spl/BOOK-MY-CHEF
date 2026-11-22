@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { ASSETS } from '../../assets/assetCatalog';
 
@@ -7,7 +8,23 @@ export default function CustomerProfile() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
-  const handleLogout = () => {
+  let clerk = null;
+  try {
+    clerk = useClerk();
+  } catch (e) {
+    // Graceful fallback
+  }
+
+  const handleLogout = async () => {
+    try {
+      if (clerk && typeof clerk.signOut === 'function') {
+        await clerk.signOut();
+      } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+        await window.Clerk.signOut();
+      }
+    } catch (e) {
+      console.warn('Clerk sign out error in customer profile:', e);
+    }
     logout();
     navigate('/auth/welcome', { replace: true });
   };

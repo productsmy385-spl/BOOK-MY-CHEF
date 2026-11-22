@@ -78,7 +78,7 @@ export default function CustomerLiveTracking() {
             <h3 className="font-sora font-extrabold text-xl leading-tight mt-0.5">
               {isCompleted ? 'Feast Successfully Completed!' : 'Chef Raghavendra is 12 mins away'}
             </h3>
-            <p className="font-sans text-xs text-white/90 mt-0.5">
+            <p className="font-sans text-xs text-[#E3F2FD] font-medium mt-0.5">
               {isCompleted ? 'Kitchen sanitized & inspected. Escrow ready for release.' : 'En route on Road No. 36 • Driving Swift Dzire'}
             </p>
           </div>

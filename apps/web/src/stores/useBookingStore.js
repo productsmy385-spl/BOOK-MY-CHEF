@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export const useBookingStore = create((set, get) => ({
-  // Active Booking Draft State
+  // Provider Selected by Customer for Active Booking Flow
   provider: {
     id: 'ab33603d-aefb-414f-a4b9-145bcaf9154a',
     name: 'Chef Raghavendra Rao',
@@ -9,49 +9,43 @@ export const useBookingStore = create((set, get) => ({
     title: 'Culinary Master • 18+ Yrs Exp',
     cuisines: 'Andhra Royal • Telangana Home-Style',
     rating: 4.95,
-    reviewsCount: 1240,
+    reviewsCount: 124,
     baseFee: 1500,
     perPersonRate: 350,
   },
 
   step1Requirements: {
-    eventType: 'Family Gathering',
-    eventDate: '2026-11-28',
+    eventType: 'Family Celebration',
+    eventDate: '',
     timeSlot: 'Lunch (12:30 PM)',
-    guestCount: 25,
-    location: 'Jubilee Hills, Road No. 36, Hyderabad',
-    budgetEstimate: 11000,
+    guestCount: 15,
+    location: '',
+    budgetEstimate: 0,
   },
 
   step2Preferences: {
     serviceMode: 'CHEF_VISITS_HOME', // 'CHEF_VISITS_HOME' | 'COOK_AND_DELIVER' | 'VENUE_BANQUET'
-    dietary: 'Pure Vegetarian',
+    dietary: 'All Diets Accommodated',
     spiceLevel: 'Medium Spice',
     appliancesProvided: true,
-    specialNotes: 'Authentic Andhra festive meal with Gutti Vankaya and hot ghee pappu. Banana leaves requested.',
+    specialNotes: '',
     referenceImages: [],
   },
 
   quotation: {
     baseVisitingFee: 1500,
-    perHeadCost: 8750, // 25 guests * 350
+    perHeadCost: 5250, // 15 guests * 350
     travelLogistics: 300,
     platformServiceFee: 450,
     taxGst: 0,
-    totalPayable: 11000,
+    totalPayable: 7500,
     advancePercentage: 30,
-    advancePayable: 3300,
-    balanceOnCompletion: 7700,
+    advancePayable: 2250,
+    balanceOnCompletion: 5250,
   },
 
-  activeBooking: {
-    bookingId: '5f154cff-3dcf-43ad-b22a-793b3fac436a',
-    bookingReference: '#BMC-6821-HYD',
-    status: 'CONFIRMED', // 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED'
-    paidAdvance: 3300,
-    paymentMethod: 'Razorpay UPI',
-    transactionId: 'TXN_987625121',
-  },
+  // Active Real Persistent Booking (null by default for real production users)
+  activeBooking: null,
 
   // Actions
   setProvider: (newProvider) => set({ provider: { ...get().provider, ...newProvider } }),
@@ -59,8 +53,10 @@ export const useBookingStore = create((set, get) => ({
   updateStep1: (fields) => set((state) => {
     const updated = { ...state.step1Requirements, ...fields };
     const guestCount = fields.guestCount !== undefined ? Number(fields.guestCount) : state.step1Requirements.guestCount;
-    const perHead = guestCount * state.provider.perPersonRate;
-    const total = state.quotation.baseVisitingFee + perHead + state.quotation.travelLogistics + state.quotation.platformServiceFee;
+    const perHeadRate = state.provider?.perPersonRate || 350;
+    const baseFee = state.quotation.baseVisitingFee || 1500;
+    const perHead = guestCount * perHeadRate;
+    const total = baseFee + perHead + state.quotation.travelLogistics + state.quotation.platformServiceFee;
     const advance = Math.round(total * 0.3);
 
     return {
@@ -81,5 +77,25 @@ export const useBookingStore = create((set, get) => ({
 
   setConfirmedBooking: (bookingData) => set({
     activeBooking: bookingData
+  }),
+
+  clearBookingDraft: () => set({
+    activeBooking: null,
+    step1Requirements: {
+      eventType: 'Family Celebration',
+      eventDate: '',
+      timeSlot: 'Lunch (12:30 PM)',
+      guestCount: 15,
+      location: '',
+      budgetEstimate: 0,
+    },
+    step2Preferences: {
+      serviceMode: 'CHEF_VISITS_HOME',
+      dietary: 'All Diets Accommodated',
+      spiceLevel: 'Medium Spice',
+      appliancesProvided: true,
+      specialNotes: '',
+      referenceImages: [],
+    },
   }),
 }));

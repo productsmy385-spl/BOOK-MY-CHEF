@@ -13,9 +13,12 @@ export default function PartnerAuth() {
   const { updateOnboarding } = useProviderStore();
   const {
     isConfigured,
+    clerk,
+    clerkUser,
     isLoading: isClerkLoading,
     errorMessage,
     setErrorMessage,
+    signOut,
     sendSignUpEmailOtp,
     verifySignUpEmailOtp,
     sendSignInEmailOtp,
@@ -201,9 +204,9 @@ export default function PartnerAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col lg:grid lg:grid-cols-12 font-sora">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-white flex flex-col lg:grid lg:grid-cols-12 font-sora">
       {/* Desktop Left Brand & Editorial Section (Sharp Geometry + WCAG AAA High Contrast) */}
-      <div className="hidden lg:flex lg:col-span-5 bg-[#0D47A1] text-white flex-col justify-between p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:col-span-5 bg-[#0D47A1] text-white flex-col justify-between p-8 xl:p-12 relative overflow-hidden h-full">
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/10 border border-white/20 rounded-md flex items-center justify-center">
@@ -219,7 +222,7 @@ export default function PartnerAuth() {
             </div>
           </div>
 
-          <div className="mt-16">
+          <div className="mt-12 xl:mt-16">
             <span className="inline-block px-3 py-1 bg-white/15 border border-white/30 text-[#E3F2FD] text-xs font-semibold rounded-md uppercase tracking-wider mb-4">
               Service Partner Ecosystem
             </span>
@@ -232,14 +235,14 @@ export default function PartnerAuth() {
           </div>
         </div>
 
-        <div className="relative z-10 mt-8">
+        <div className="relative z-10 mt-6 xl:mt-8">
           <div className="card-on-navy rounded-lg p-5">
             <h4 className="font-sora font-bold text-sm text-white">Multi-Role Enablement</h4>
             <p className="font-inter text-xs text-[#E3F2FD] mt-1 leading-relaxed">
               Operate as a Chef, Caterer, and Event Manager concurrently under one unified atelier profile.
             </p>
           </div>
-          <div className="mt-6 flex items-center justify-between text-xs text-[#E3F2FD] border-t border-white/20 pt-4 font-inter">
+          <div className="mt-5 flex items-center justify-between text-xs text-[#E3F2FD] border-t border-white/20 pt-4 font-inter">
             <span>Razorpay Route Escrow Settlements</span>
             <span className="flex items-center gap-1.5 font-medium">
               <span className="material-symbols-outlined text-[16px] text-[#90CAF9]">verified</span>
@@ -249,18 +252,18 @@ export default function PartnerAuth() {
         </div>
       </div>
 
-      {/* Right Column: Form Container (Desktop & Mobile) */}
-      <div className="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 max-w-2xl mx-auto w-full min-h-screen lg:min-h-0">
+      {/* Right Column: Form Container (Desktop & Mobile) - Non-clipping, sleek height */}
+      <div className="flex-1 lg:col-span-7 flex flex-col justify-between px-6 py-6 sm:px-10 sm:py-8 lg:px-12 lg:py-6 max-w-2xl mx-auto w-full h-full overflow-y-auto">
         <div>
           {/* Top Bar Navigation */}
-          <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
             <button
               onClick={() => {
                 if (step === 'OTP') setStep('DETAILS');
                 else if (step === 'DETAILS') setStep('ROLE_FIRST');
                 else navigate('/auth/welcome');
               }}
-              className="btn-ghost"
+              className="btn-ghost py-1 px-2.5 text-xs"
             >
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
               <span>{step === 'OTP' ? 'Change Email' : (step === 'DETAILS' ? 'Change Roles' : 'Back')}</span>
@@ -272,8 +275,8 @@ export default function PartnerAuth() {
           </div>
 
           {/* Heading */}
-          <div className="mt-6 mb-5">
-            <h1 className="heading-2">
+          <div className="mt-4 mb-4">
+            <h1 className="heading-2 text-xl sm:text-2xl text-[#172033]">
               {step === 'ROLE_FIRST' && mode === 'REGISTER'
                 ? 'Select Your Service Categories'
                 : step === 'OTP'
@@ -282,7 +285,7 @@ export default function PartnerAuth() {
                 ? 'Partner Profile Details'
                 : 'Partner Studio Sign In'}
             </h1>
-            <p className="body-sm mt-1.5">
+            <p className="body-sm text-xs mt-1 text-[#64748B]">
               {step === 'ROLE_FIRST' && mode === 'REGISTER'
                 ? 'Select your primary role and any additional services you provide. You can configure individual pricing for each.'
                 : step === 'OTP'
@@ -293,9 +296,44 @@ export default function PartnerAuth() {
             </p>
           </div>
 
+          {/* Active Clerk Session Detected Banner */}
+          {clerkUser && (step === 'ROLE_FIRST' || step === 'DETAILS') && (
+            <div className="mb-4 p-3.5 rounded-md bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] text-xs font-inter flex flex-col gap-2.5 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="material-symbols-outlined text-[#2196F3] text-[20px] shrink-0">account_circle</span>
+                  <div className="min-w-0">
+                    <span className="font-bold font-sora block text-[#172033] text-xs">Currently Signed In</span>
+                    <span className="text-[#64748B] text-[11px] truncate block">
+                      {clerkUser.primaryEmailAddress?.emailAddress || clerkUser.fullName || 'Active Session'}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await signOut();
+                    setErrorMessage('');
+                  }}
+                  className="px-2.5 py-1 rounded bg-white hover:bg-red-50 text-red-600 border border-red-200 text-[11px] font-bold font-sora shrink-0 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate('/provider/dashboard')}
+                className="btn-primary py-2 px-3 text-xs w-full flex items-center justify-center gap-1.5"
+              >
+                <span>Continue to Partner Console</span>
+                <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+              </button>
+            </div>
+          )}
+
           {/* Tabs: Sign Up / Sign In */}
           {(step === 'ROLE_FIRST' || step === 'DETAILS') && (
-            <div className="flex bg-[#F8FAFC] p-1 mb-4 border border-[#E5E7EB] rounded-md">
+            <div className="flex bg-[#F8FAFC] p-1 mb-3.5 border border-[#E5E7EB] rounded-md">
               <button
                 type="button"
                 onClick={() => {
@@ -303,7 +341,7 @@ export default function PartnerAuth() {
                   setStep('ROLE_FIRST');
                   setErrorMessage('');
                 }}
-                className={`flex-1 py-2 font-sora text-xs font-bold rounded transition-all ${
+                className={`flex-1 py-1.5 font-sora text-xs font-bold rounded transition-all ${
                   mode === 'REGISTER'
                     ? 'bg-white text-[#0D47A1] shadow-xs border border-[#CBD5E1]'
                     : 'text-[#64748B] hover:text-[#172033]'
@@ -318,7 +356,7 @@ export default function PartnerAuth() {
                   setStep('DETAILS');
                   setErrorMessage('');
                 }}
-                className={`flex-1 py-2 font-sora text-xs font-bold rounded transition-all ${
+                className={`flex-1 py-1.5 font-sora text-xs font-bold rounded transition-all ${
                   mode === 'LOGIN'
                     ? 'bg-white text-[#0D47A1] shadow-xs border border-[#CBD5E1]'
                     : 'text-[#64748B] hover:text-[#172033]'
@@ -331,7 +369,7 @@ export default function PartnerAuth() {
 
           {/* Secondary Sub-Tabs for LOGIN Mode: Email OTP vs Password */}
           {step === 'DETAILS' && mode === 'LOGIN' && (
-            <div className="flex items-center gap-2 mb-5 p-1 bg-[#F1F5F9] rounded-md text-xs font-inter">
+            <div className="flex items-center gap-2 mb-4 p-1 bg-[#F1F5F9] rounded-md text-xs font-inter">
               <button
                 type="button"
                 onClick={() => {
@@ -365,11 +403,34 @@ export default function PartnerAuth() {
             </div>
           )}
 
-          {/* Error Banner */}
+          {/* Error Banner with Interactive Resolution Controls */}
           {errorMessage && step !== 'OTP' && (
-            <div className="mb-4 p-3.5 rounded-md bg-red-50 border border-red-200 text-red-700 font-inter text-xs flex items-center gap-2 animate-in fade-in duration-200">
-              <span className="material-symbols-outlined text-[18px] text-red-500 flex-shrink-0">error</span>
-              <span>{errorMessage}</span>
+            <div className="mb-4 p-3.5 rounded-md bg-red-50 border border-red-200 text-red-700 font-inter text-xs flex flex-col gap-2 animate-in fade-in duration-200">
+              <div className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-[18px] text-red-500 shrink-0 mt-0.5">error</span>
+                <span className="flex-1 leading-snug">{errorMessage}</span>
+              </div>
+              {errorMessage.toLowerCase().includes('signed in') && (
+                <div className="flex items-center gap-2 pt-1 border-t border-red-200/60 font-sora">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/provider/dashboard')}
+                    className="flex-1 py-1.5 px-3 bg-[#0D47A1] text-white rounded font-bold text-[11px] hover:bg-[#1565C0] transition-colors"
+                  >
+                    Go to Dashboard
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await signOut();
+                      setErrorMessage('');
+                    }}
+                    className="flex-1 py-1.5 px-3 bg-white text-red-600 border border-red-300 rounded font-bold text-[11px] hover:bg-red-50 transition-colors"
+                  >
+                    Sign Out &amp; Retry
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

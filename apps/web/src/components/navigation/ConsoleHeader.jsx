@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useClerk } from '@clerk/react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { ASSETS } from '../../assets/assetCatalog';
 
@@ -9,6 +10,13 @@ export default function ConsoleHeader({ onOpenDrawer }) {
   const { isAuthenticated, userType, user, logout } = useAuthStore();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const dropdownRef = useRef(null);
+
+  let clerk = null;
+  try {
+    clerk = useClerk();
+  } catch (e) {
+    // Graceful fallback if rendered outside ClerkProvider
+  }
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -21,8 +29,17 @@ export default function ConsoleHeader({ onOpenDrawer }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowProfileMenu(false);
+    try {
+      if (clerk && typeof clerk.signOut === 'function') {
+        await clerk.signOut();
+      } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+        await window.Clerk.signOut();
+      }
+    } catch (e) {
+      console.warn('Clerk sign out error:', e);
+    }
     logout();
     navigate('/auth/welcome', { replace: true });
   };

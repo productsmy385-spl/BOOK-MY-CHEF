@@ -1,11 +1,35 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/react';
 import { ASSETS } from '../../assets/assetCatalog';
+import { useAuthStore } from '../../stores/useAuthStore';
 import { useProviderStore } from '../../stores/useProviderStore';
 
 export default function ProviderProfile() {
   const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
   const { onboarding } = useProviderStore();
+
+  let clerk = null;
+  try {
+    clerk = useClerk();
+  } catch (e) {
+    // Graceful fallback
+  }
+
+  const handleLogout = async () => {
+    try {
+      if (clerk && typeof clerk.signOut === 'function') {
+        await clerk.signOut();
+      } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+        await window.Clerk.signOut();
+      }
+    } catch (e) {
+      console.warn('Clerk sign out error in provider profile:', e);
+    }
+    logout();
+    navigate('/auth/welcome', { replace: true });
+  };
 
   return (
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 px-4 bg-white">
@@ -46,6 +70,17 @@ export default function ProviderProfile() {
             <span className="material-symbols-outlined text-[#64748B] text-[18px]">chevron_right</span>
           </button>
         ))}
+      </div>
+
+      {/* Sign Out Button */}
+      <div className="mt-4">
+        <button
+          onClick={handleLogout}
+          className="btn-destructive w-full py-3.5 text-xs font-bold"
+        >
+          <span className="material-symbols-outlined text-[18px]">logout</span>
+          <span>Sign Out of Atelier Partner Account</span>
+        </button>
       </div>
     </div>
   );

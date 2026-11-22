@@ -1,11 +1,34 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { ASSETS } from '../../assets/assetCatalog';
 
 export default function CustomerDrawer({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+
+  let clerk = null;
+  try {
+    clerk = useClerk();
+  } catch (e) {
+    // Graceful fallback
+  }
+
+  const handleLogout = async () => {
+    onClose();
+    try {
+      if (clerk && typeof clerk.signOut === 'function') {
+        await clerk.signOut();
+      } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+        await window.Clerk.signOut();
+      }
+    } catch (e) {
+      console.warn('Clerk drawer signOut error:', e);
+    }
+    logout();
+    navigate('/auth/welcome');
+  };
 
   if (!isOpen) return null;
 
@@ -96,11 +119,7 @@ export default function CustomerDrawer({ isOpen, onClose }) {
         {/* Footer & Logout */}
         <div className="p-4 border-t border-[#E5E7EB] bg-white">
           <button 
-            onClick={() => {
-              onClose();
-              logout();
-              navigate('/auth/welcome');
-            }}
+            onClick={handleLogout}
             className="w-full flex items-center gap-2 text-xs text-[#DC2626] font-semibold px-3 py-2 rounded-md hover:bg-red-50 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">logout</span>

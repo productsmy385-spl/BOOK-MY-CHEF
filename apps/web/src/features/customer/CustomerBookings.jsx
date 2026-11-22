@@ -8,7 +8,7 @@ import apiClient from '../../lib/apiClient';
 export default function CustomerBookings() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { booking: activeBooking, step1Requirements, quotation, provider } = useBookingStore();
+  const { activeBooking, step1Requirements, quotation, provider } = useBookingStore();
   const [dbBookings, setDbBookings] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -130,27 +130,27 @@ export default function CustomerBookings() {
           );
         })}
 
-        {/* Client Draft / Active Store Booking Card if not in DB */}
-        {dbBookings.length === 0 && (
+        {/* Real Dynamic Booking Card from current session if created and not yet re-fetched from DB */}
+        {activeBooking && activeBooking.bookingReference && dbBookings.length === 0 && (
           <div className="card-sharp p-4 flex flex-col gap-3 border-[#2196F3]/40">
             <div className="flex items-center justify-between">
               <span className="font-sora text-xs font-bold text-[#0D47A1]">
                 Ref: {activeBooking.bookingReference}
               </span>
               <span className="badge-sharp bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] animate-pulse">
-                CONFIRMED &amp; ESCROW LOCKED
+                {activeBooking.status || 'CONFIRMED & ESCROW LOCKED'}
               </span>
             </div>
 
             <div className="flex items-center gap-3 pt-2 border-t border-[#E5E7EB]">
               <div className="w-14 h-14 rounded-md overflow-hidden ring-1 ring-[#CBD5E1] shrink-0">
-                <img src={provider.avatar} alt={provider.name} className="w-full h-full object-cover" />
+                <img src={provider?.avatar || ASSETS.chefRaghavendraStudio} alt={provider?.name || 'Chef'} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="heading-4 text-sm truncate">{provider.name}</h4>
-                <p className="font-sora text-xs text-[#2196F3] font-semibold">{step1Requirements.eventType}</p>
+                <h4 className="heading-4 text-sm truncate">{provider?.name || 'Atelier Masterchef'}</h4>
+                <p className="font-sora text-xs text-[#2196F3] font-semibold">{step1Requirements?.eventType || 'Celebration Feast'}</p>
                 <p className="font-inter text-xs text-[#64748B]">
-                  {step1Requirements.eventDate} • {step1Requirements.timeSlot}
+                  {step1Requirements?.eventDate || 'Scheduled Date'} • {step1Requirements?.timeSlot || 'Lunch'}
                 </p>
               </div>
             </div>
@@ -158,15 +158,15 @@ export default function CustomerBookings() {
             <div className="p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-sora flex items-center justify-between">
               <div>
                 <span className="text-[#64748B] block text-[10px] font-inter">Total Booking:</span>
-                <span className="font-bold text-[#172033]">₹{quotation.totalPayable.toLocaleString('en-IN')}</span>
+                <span className="font-bold text-[#172033]">₹{(activeBooking.totalAmount || quotation?.totalPayable || 0).toLocaleString('en-IN')}</span>
               </div>
               <div>
                 <span className="text-[#64748B] block text-[10px] font-inter">Advance Paid:</span>
-                <span className="font-bold text-[#059669]">₹{quotation.advancePayable.toLocaleString('en-IN')} (Escrow)</span>
+                <span className="font-bold text-[#059669]">₹{(activeBooking.paidAdvance || quotation?.advancePayable || 0).toLocaleString('en-IN')} (Escrow)</span>
               </div>
               <div>
                 <span className="text-[#64748B] block text-[10px] font-inter">Guest Count:</span>
-                <span className="font-bold text-[#172033]">{step1Requirements.guestCount} Guests</span>
+                <span className="font-bold text-[#172033]">{step1Requirements?.guestCount || 15} Guests</span>
               </div>
             </div>
 
@@ -188,39 +188,51 @@ export default function CustomerBookings() {
           </div>
         )}
 
-        {/* Past Completed Booking Card */}
-        <div className="card-sharp p-4 flex flex-col gap-3 opacity-95">
-          <div className="flex items-center justify-between">
-            <span className="font-sora text-xs font-bold text-[#64748B]">Ref: #BMC-7819-HYD</span>
-            <span className="badge-sharp bg-emerald-50 border border-emerald-300 text-emerald-800">
-              COMPLETED
-            </span>
-          </div>
+        {/* Real Production Empty State: Displayed when customer has 0 bookings */}
+        {dbBookings.length === 0 && !activeBooking && !loading && (
+          <div className="p-8 rounded-lg card-sharp border-[#CBD5E1] bg-white flex flex-col items-center text-center my-6">
+            <div className="w-16 h-16 rounded-lg bg-[#E3F2FD] border border-[#90CAF9] flex items-center justify-center text-[#2196F3] mb-4 shadow-xs">
+              <span className="material-symbols-outlined text-[32px]">event_available</span>
+            </div>
+            <h3 className="heading-3 text-base text-[#172033]">No Event Bookings Yet</h3>
+            <p className="body-sm text-xs text-[#64748B] max-w-sm mt-1 leading-relaxed">
+              You haven't scheduled any private chefs, caterers, or event artisans yet. Discover verified culinary masters to craft a personalized feast for your celebration.
+            </p>
 
-          <div className="flex items-center gap-3 pt-2 border-t border-[#E5E7EB]">
-            <div className="w-12 h-12 rounded-md overflow-hidden ring-1 ring-[#CBD5E1] shrink-0">
-              <img src={ASSETS.chefFemaleMaharashtrian} alt="Chef Anupama" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="heading-4 text-sm truncate">Chef Anupama Joshi</h4>
-              <p className="font-inter text-xs text-[#64748B]">Bespoke Maharashtrian Thali • 15 Guests</p>
-              <span className="font-inter text-[11px] text-[#94A3B8] block mt-0.5">Delivered on 14 Oct 2026</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB]">
-            <div className="flex items-center gap-1 text-xs font-sora font-bold text-[#D97706]">
-              <span className="material-symbols-outlined text-[16px] fill-1">star</span>
-              <span>5.0 Rated by Host</span>
-            </div>
             <button
-              onClick={() => navigate('/explore')}
-              className="btn-ghost px-3.5 py-1.5 text-xs font-semibold text-[#0D47A1]"
+              onClick={() => navigate('/customer/home')}
+              className="btn-primary py-3 px-6 text-xs mt-5 shadow-xs flex items-center gap-2"
             >
-              Book Again
+              <span className="material-symbols-outlined text-[18px]">restaurant_menu</span>
+              <span>Explore Chefs &amp; Caterers</span>
             </button>
+
+            {/* Platform Guarantees */}
+            <div className="mt-8 pt-6 border-t border-[#E5E7EB] w-full grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+              <div className="flex items-start gap-2.5 p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB]">
+                <span className="material-symbols-outlined text-[#059669] text-[18px] shrink-0 mt-0.5">verified_user</span>
+                <div>
+                  <h5 className="font-sora font-bold text-[11px] text-[#172033]">Escrow Protected</h5>
+                  <p className="font-inter text-[10px] text-[#64748B] mt-0.5 leading-tight">Payment released only after feast completion</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB]">
+                <span className="material-symbols-outlined text-[#2196F3] text-[18px] shrink-0 mt-0.5">health_and_safety</span>
+                <div>
+                  <h5 className="font-sora font-bold text-[11px] text-[#172033]">FSSAI Certified</h5>
+                  <p className="font-inter text-[10px] text-[#64748B] mt-0.5 leading-tight">Rigorous kitchen hygiene and food safety pledge</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB]">
+                <span className="material-symbols-outlined text-[#0D47A1] text-[18px] shrink-0 mt-0.5">soup_kitchen</span>
+                <div>
+                  <h5 className="font-sora font-bold text-[11px] text-[#172033]">Custom Menus</h5>
+                  <p className="font-inter text-[10px] text-[#64748B] mt-0.5 leading-tight">Bespoke regional cuisines tailored to your guests</p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
