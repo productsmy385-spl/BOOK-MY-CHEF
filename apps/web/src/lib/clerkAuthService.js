@@ -61,7 +61,7 @@ export async function syncUserWithPostgres({
       headers,
       body: JSON.stringify({
         clerkId,
-        phone: formatToE164(phone),
+        phone: phone ? formatToE164(phone) : '',
         email: email || '',
         fullName: fullName || 'User',
         intendedRole: intendedRole || 'CUSTOMER',
