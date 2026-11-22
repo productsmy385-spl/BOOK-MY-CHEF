@@ -58,19 +58,19 @@ export default function CustomerLiveTracking() {
     <div className="flex flex-col w-full min-h-screen pb-28 pt-2 bg-white">
       {/* Top Header */}
       <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-xs font-sora font-semibold text-[#64748B] hover:text-[#172033]">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-xs font-sans font-semibold text-[#64748B] hover:text-[#172033]">
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>Back</span>
         </button>
         <span className="font-sora text-xs font-bold text-[#0D47A1]">Live Event Tracking</span>
-        <span className="px-2 py-0.5 rounded-full bg-[#10B981]/15 text-[#10B981] font-sora text-[10px] font-bold">
+        <span className="px-2 py-0.5 rounded-sm bg-[#10B981]/15 text-[#10B981] font-sans text-[10px] font-bold">
           {isCompleted ? 'COMPLETED' : 'LIVE'}
         </span>
       </div>
 
       <div className="px-4 mt-4 flex flex-col gap-4">
-        {/* Live ETA Card (Stitch Screen 24) */}
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-[#0D47A1] to-[#2196F3] text-white shadow-md flex items-center justify-between">
+        {/* Live ETA Card (Stitch Screen 24 - Sharp Geometry) */}
+        <div className="p-4 rounded-lg bg-gradient-to-r from-[#0D47A1] to-[#2196F3] text-white shadow-md flex items-center justify-between">
           <div>
             <span className="font-sora text-[10px] uppercase tracking-wider text-[#90CAF9] font-bold block">
               Booking Ref: {bookingRef}
@@ -78,11 +78,11 @@ export default function CustomerLiveTracking() {
             <h3 className="font-sora font-extrabold text-xl leading-tight mt-0.5">
               {isCompleted ? 'Feast Successfully Completed!' : 'Chef Raghavendra is 12 mins away'}
             </h3>
-            <p className="font-sora text-xs text-white/90 mt-0.5">
+            <p className="font-sans text-xs text-white/90 mt-0.5">
               {isCompleted ? 'Kitchen sanitized & inspected. Escrow ready for release.' : 'En route on Road No. 36 • Driving Swift Dzire'}
             </p>
           </div>
-          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 animate-pulse">
+          <div className="w-12 h-12 rounded-md bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 animate-pulse border border-white/20">
             <span className="material-symbols-outlined text-[28px] text-white">
               {isCompleted ? 'task_alt' : 'navigation'}
             </span>
@@ -90,9 +90,9 @@ export default function CustomerLiveTracking() {
         </div>
 
         {/* Chef Contact Strip */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex items-center justify-between">
+        <div className="p-4 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-[#90CAF9] flex-shrink-0">
+            <div className="w-14 h-14 rounded-md overflow-hidden ring-1 ring-[#90CAF9] flex-shrink-0">
               <img src={ASSETS.chefRaghavendraTracking} alt={provider.name} className="w-full h-full object-cover" />
             </div>
             <div>
@@ -101,33 +101,33 @@ export default function CustomerLiveTracking() {
                 <span className="font-sora text-[10px] font-bold text-[#0D47A1]">Assigned Masterchef</span>
               </div>
               <h4 className="font-sora font-bold text-sm text-[#172033]">{provider.name}</h4>
-              <p className="font-sora text-xs text-[#64748B]">OTP for Arrival: <strong className="text-[#0D47A1]">4892</strong></p>
+              <p className="font-sans text-xs text-[#64748B]">OTP for Arrival: <strong className="text-[#0D47A1] font-sora">4892</strong></p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/provider/chat')}
-              className="w-10 h-10 rounded-full bg-[#E3F2FD] text-[#0D47A1] flex items-center justify-center hover:bg-[#90CAF9] transition-colors"
+              className="w-9 h-9 rounded-md bg-[#E3F2FD] text-[#0D47A1] flex items-center justify-center hover:bg-[#90CAF9] transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px]">chat</span>
+              <span className="material-symbols-outlined text-[18px]">chat</span>
             </button>
             <a
               href="tel:+919849012345"
-              className="w-10 h-10 rounded-full bg-[#2196F3] text-white flex items-center justify-center hover:bg-[#0D47A1] transition-colors shadow-sm"
+              className="w-9 h-9 rounded-md bg-[#2196F3] text-white flex items-center justify-center hover:bg-[#0D47A1] transition-colors shadow-xs"
             >
-              <span className="material-symbols-outlined text-[20px]">call</span>
+              <span className="material-symbols-outlined text-[18px]">call</span>
             </a>
           </div>
         </div>
 
-        {/* Live Service Timeline (Stitch Checklist) */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-4">
+        {/* Live Service Timeline (Stitch Checklist - Sharp Geometry) */}
+        <div className="p-4 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
               Event-Day Live Checklist
             </span>
-            <span className="font-sora text-[10px] text-[#2196F3] font-bold">
+            <span className="font-sans text-[10px] text-[#2196F3] font-bold">
               {isCompleted ? 'All Steps Completed' : `Step ${currentStep} of 6 Active`}
             </span>
           </div>
@@ -137,11 +137,11 @@ export default function CustomerLiveTracking() {
 
             {steps.map((step) => (
               <div key={step.id} className="flex items-start gap-3.5 relative z-10">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-sora text-xs font-bold transition-all ${
+                <div className={`w-8 h-8 rounded-md flex items-center justify-center font-sora text-xs font-bold transition-all ${
                   step.completed
-                    ? 'bg-[#10B981] text-white ring-4 ring-[#10B981]/15'
+                    ? 'bg-[#10B981] text-white ring-2 ring-[#10B981]/20'
                     : step.active
-                    ? 'bg-[#2196F3] text-white ring-4 ring-[#2196F3]/20 animate-pulse'
+                    ? 'bg-[#2196F3] text-white ring-2 ring-[#2196F3]/30 animate-pulse'
                     : 'bg-[#f1f3ff] text-[#64748B] border border-[#E5E7EB]'
                 }`}>
                   {step.completed ? (
@@ -158,10 +158,10 @@ export default function CustomerLiveTracking() {
                     }`}>
                       {step.title}
                     </h5>
-                    <span className="font-sora text-[10px] text-[#64748B]">{step.time}</span>
+                    <span className="font-sans text-[10px] text-[#64748B]">{step.time}</span>
                   </div>
                   {step.active && (
-                    <span className="inline-block mt-1 font-sora text-[10px] font-bold text-[#2196F3] bg-[#E3F2FD] px-2 py-0.5 rounded-full">
+                    <span className="inline-block mt-1 font-sans text-[10px] font-bold text-[#2196F3] bg-[#E3F2FD] px-2 py-0.5 rounded-sm">
                       In Progress Right Now
                     </span>
                   )}
@@ -173,15 +173,15 @@ export default function CustomerLiveTracking() {
 
         {/* Rate Chef Button when Completed */}
         {isCompleted && (
-          <div className="p-4 rounded-2xl bg-[#f1f3ff] border border-[#90CAF9] flex flex-col items-center gap-3 text-center">
+          <div className="p-4 rounded-lg bg-[#f8faff] border border-[#90CAF9] flex flex-col items-center gap-3 text-center">
             <span className="material-symbols-outlined text-[#FFB300] text-[32px] fill-1">star</span>
             <div>
               <h4 className="font-sora font-bold text-sm text-[#172033]">How was your dining experience?</h4>
-              <p className="font-sora text-xs text-[#64748B] mt-0.5">Your rating releases the provider escrow and updates chef rankings.</p>
+              <p className="font-sans text-xs text-[#64748B] mt-0.5">Your rating releases the provider escrow and updates chef rankings.</p>
             </div>
             <button
               onClick={() => navigate(`/review/${effectiveBookingId}`)}
-              className="w-full py-3 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-bold shadow-md active:scale-95 transition-all"
+              className="w-full btn-primary py-3 text-xs"
             >
               Rate Chef &amp; Share Feedback
             </button>
