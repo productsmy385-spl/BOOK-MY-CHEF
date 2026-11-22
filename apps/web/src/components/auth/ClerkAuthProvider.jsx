@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/react';
 
 export const CLERK_KEY_STORAGE = 'book_my_chef_clerk_pub_key';
 

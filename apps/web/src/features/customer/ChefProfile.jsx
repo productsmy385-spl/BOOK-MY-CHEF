@@ -99,24 +99,24 @@ export default function ChefProfile() {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#172033] shadow-md hover:bg-white transition-all active:scale-95"
+          className="absolute top-4 left-4 w-9 h-9 rounded-md bg-white/95 backdrop-blur-md flex items-center justify-center text-[#172033] shadow-sm hover:bg-white transition-all active:scale-95"
         >
           <span className="material-symbols-outlined text-[20px]">arrow_back</span>
         </button>
 
         {/* Share & Favorite */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
-          <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#172033] shadow-md active:scale-95">
-            <span className="material-symbols-outlined text-[20px]">share</span>
+          <button className="w-9 h-9 rounded-md bg-white/95 backdrop-blur-md flex items-center justify-center text-[#172033] shadow-sm active:scale-95">
+            <span className="material-symbols-outlined text-[18px]">share</span>
           </button>
-          <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-red-500 shadow-md active:scale-95">
-            <span className="material-symbols-outlined text-[20px] fill-1">favorite</span>
+          <button className="w-9 h-9 rounded-md bg-white/95 backdrop-blur-md flex items-center justify-center text-red-500 shadow-sm active:scale-95">
+            <span className="material-symbols-outlined text-[18px] fill-1">favorite</span>
           </button>
         </div>
 
         {/* Floating Chef Avatar & Title */}
         <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3.5">
-          <div className="w-20 h-20 rounded-2xl ring-4 ring-white overflow-hidden shadow-xl flex-shrink-0 bg-white">
+          <div className="w-20 h-20 rounded-md ring-2 ring-white overflow-hidden shadow-lg flex-shrink-0 bg-white">
             <img
               src={displayChef.avatarUrl || ASSETS.chefRaghavendraStudio}
               alt={displayChef.professionalName}
@@ -131,57 +131,57 @@ export default function ChefProfile() {
             <h1 className="font-sora font-extrabold text-xl sm:text-2xl leading-tight text-white truncate drop-shadow-sm">
               {displayChef.professionalName}
             </h1>
-            <p className="font-sora text-xs text-white/90 truncate">
+            <p className="font-sans text-xs text-white/90 truncate">
               {displayChef.businessName || 'Royal Atelier'} • Jubilee Hills
             </p>
           </div>
         </div>
       </div>
 
-      {/* Metrics Row (Stitch Exact Cards) */}
+      {/* Metrics Row (Stitch Exact Cards - Sharp Geometry) */}
       <section className="px-4 py-4 grid grid-cols-3 gap-2.5 bg-white border-b border-[#E5E7EB]">
-        <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB]">
+        <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-[#f8faff] border border-[#E5E7EB]">
           <span className="font-sora font-extrabold text-base text-[#172033]">{displayChef.experienceYears || 18}+ Yrs</span>
-          <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">Experience</span>
+          <span className="font-sans text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">Experience</span>
         </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB]">
+        <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-[#f8faff] border border-[#E5E7EB]">
           <div className="flex items-center gap-1">
             <span className="material-symbols-outlined text-[#FFB300] text-[16px] fill-1">star</span>
             <span className="font-sora font-extrabold text-base text-[#172033]">{displayChef.averageRating || 4.95}</span>
           </div>
-          <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">{displayChef.totalReviews || 124} Reviews</span>
+          <span className="font-sans text-[10px] text-[#64748B] uppercase tracking-wider mt-0.5">{displayChef.totalReviews || 124} Reviews</span>
         </div>
-        <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#E3F2FD] border border-[#90CAF9]/50">
+        <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-[#E3F2FD] border border-[#90CAF9]/60">
           <span className="font-sora font-extrabold text-base text-[#0D47A1]">350+</span>
-          <span className="font-sora text-[10px] text-[#0D47A1] font-semibold uppercase tracking-wider mt-0.5">Events Hosted</span>
+          <span className="font-sans text-[10px] text-[#0D47A1] font-semibold uppercase tracking-wider mt-0.5">Events Hosted</span>
         </div>
       </section>
 
       {/* Bio & Philosophy */}
       <section className="px-4 py-4 border-b border-[#E5E7EB]">
         <h3 className="font-sora font-bold text-sm text-[#172033] mb-1.5">Culinary Biography</h3>
-        <p className="font-sora text-xs text-[#64748B] leading-relaxed">
+        <p className="font-sans text-xs text-[#64748B] leading-relaxed">
           {displayChef.bio}
         </p>
 
         {/* Cuisines */}
         <div className="flex flex-wrap items-center gap-1.5 mt-3">
           {(displayChef.cuisines || ['Andhra Royal', 'Telangana Heritage']).map((c, i) => (
-            <span key={i} className="px-3 py-1 bg-[#f1f3ff] rounded-full font-sora text-xs font-medium text-[#0D47A1]">
+            <span key={i} className="px-3 py-1 bg-[#f1f3ff] rounded-md font-sans text-xs font-medium text-[#0D47A1]">
               {c}
             </span>
           ))}
         </div>
       </section>
 
-      {/* Packages vs Portfolio Tabs */}
+      {/* Packages vs Portfolio Tabs - Sharp Geometry */}
       <section className="px-4 py-3">
-        <div className="flex rounded-full bg-[#f1f3ff] p-1 border border-[#E5E7EB]">
+        <div className="flex rounded-md bg-[#f1f3ff] p-1 border border-[#E5E7EB]">
           <button
             onClick={() => setActiveTab('PACKAGES')}
-            className={`flex-1 py-2 rounded-full font-sora text-xs font-bold transition-all ${
+            className={`flex-1 py-2 rounded-md font-sora text-xs font-bold transition-all ${
               activeTab === 'PACKAGES'
-                ? 'bg-[#2196F3] text-white shadow-sm'
+                ? 'bg-[#2196F3] text-white shadow-xs'
                 : 'text-[#64748B] hover:text-[#172033]'
             }`}
           >
@@ -189,9 +189,9 @@ export default function ChefProfile() {
           </button>
           <button
             onClick={() => setActiveTab('PORTFOLIO')}
-            className={`flex-1 py-2 rounded-full font-sora text-xs font-bold transition-all ${
+            className={`flex-1 py-2 rounded-md font-sora text-xs font-bold transition-all ${
               activeTab === 'PORTFOLIO'
-                ? 'bg-[#2196F3] text-white shadow-sm'
+                ? 'bg-[#2196F3] text-white shadow-xs'
                 : 'text-[#64748B] hover:text-[#172033]'
             }`}
           >
@@ -207,30 +207,30 @@ export default function ChefProfile() {
             <div
               key={pkg.id}
               onClick={() => setSelectedPackage(pkg.id)}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+              className={`p-4 rounded-lg border transition-all cursor-pointer ${
                 selectedPackage === pkg.id
-                  ? 'border-2 border-[#2196F3] bg-[#E3F2FD]/20 shadow-md'
+                  ? 'border-2 border-[#2196F3] bg-[#E3F2FD]/20 shadow-sm'
                   : 'border-[#E5E7EB] bg-white hover:border-[#90CAF9]'
               }`}
             >
               <div className="flex items-start justify-between">
                 <div>
                   <h4 className="font-sora font-bold text-base text-[#172033]">{pkg.title}</h4>
-                  <p className="font-sora text-xs text-[#64748B] mt-0.5">{pkg.description}</p>
+                  <p className="font-sans text-xs text-[#64748B] mt-0.5">{pkg.description}</p>
                 </div>
                 <div className="text-right flex-shrink-0 ml-3">
                   <span className="font-sora font-extrabold text-lg text-[#0D47A1]">
                     ₹{pkg.price.toLocaleString('en-IN')}
                   </span>
-                  <span className="block font-sora text-[10px] text-[#64748B]">/ guest</span>
+                  <span className="block font-sans text-[10px] text-[#64748B]">/ guest</span>
                 </div>
               </div>
 
               {/* Course Items List */}
               <div className="mt-3 pt-3 border-t border-[#E5E7EB] flex flex-col gap-2">
                 {pkg.courses.map((course, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-xs font-sora">
-                    <span className="font-bold text-[#0D47A1] min-w-[70px] uppercase text-[10px] pt-0.5">
+                  <div key={idx} className="flex items-start gap-2 text-xs font-sans">
+                    <span className="font-bold text-[#0D47A1] min-w-[70px] uppercase text-[10px] pt-0.5 font-sora">
                       {course.category}:
                     </span>
                     <span className="text-[#172033]">{course.name}</span>
@@ -245,22 +245,22 @@ export default function ChefProfile() {
       {/* Tab 2: Portfolio & Cooking Video Proof */}
       {activeTab === 'PORTFOLIO' && (
         <section className="px-4 grid grid-cols-2 gap-3 mt-2">
-          <div className="rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-xs relative group h-40">
+          <div className="rounded-lg overflow-hidden border border-[#E5E7EB] shadow-xs relative group h-40">
             <img src={ASSETS.bannerAndhraHomeFeast} alt="Gutti Vankaya" className="w-full h-full object-cover" />
             <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white font-sora text-[11px] font-semibold">
               Gutti Vankaya Plating
             </div>
           </div>
-          <div className="rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-xs relative group h-40">
+          <div className="rounded-lg overflow-hidden border border-[#E5E7EB] shadow-xs relative group h-40">
             <img src={ASSETS.bannerRoyalBanquet} alt="Royal Banquet" className="w-full h-full object-cover" />
             <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white font-sora text-[11px] font-semibold">
               Palace Banquet Spread
             </div>
           </div>
-          <div className="col-span-2 rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-xs relative h-48 bg-black flex items-center justify-center">
+          <div className="col-span-2 rounded-lg overflow-hidden border border-[#E5E7EB] shadow-xs relative h-48 bg-black flex items-center justify-center">
             <img src={ASSETS.chefRaghavendraWarm} alt="Cooking Demo" className="w-full h-full object-cover opacity-75" />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-              <div className="w-12 h-12 rounded-full bg-[#2196F3] flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform cursor-pointer">
+              <div className="w-12 h-12 rounded-md bg-[#2196F3] flex items-center justify-center text-white shadow-md active:scale-95 transition-transform cursor-pointer">
                 <span className="material-symbols-outlined text-[28px] fill-1">play_arrow</span>
               </div>
               <span className="font-sora text-xs font-bold mt-2 text-white drop-shadow-sm">
@@ -271,16 +271,16 @@ export default function ChefProfile() {
         </section>
       )}
 
-      {/* Sticky Bottom Booking Action Bar (Stitch Level 3 Elevation) */}
+      {/* Sticky Bottom Booking Action Bar (Stitch Level 3 Elevation - Sharp Geometry) */}
       <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#E5E7EB] p-4 shadow-[0_-4px_20px_rgba(13,71,161,0.08)] pb-safe">
         <div className="max-w-md mx-auto flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="font-sora text-[10px] text-[#64748B] uppercase tracking-wider">Chef Visiting Fee</span>
+            <span className="font-sans text-[10px] text-[#64748B] uppercase tracking-wider">Chef Visiting Fee</span>
             <div className="flex items-baseline gap-1">
               <span className="font-sora font-extrabold text-xl text-[#172033]">
                 ₹{Number(displayChef.startingPrice || 1500).toLocaleString('en-IN')}
               </span>
-              <span className="font-sora text-xs text-[#64748B]">+ ₹350/guest</span>
+              <span className="font-sans text-xs text-[#64748B]">+ ₹350/guest</span>
             </div>
           </div>
 
@@ -296,7 +296,7 @@ export default function ChefProfile() {
               });
               navigate('/booking/step-1');
             }}
-            className="flex-1 py-3 px-6 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-sm font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5"
+            className="flex-1 btn-primary py-3 px-6 text-sm flex items-center justify-center gap-1.5"
           >
             <span>Reserve {displayChef.professionalName || 'Chef'}</span>
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>

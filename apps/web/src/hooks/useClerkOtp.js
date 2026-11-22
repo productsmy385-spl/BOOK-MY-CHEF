@@ -1,5 +1,5 @@
 import { useState, useTransition } from 'react';
-import { useSignUp, useSignIn, useClerk } from '@clerk/clerk-react';
+import { useSignUp, useSignIn, useClerk } from '@clerk/react';
 import { getClerkPublishableKey } from '../components/auth/ClerkAuthProvider';
 
 /**

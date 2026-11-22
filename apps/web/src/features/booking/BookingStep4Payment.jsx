@@ -149,26 +149,26 @@ export default function BookingStep4Payment() {
     <div className="flex flex-col w-full min-h-screen pb-32 pt-2 bg-white">
       {/* Header & Progress */}
       <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-xs font-sora font-semibold text-[#64748B] hover:text-[#172033]">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-xs font-sans font-semibold text-[#64748B] hover:text-[#172033]">
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>Back</span>
         </button>
         <span className="font-sora text-xs font-bold text-[#0D47A1]">Step 4 of 5: Payment &amp; Escrow</span>
-        <div className="w-16 h-1.5 rounded-full bg-[#f1f3ff] overflow-hidden">
-          <div className="w-4/5 h-full bg-[#2196F3] rounded-full"></div>
+        <div className="w-16 h-1.5 rounded-sm bg-[#f1f3ff] overflow-hidden">
+          <div className="w-4/5 h-full bg-[#2196F3] rounded-sm"></div>
         </div>
       </div>
 
       <div className="px-4 mt-4 flex flex-col gap-4">
         {statusMessage && (
-          <div className="p-3.5 rounded-2xl bg-[#E3F2FD] border border-[#90CAF9] flex items-center gap-2 text-[#0D47A1] font-sora text-xs font-bold animate-pulse">
+          <div className="p-3.5 rounded-md bg-[#E3F2FD] border border-[#90CAF9] flex items-center gap-2 text-[#0D47A1] font-sans text-xs font-bold animate-pulse">
             <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
             <span>{statusMessage}</span>
           </div>
         )}
 
         {/* Payment Amount Choice */}
-        <div className="p-4 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] flex flex-col gap-2">
+        <div className="p-4 rounded-lg bg-[#f8faff] border border-[#E5E7EB] flex flex-col gap-2">
           <span className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
             Choose Payment Plan
           </span>
@@ -176,7 +176,7 @@ export default function BookingStep4Payment() {
             <button
               type="button"
               onClick={() => setPaymentStage('ADVANCE')}
-              className={`p-3 rounded-xl border text-left font-sora transition-all ${
+              className={`p-3 rounded-md border text-left font-sans transition-all ${
                 paymentStage === 'ADVANCE'
                   ? 'border-2 border-[#2196F3] bg-white shadow-xs'
                   : 'border-[#E5E7EB] bg-white/60 text-[#64748B]'
@@ -186,7 +186,7 @@ export default function BookingStep4Payment() {
                 <span className="font-bold text-xs text-[#0D47A1]">30% Advance</span>
                 <span className="material-symbols-outlined text-[16px] text-[#2196F3]">verified</span>
               </div>
-              <span className="font-extrabold text-base text-[#172033] block mt-1">
+              <span className="font-extrabold text-base text-[#172033] block mt-1 font-sora">
                 ₹{advanceAmount.toLocaleString('en-IN')}
               </span>
               <span className="text-[10px] text-[#64748B]">Locks calendar slot</span>
@@ -195,7 +195,7 @@ export default function BookingStep4Payment() {
             <button
               type="button"
               onClick={() => setPaymentStage('FULL')}
-              className={`p-3 rounded-xl border text-left font-sora transition-all ${
+              className={`p-3 rounded-md border text-left font-sans transition-all ${
                 paymentStage === 'FULL'
                   ? 'border-2 border-[#2196F3] bg-white shadow-xs'
                   : 'border-[#E5E7EB] bg-white/60 text-[#64748B]'
@@ -204,7 +204,7 @@ export default function BookingStep4Payment() {
               <div className="flex items-center justify-between">
                 <span className="font-bold text-xs text-[#172033]">100% Full</span>
               </div>
-              <span className="font-extrabold text-base text-[#172033] block mt-1">
+              <span className="font-extrabold text-base text-[#172033] block mt-1 font-sora">
                 ₹{totalAmount.toLocaleString('en-IN')}
               </span>
               <span className="text-[10px] text-[#64748B]">Zero balance on day</span>
@@ -213,21 +213,21 @@ export default function BookingStep4Payment() {
         </div>
 
         {/* Payment Methods */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-subtle flex flex-col gap-3">
+        <div className="p-4 rounded-lg bg-white border border-[#E5E7EB] shadow-sm flex flex-col gap-3">
           <span className="font-sora font-bold text-xs text-[#172033] uppercase tracking-wider">
             Select Payment Method (Razorpay)
           </span>
 
-          <div className="flex flex-col gap-2 font-sora text-xs">
+          <div className="flex flex-col gap-2 font-sans text-xs">
             {/* UPI Option 1: Google Pay */}
             <label
               onClick={() => setSelectedMethod('UPI_GPAY')}
-              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+              className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-all ${
                 selectedMethod === 'UPI_GPAY' ? 'border-[#2196F3] bg-[#E3F2FD]/30 ring-1 ring-[#2196F3]' : 'border-[#E5E7EB]'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center font-bold text-xs text-[#2196F3]">
+                <div className="w-8 h-8 rounded-md bg-white border border-[#E5E7EB] flex items-center justify-center font-bold text-xs text-[#2196F3]">
                   GPay
                 </div>
                 <div>
@@ -245,12 +245,12 @@ export default function BookingStep4Payment() {
             {/* UPI Option 2: PhonePe */}
             <label
               onClick={() => setSelectedMethod('UPI_PHONEPE')}
-              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+              className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-all ${
                 selectedMethod === 'UPI_PHONEPE' ? 'border-[#2196F3] bg-[#E3F2FD]/30 ring-1 ring-[#2196F3]' : 'border-[#E5E7EB]'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center font-bold text-xs text-purple-700">
+                <div className="w-8 h-8 rounded-md bg-purple-100 border border-purple-200 flex items-center justify-center font-bold text-xs text-purple-700">
                   Pe
                 </div>
                 <div>
@@ -268,7 +268,7 @@ export default function BookingStep4Payment() {
             {/* Cards Option */}
             <label
               onClick={() => setSelectedMethod('CARDS')}
-              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+              className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-all ${
                 selectedMethod === 'CARDS' ? 'border-[#2196F3] bg-[#E3F2FD]/30 ring-1 ring-[#2196F3]' : 'border-[#E5E7EB]'
               }`}
             >
@@ -289,14 +289,14 @@ export default function BookingStep4Payment() {
         </div>
 
         {/* Promo Code Input */}
-        <div className="p-3.5 rounded-2xl bg-[#f1f3ff] border border-[#E5E7EB] flex items-center gap-2">
+        <div className="p-3.5 rounded-md bg-[#f8faff] border border-[#E5E7EB] flex items-center gap-2">
           <span className="material-symbols-outlined text-[#2196F3] text-[20px]">local_offer</span>
           <input
             type="text"
             value={promoCode}
             onChange={(e) => setPromoCode(e.target.value)}
             placeholder="Try code ATELIER250"
-            className="w-full bg-transparent font-sora text-xs outline-none text-[#172033] placeholder:text-[#64748B] uppercase"
+            className="w-full bg-transparent font-sans text-xs outline-none text-[#172033] placeholder:text-[#64748B] uppercase"
           />
           <button
             type="button"
@@ -305,21 +305,21 @@ export default function BookingStep4Payment() {
                 setPromoApplied(true);
               }
             }}
-            className="px-3 py-1.5 bg-white border border-[#90CAF9] text-[#0D47A1] rounded-full font-sora text-xs font-bold active:scale-95 shadow-xs"
+            className="btn-secondary py-1 px-3 text-xs"
           >
             {promoApplied ? 'Applied' : 'Apply'}
           </button>
         </div>
         {promoApplied && (
-          <span className="font-sora text-xs text-[#10B981] font-bold px-2">
+          <span className="font-sans text-xs text-[#10B981] font-bold px-2">
             ✓ ATELIER250 applied: ₹250 instant discount!
           </span>
         )}
 
         {/* Escrow Guarantee Seal */}
-        <div className="p-3 rounded-2xl bg-[#E3F2FD] border border-[#90CAF9] flex items-center gap-3">
+        <div className="p-3 rounded-md bg-[#E3F2FD] border border-[#90CAF9] flex items-center gap-3">
           <span className="material-symbols-outlined text-[#0D47A1] text-[24px] flex-shrink-0">verified_user</span>
-          <p className="font-sora text-[11px] text-[#0D47A1] leading-relaxed">
+          <p className="font-sans text-[11px] text-[#0D47A1] leading-relaxed">
             <strong>Escrow Guarantee:</strong> Payment is held securely in platform escrow and will only be released to {provider.name} after your event is successfully completed.
           </p>
         </div>
@@ -329,7 +329,7 @@ export default function BookingStep4Payment() {
       <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#E5E7EB] p-4 shadow-nav pb-safe">
         <div className="max-w-md mx-auto flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="font-sora text-[10px] text-[#64748B]">Total Payable Now</span>
+            <span className="font-sans text-[10px] text-[#64748B]">Total Payable Now</span>
             <span className="font-sora font-extrabold text-lg text-[#0D47A1]">
               ₹{discountedPayable.toLocaleString('en-IN')}
             </span>
@@ -337,7 +337,7 @@ export default function BookingStep4Payment() {
           <button
             onClick={handlePay}
             disabled={isProcessing}
-            className="flex-1 py-3 px-6 bg-[#2196F3] hover:bg-[#0D47A1] text-white rounded-full font-sora text-xs font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-75"
+            className="flex-1 btn-primary py-3 px-6 text-xs flex items-center justify-center gap-1.5 disabled:opacity-75"
           >
             {isProcessing ? (
               <span className="inline-block animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
