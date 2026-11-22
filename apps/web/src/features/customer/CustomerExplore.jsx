@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ASSETS } from '../../assets/assetCatalog';
 import { useBookingStore } from '../../stores/useBookingStore';
 import { api } from '../../services/api';
+import MarketplaceFilterDrawer from '../../components/common/MarketplaceFilterDrawer';
 
 export default function CustomerExplore() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export default function CustomerExplore() {
   const [searchFilter, setSearchFilter] = useState('');
   const [dbProviders, setDbProviders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [drawerFilters, setDrawerFilters] = useState({ activeCount: 0 });
 
   const cuisines = [
     { id: 'ALL', label: 'All Cuisines' },
@@ -99,6 +102,10 @@ export default function CustomerExplore() {
         const queryParams = {};
         if (searchFilter.trim()) queryParams.query = searchFilter.trim();
         if (selectedCuisine !== 'ALL') queryParams.cuisine = selectedCuisine;
+        else if (drawerFilters.cuisines?.length === 1) queryParams.cuisine = drawerFilters.cuisines[0];
+        if (drawerFilters.categories?.length === 1) queryParams.category = drawerFilters.categories[0];
+        if (drawerFilters.radiusKm) queryParams.radiusKm = drawerFilters.radiusKm;
+
         const res = await api.providers.search(queryParams);
         if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
           const mapped = res.data.map(item => ({
@@ -130,13 +137,31 @@ export default function CustomerExplore() {
     }
     fetchFromBackend();
     return () => { isMounted = false; };
-  }, [searchFilter, selectedCuisine]);
+  }, [searchFilter, selectedCuisine, drawerFilters]);
 
   // Combine DB providers with catalog fallbacks if DB returned fewer items
   const allProviders = dbProviders.length > 0 ? dbProviders : catalogProviders;
 
   const filteredProviders = allProviders.filter((p) => {
     if (selectedCuisine !== 'ALL' && !p.cuisines.some(c => c.toUpperCase().includes(selectedCuisine))) {
+      return false;
+    }
+    if (drawerFilters.cuisines?.length > 0 && !drawerFilters.cuisines.some(dc => p.cuisines.some(c => c.toLowerCase().includes(dc.toLowerCase())))) {
+      return false;
+    }
+    if (drawerFilters.categories?.length > 0 && !drawerFilters.categories.includes(p.category)) {
+      return false;
+    }
+    if (drawerFilters.verifiedOnly && !p.verified) {
+      return false;
+    }
+    if (drawerFilters.minRating > 0 && (p.rating || 4.9) < drawerFilters.minRating) {
+      return false;
+    }
+    if (drawerFilters.minPrice && p.price < Number(drawerFilters.minPrice)) {
+      return false;
+    }
+    if (drawerFilters.maxPrice && p.price > Number(drawerFilters.maxPrice)) {
       return false;
     }
     if (instantOnly && !p.instantAvailable) {
@@ -147,6 +172,36 @@ export default function CustomerExplore() {
     }
     return true;
   });
+
+  const handleApplyDrawerFilters = (filters) => {
+    setDrawerFilters(filters);
+    setIsFilterOpen(false);
+  };
+
+  const handleRemoveDrawerFilter = (key, val) => {
+    const updated = { ...drawerFilters };
+    if (key === 'categories') updated.categories = (updated.categories || []).filter(c => c !== val);
+    if (key === 'cuisines') updated.cuisines = (updated.cuisines || []).filter(c => c !== val);
+    if (key === 'price') { delete updated.minPrice; delete updated.maxPrice; }
+    if (key === 'verifiedOnly') updated.verifiedOnly = false;
+    if (key === 'minRating') updated.minRating = 0;
+
+    let count = 0;
+    if (updated.categories?.length) count += updated.categories.length;
+    if (updated.cuisines?.length) count += updated.cuisines.length;
+    if (updated.minPrice || updated.maxPrice) count += 1;
+    if (updated.pricingModel && updated.pricingModel !== 'ALL') count += 1;
+    if (updated.verifiedOnly) count += 1;
+    if (updated.minRating > 0) count += 1;
+    updated.activeCount = count;
+    setDrawerFilters(updated);
+  };
+
+  const handleClearAllDrawerFilters = () => {
+    setDrawerFilters({ activeCount: 0 });
+    setSelectedCuisine('ALL');
+    setInstantOnly(false);
+  };
 
   const handleSelectChef = (provider, target = '/chef') => {
     setProvider({
@@ -180,13 +235,89 @@ export default function CustomerExplore() {
             placeholder="Search by chef, cuisine, or catering..."
             className="w-full bg-transparent border-none outline-none px-3 font-sans text-sm text-[#172033] placeholder:text-[#64748B]"
           />
-          {searchFilter && (
-            <button onClick={() => setSearchFilter('')} className="text-[#64748B] hover:text-[#172033]">
-              <span className="material-symbols-outlined text-[18px]">clear</span>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {searchFilter && (
+              <button onClick={() => setSearchFilter('')} className="text-[#64748B] hover:text-[#172033] cursor-pointer">
+                <span className="material-symbols-outlined text-[18px]">clear</span>
+              </button>
+            )}
+            <div className="w-px h-4 bg-[#E5E7EB]"></div>
+            <button 
+              type="button"
+              onClick={() => setIsFilterOpen(true)} 
+              aria-label="Filters" 
+              className="relative w-8 h-8 rounded-md flex items-center justify-center text-[#2196F3] hover:bg-[#E3F2FD] transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]">tune</span>
+              {drawerFilters.activeCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0D47A1] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
+                  {drawerFilters.activeCount}
+                </span>
+              )}
             </button>
-          )}
+          </div>
         </div>
       </section>
+
+      {/* Active Drawer Filter Chips */}
+      {drawerFilters.activeCount > 0 && (
+        <section className="px-4 py-1.5 -mt-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar font-inter text-xs">
+          <span className="text-[11px] font-semibold text-[#64748B] whitespace-nowrap">Filters:</span>
+
+          {drawerFilters.categories?.map((cat) => (
+            <span key={cat} className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] rounded-md font-medium whitespace-nowrap">
+              <span>{cat}</span>
+              <button type="button" onClick={() => handleRemoveDrawerFilter('categories', cat)} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          ))}
+
+          {drawerFilters.cuisines?.map((cui) => (
+            <span key={cui} className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] rounded-md font-medium whitespace-nowrap">
+              <span>{cui}</span>
+              <button type="button" onClick={() => handleRemoveDrawerFilter('cuisines', cui)} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          ))}
+
+          {(drawerFilters.minPrice || drawerFilters.maxPrice) && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] rounded-md font-medium whitespace-nowrap">
+              <span>₹{drawerFilters.minPrice || '0'} - ₹{drawerFilters.maxPrice || '50,000+'}</span>
+              <button type="button" onClick={() => handleRemoveDrawerFilter('price')} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          )}
+
+          {drawerFilters.verifiedOnly && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-md font-medium whitespace-nowrap">
+              <span>Verified</span>
+              <button type="button" onClick={() => handleRemoveDrawerFilter('verifiedOnly')} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          )}
+
+          {drawerFilters.minRating > 0 && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-300 text-amber-800 rounded-md font-medium whitespace-nowrap">
+              <span>★ {drawerFilters.minRating}+</span>
+              <button type="button" onClick={() => handleRemoveDrawerFilter('minRating')} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={handleClearAllDrawerFilters}
+            className="text-[11px] font-bold text-red-600 hover:underline whitespace-nowrap px-1 cursor-pointer"
+          >
+            Clear All
+          </button>
+        </section>
+      )}
 
       {/* Filter Chips Horizontal Scroller (Exact Stitch Screen 02 - Sharp Geometry) */}
       <section className="px-4 py-1">
@@ -325,6 +456,14 @@ export default function CustomerExplore() {
           </div>
         ))}
       </section>
+
+      {/* On-Page Universal Marketplace Filter Drawer */}
+      <MarketplaceFilterDrawer
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        initialFilters={drawerFilters}
+        onApply={handleApplyDrawerFilters}
+      />
     </div>
   );
 }

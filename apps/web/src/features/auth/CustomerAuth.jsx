@@ -262,7 +262,7 @@ export default function CustomerAuth() {
           </div>
 
           {/* Active Clerk Session Detected Banner */}
-          {clerkUser && step === 'FORM_ENTRY' && (
+          {(clerkUser || isAuthenticated || clerk?.session) && step === 'FORM_ENTRY' && (
             <div className="mb-4 p-3.5 rounded-md bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] text-xs font-inter flex flex-col gap-2.5 animate-in fade-in duration-200">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
@@ -270,7 +270,7 @@ export default function CustomerAuth() {
                   <div className="min-w-0">
                     <span className="font-bold font-sora block text-[#172033] text-xs">Currently Signed In</span>
                     <span className="text-[#64748B] text-[11px] truncate block">
-                      {clerkUser.primaryEmailAddress?.emailAddress || clerkUser.fullName || 'Active Session'}
+                      {clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.fullName || user?.name || user?.email || 'Active Session'}
                     </span>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export default function CustomerAuth() {
                     await signOut();
                     setErrorMessage('');
                   }}
-                  className="px-2.5 py-1 rounded bg-white hover:bg-red-50 text-red-600 border border-red-200 text-[11px] font-bold font-sora shrink-0 transition-colors"
+                  className="px-2.5 py-1 rounded bg-white hover:bg-red-50 text-red-600 border border-red-200 text-[11px] font-bold font-sora shrink-0 transition-colors cursor-pointer"
                 >
                   Sign Out
                 </button>
@@ -288,7 +288,7 @@ export default function CustomerAuth() {
               <button
                 type="button"
                 onClick={() => navigate('/customer/home')}
-                className="btn-primary py-2 px-3 text-xs w-full flex items-center justify-center gap-1.5"
+                className="btn-primary py-2 px-3 text-xs w-full flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Continue to Customer Console</span>
                 <span className="material-symbols-outlined text-[15px]">arrow_forward</span>

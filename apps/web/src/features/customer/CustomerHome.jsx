@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ASSETS } from '../../assets/assetCatalog';
 import { useBookingStore } from '../../stores/useBookingStore';
 import { api } from '../../services/api';
+import MarketplaceFilterDrawer from '../../components/common/MarketplaceFilterDrawer';
 
 export default function CustomerHome() {
   const navigate = useNavigate();
@@ -12,13 +13,21 @@ export default function CustomerHome() {
   const [favorites, setFavorites] = useState({ 'raghavendra': true, 'utsav': false });
   const [realProviders, setRealProviders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({ activeCount: 0 });
 
   useEffect(() => {
     let isMounted = true;
     async function fetchProviders() {
       setIsLoading(true);
       try {
-        const res = await api.providers.search({ query: searchQuery.trim() || undefined });
+        const queryParams = {};
+        if (searchQuery.trim()) queryParams.query = searchQuery.trim();
+        if (activeFilters.categories?.length === 1) queryParams.category = activeFilters.categories[0];
+        if (activeFilters.cuisines?.length === 1) queryParams.cuisine = activeFilters.cuisines[0];
+        if (activeFilters.radiusKm) queryParams.radiusKm = activeFilters.radiusKm;
+
+        const res = await api.providers.search(queryParams);
         if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
           setRealProviders(res.data);
         }
@@ -30,7 +39,51 @@ export default function CustomerHome() {
     }
     fetchProviders();
     return () => { isMounted = false; };
-  }, [searchQuery]);
+  }, [searchQuery, activeFilters]);
+
+  const handleApplyFilters = (newFilters) => {
+    setActiveFilters(newFilters);
+    setIsFilterOpen(false);
+  };
+
+  const handleRemoveFilter = (filterKey, value) => {
+    const updated = { ...activeFilters };
+    if (filterKey === 'categories') {
+      updated.categories = (updated.categories || []).filter(c => c !== value);
+    } else if (filterKey === 'cuisines') {
+      updated.cuisines = (updated.cuisines || []).filter(c => c !== value);
+    } else if (filterKey === 'price') {
+      delete updated.minPrice;
+      delete updated.maxPrice;
+    } else if (filterKey === 'pricingModel') {
+      updated.pricingModel = 'ALL';
+    } else if (filterKey === 'verifiedOnly') {
+      updated.verifiedOnly = false;
+    } else if (filterKey === 'minRating') {
+      updated.minRating = 0;
+    } else if (filterKey === 'availabilityMode') {
+      updated.availabilityMode = 'ANY';
+    } else if (filterKey === 'selectedModes') {
+      updated.selectedModes = (updated.selectedModes || []).filter(m => m !== value);
+    }
+
+    let count = 0;
+    if (updated.categories?.length) count += updated.categories.length;
+    if (updated.cuisines?.length) count += updated.cuisines.length;
+    if (updated.minPrice || updated.maxPrice) count += 1;
+    if (updated.pricingModel && updated.pricingModel !== 'ALL') count += 1;
+    if (updated.verifiedOnly) count += 1;
+    if (updated.minRating > 0) count += 1;
+    if (updated.availabilityMode && updated.availabilityMode !== 'ANY') count += 1;
+    if (updated.selectedModes?.length) count += updated.selectedModes.length;
+    updated.activeCount = count;
+
+    setActiveFilters(updated);
+  };
+
+  const handleClearAllFilters = () => {
+    setActiveFilters({ activeCount: 0 });
+  };
 
   const toggleFav = (id) => {
     setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
@@ -84,15 +137,81 @@ export default function CustomerHome() {
             </button>
             <div className="w-px h-4 bg-[#E5E7EB]"></div>
             <button 
-              onClick={() => navigate('/explore')} 
+              type="button"
+              onClick={() => setIsFilterOpen(true)} 
               aria-label="Filters" 
-              className="w-8 h-8 rounded-md flex items-center justify-center text-[#2196F3] hover:bg-[#E3F2FD] transition-colors"
+              className="relative w-8 h-8 rounded-md flex items-center justify-center text-[#2196F3] hover:bg-[#E3F2FD] transition-colors cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">tune</span>
+              {activeFilters.activeCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0D47A1] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
+                  {activeFilters.activeCount}
+                </span>
+              )}
             </button>
           </div>
         </div>
       </section>
+
+      {/* Active Filter Chips Scroller */}
+      {activeFilters.activeCount > 0 && (
+        <section className="px-4 py-1.5 -mt-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar font-inter text-xs">
+          <span className="text-[11px] font-semibold text-[#64748B] whitespace-nowrap">Active:</span>
+
+          {activeFilters.categories?.map((cat) => (
+            <span key={cat} className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] rounded-md font-medium whitespace-nowrap">
+              <span>{cat}</span>
+              <button type="button" onClick={() => handleRemoveFilter('categories', cat)} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          ))}
+
+          {activeFilters.cuisines?.map((cui) => (
+            <span key={cui} className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] rounded-md font-medium whitespace-nowrap">
+              <span>{cui}</span>
+              <button type="button" onClick={() => handleRemoveFilter('cuisines', cui)} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          ))}
+
+          {(activeFilters.minPrice || activeFilters.maxPrice) && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#E3F2FD] border border-[#90CAF9] text-[#0D47A1] rounded-md font-medium whitespace-nowrap">
+              <span>₹{activeFilters.minPrice || '0'} - ₹{activeFilters.maxPrice || '50,000+'}</span>
+              <button type="button" onClick={() => handleRemoveFilter('price')} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          )}
+
+          {activeFilters.verifiedOnly && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-md font-medium whitespace-nowrap">
+              <span>Verified Only</span>
+              <button type="button" onClick={() => handleRemoveFilter('verifiedOnly')} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          )}
+
+          {activeFilters.minRating > 0 && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-300 text-amber-800 rounded-md font-medium whitespace-nowrap">
+              <span>★ {activeFilters.minRating}+</span>
+              <button type="button" onClick={() => handleRemoveFilter('minRating')} className="hover:text-red-500 cursor-pointer">
+                <span className="material-symbols-outlined text-[14px]">close</span>
+              </button>
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={handleClearAllFilters}
+            className="text-[11px] font-bold text-red-600 hover:underline whitespace-nowrap px-1 cursor-pointer"
+          >
+            Clear All
+          </button>
+        </section>
+      )}
 
       {/* 2. Curated Promotional Carousel (Exact Stitch Screen 01 Structure - Sharp Geometry) */}
       <section className="mt-2">
@@ -614,6 +733,14 @@ export default function CustomerHome() {
           </div>
         </div>
       </section>
+
+      {/* On-Page Universal Marketplace Filter Drawer */}
+      <MarketplaceFilterDrawer
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        initialFilters={activeFilters}
+        onApply={handleApplyFilters}
+      />
     </div>
   );
 }

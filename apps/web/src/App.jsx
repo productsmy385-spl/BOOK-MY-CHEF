@@ -41,6 +41,7 @@ import ProviderCalendar from './features/provider/ProviderCalendar';
 import ProviderEventDay from './features/provider/ProviderEventDay';
 import ProviderAlerts from './features/provider/ProviderAlerts';
 import ProviderServices from './features/provider/ProviderServices';
+import ProviderBookings from './features/provider/ProviderBookings';
 import ProviderProfile from './features/provider/ProviderProfile';
 
 // Platform Admin Feature Screens
@@ -141,7 +142,7 @@ function AppContent() {
             <Route path="/provider/event-day" element={<ProviderEventDay />} />
             <Route path="/provider/alerts" element={<ProviderAlerts />} />
             <Route path="/provider/services" element={<ProviderServices />} />
-            <Route path="/provider/bookings" element={<ProviderDashboard />} />
+            <Route path="/provider/bookings" element={<ProviderBookings />} />
             <Route path="/provider/profile" element={<ProviderProfile />} />
           </Route>
 

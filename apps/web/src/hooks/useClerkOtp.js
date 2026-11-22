@@ -44,8 +44,8 @@ export function useClerkOtp() {
     const code = err?.errors?.[0]?.code || '';
 
     // Error 0: Already signed in / Session exists
-    if (code === 'session_exists' || rawMsg.includes('already signed in')) {
-      return 'You are currently signed in with an active session. Click below to continue to your console or sign out to use a different account.';
+    if (code === 'session_exists' || rawMsg.toLowerCase().includes('already signed in')) {
+      return 'You are currently signed in with an active session. Click "Go to Console" or "Sign Out & Retry" below to switch accounts.';
     }
 
     // Error 1: Email already in use
@@ -302,6 +302,39 @@ export function useClerkOtp() {
       setIsLoading(false);
       return { success: true };
     } catch (err) {
+      // Auto-recover if session already exists: clear stale session and retry
+      const rawErr = err?.errors?.[0]?.code || err?.errors?.[0]?.message || err?.message || String(err);
+      if (String(rawErr).toLowerCase().includes('session_exists') || String(rawErr).toLowerCase().includes('already signed in')) {
+        try {
+          if (clerk && typeof clerk.signOut === 'function') {
+            await clerk.signOut();
+          } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
+            await window.Clerk.signOut();
+          }
+          const { signIn } = signInHook || {};
+          if (signIn) {
+            const normalizedEmail = email.trim().toLowerCase();
+            if (signIn.emailCode && typeof signIn.emailCode.sendCode === 'function') {
+              const retryRes = await signIn.emailCode.sendCode({ emailAddress: normalizedEmail });
+              if (!retryRes?.error) {
+                setIsLoading(false);
+                return { success: true };
+              }
+            } else if (typeof signIn.create === 'function') {
+              const attempt = await signIn.create({ identifier: normalizedEmail });
+              const factor = attempt.supportedFirstFactors?.find(f => f.strategy === 'email_code');
+              if (factor) {
+                await signIn.prepareFirstFactor({ strategy: 'email_code', emailAddressId: factor.emailAddressId });
+                setIsLoading(false);
+                return { success: true };
+              }
+            }
+          }
+        } catch (retryErr) {
+          console.warn('Retry sendSignInEmailOtp after clearing stale session:', retryErr);
+        }
+      }
+
       const msg = formatClerkError(err, 'Could not initiate email sign-in. Ensure this email address is already registered.', 'SIGN_IN');
       setErrorMessage(msg);
       setIsLoading(false);
@@ -444,10 +477,23 @@ export function useClerkOtp() {
         throw new Error(`Sign-in incomplete (status: ${result.status})`);
       }
     } catch (err) {
-      // Auto-recover if session already exists: sign out from stale session and retry
-      const rawErr = err?.errors?.[0]?.code || err?.message || String(err);
-      if (rawErr.includes('session_exists') || rawErr.includes('already signed in')) {
+      // Auto-recover if session already exists
+      const rawErr = err?.errors?.[0]?.code || err?.errors?.[0]?.message || err?.message || String(err);
+      if (String(rawErr).toLowerCase().includes('session_exists') || String(rawErr).toLowerCase().includes('already signed in')) {
         try {
+          // If the user is already authenticated in Clerk, accept the active session directly
+          const activeUser = clerk?.user || (typeof window !== 'undefined' && window.Clerk?.user);
+          const activeSession = clerk?.session || (typeof window !== 'undefined' && window.Clerk?.session);
+          if (activeUser?.id && activeSession?.id) {
+            setIsLoading(false);
+            return {
+              success: true,
+              clerkUserId: activeUser.id,
+              sessionId: activeSession.id,
+            };
+          }
+
+          // Otherwise, clear the stale session and retry
           if (clerk && typeof clerk.signOut === 'function') {
             await clerk.signOut();
           } else if (typeof window !== 'undefined' && window.Clerk?.signOut) {
