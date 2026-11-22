@@ -1,16 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { api } from '../../services/api';
 
 export default function ProviderCalendar() {
+  const { user } = useAuthStore();
+  const providerId = user?.id || 'c3d4e5f6-a7b8-9012-cdef-123456789012';
+
   const [selectedDay, setSelectedDay] = useState(28);
-  const [blockedDays, setBlockedDays] = useState([14, 15, 21]);
+  const [blockedDays, setBlockedDays] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeBookingsDates, setActiveBookingsDates] = useState([28]);
 
   const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1);
 
-  const toggleBlockDay = (day) => {
-    if (blockedDays.includes(day)) {
-      setBlockedDays(blockedDays.filter((d) => d !== day));
-    } else {
-      setBlockedDays([...blockedDays, day]);
+  const fetchSlots = async () => {
+    try {
+      setLoading(true);
+      const res = await api.availability.getSlots(providerId);
+      const slots = res?.data || [];
+      const blocked = slots
+        .filter(s => s.status === 'BLOCKED')
+        .map(s => {
+          if (s.slotDate) {
+            const parts = s.slotDate.split('-');
+            return parseInt(parts[parts.length - 1], 10);
+          }
+          return null;
+        })
+        .filter(Boolean);
+      setBlockedDays(blocked);
+    } catch (err) {
+      console.warn('Could not load availability slots:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlots();
+  }, [providerId]);
+
+  const toggleBlockDay = async (day) => {
+    const formattedDate = `2026-11-${String(day).padStart(2, '0')}`;
+    const isCurrentlyBlocked = blockedDays.includes(day);
+
+    try {
+      if (isCurrentlyBlocked) {
+        await api.availability.unblockDate(providerId, formattedDate);
+        setBlockedDays(prev => prev.filter(d => d !== day));
+      } else {
+        await api.availability.blockDate(providerId, formattedDate, 'FULL_DAY');
+        setBlockedDays(prev => [...prev, day]);
+      }
+    } catch (err) {
+      console.error('Failed to toggle date availability:', err);
+      alert('Failed to update date availability: ' + err.message);
     }
   };
 
@@ -24,6 +68,7 @@ export default function ProviderCalendar() {
         </div>
         <button
           onClick={() => toggleBlockDay(selectedDay)}
+          disabled={loading}
           className={`py-1.5 px-3 rounded-md text-xs font-bold transition-all shadow-xs ${
             blockedDays.includes(selectedDay)
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -56,7 +101,7 @@ export default function ProviderCalendar() {
           <div className="grid grid-cols-7 gap-1.5">
             {daysInMonth.map((day) => {
               const isSelected = selectedDay === day;
-              const isConfirmed = day === 28 || day === 2 || day === 7 || day === 18;
+              const isConfirmed = activeBookingsDates.includes(day);
               const isBlocked = blockedDays.includes(day);
 
               return (
@@ -100,10 +145,10 @@ export default function ProviderCalendar() {
               <div className="flex items-center justify-between">
                 <span className="font-sora font-bold text-sm text-[#0D47A1]">Gruhapravesam Feast</span>
                 <span className="badge-sharp bg-emerald-50 border border-emerald-300 text-emerald-800">
-                  LOCKED
+                  CONFIRMED &amp; ESCROW LOCKED
                 </span>
               </div>
-              <p className="text-[#64748B]">Host: Meera Nambiar • 25 Guests • Andhra Royal Banquet</p>
+              <p className="text-[#64748B]">Host: Ananya Rao • 25 Guests • Andhra Royal Banquet</p>
               <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-[11px] font-semibold text-[#172033]">
                 <span>12:00 PM – 4:30 PM (Lunch Slot)</span>
                 <span className="text-[#0D47A1]">Advance Paid ₹3,300</span>

@@ -59,11 +59,50 @@ export const api = {
       return request(`/search/providers?${searchParams.toString()}`);
     },
     getById: (providerId) => request(`/providers/${providerId}`),
+    getServices: (providerId) => request(`/providers/${providerId}/services`),
     setupProfile: (userId, profileData) =>
       request(`/providers/profile?userId=${userId}`, {
         method: 'POST',
         body: JSON.stringify(profileData),
       }),
+  },
+
+  // Customer Profile, Favourites & Addresses
+  customer: {
+    getFavourites: (customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/favourites${q}`);
+    },
+    addFavourite: (providerId, customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/favourites/${providerId}${q}`, { method: 'POST' });
+    },
+    removeFavourite: (providerId, customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/favourites/${providerId}${q}`, { method: 'DELETE' });
+    },
+    getAddresses: (customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/addresses${q}`);
+    },
+    addAddress: (addressData, customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/addresses${q}`, {
+        method: 'POST',
+        body: JSON.stringify(addressData),
+      });
+    },
+    deleteAddress: (addressId, customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/addresses/${addressId}${q}`, { method: 'DELETE' });
+    },
+    updateProfile: (profileData, customerId) => {
+      const q = customerId ? `?customerId=${customerId}` : '';
+      return request(`/customer/profile${q}`, {
+        method: 'PUT',
+        body: JSON.stringify(profileData),
+      });
+    },
   },
 
   // Bookings & Negotiations
@@ -76,6 +115,10 @@ export const api = {
       });
     },
     getById: (bookingId) => request(`/bookings/${bookingId}`),
+    getCustomerBookings: (customerId) => request(`/bookings/customer/${customerId}`),
+    getProviderBookings: (providerId) => request(`/bookings/provider/${providerId}`),
+    updateStatus: (bookingId, status) => request(`/bookings/${bookingId}/status?status=${status}`, { method: 'PUT' }),
+    cancel: (bookingId) => request(`/bookings/${bookingId}/cancel`, { method: 'POST' }),
     getMyBookings: (params = {}) => {
       const sp = new URLSearchParams(params).toString();
       return request(`/bookings/my${sp ? `?${sp}` : ''}`);
@@ -137,6 +180,10 @@ export const api = {
       request(`/availability/provider/${providerId}/block?date=${date}&timeSlot=${timeSlot}`, {
         method: 'POST',
       }),
+    unblockDate: (providerId, date) =>
+      request(`/availability/provider/${providerId}/unblock?date=${date}`, {
+        method: 'POST',
+      }),
   },
 
   // Platform Administration
@@ -149,6 +196,11 @@ export const api = {
         body: JSON.stringify({ decision, remarks }),
       }),
     getAuditLogs: () => request('/admin/audit-logs'),
+    getAllBookings: () => request('/admin/bookings'),
+    getAllUsers: () => request('/admin/users'),
+    suspendUser: (userId) => request(`/admin/users/${userId}/suspend`, { method: 'POST' }),
+    restoreUser: (userId) => request(`/admin/users/${userId}/restore`, { method: 'POST' }),
+    getFinance: () => request('/admin/finance'),
   },
 };
 

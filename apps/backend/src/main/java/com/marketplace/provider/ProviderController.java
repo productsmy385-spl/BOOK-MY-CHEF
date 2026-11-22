@@ -47,4 +47,11 @@ public class ProviderController {
         ProviderDetailDto detail = providerService.getProviderById(id);
         return ResponseEntity.ok(ApiResponse.ok(detail, "Provider profile retrieved successfully"));
     }
+
+    @GetMapping("/{id}/services")
+    @Operation(summary = "Get packages and services offered by provider")
+    public ResponseEntity<ApiResponse<java.util.List<ServicePackage>>> getProviderPackages(@PathVariable UUID id) {
+        java.util.List<ServicePackage> packages = providerService.getProviderPackages(id);
+        return ResponseEntity.ok(ApiResponse.ok(packages, "Provider services and packages retrieved successfully"));
+    }
 }

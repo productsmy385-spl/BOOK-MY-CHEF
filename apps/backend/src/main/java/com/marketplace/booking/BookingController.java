@@ -70,6 +70,36 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.ok(list, "Bookings retrieved"));
     }
 
+    @GetMapping("/customer/{customerId}")
+    @Operation(summary = "Get bookings for a specific customer")
+    public ResponseEntity<ApiResponse<List<BookingResponseDto>>> getCustomerBookings(@PathVariable UUID customerId) {
+        List<BookingResponseDto> list = bookingService.getCustomerBookings(customerId);
+        return ResponseEntity.ok(ApiResponse.ok(list, "Customer bookings retrieved successfully"));
+    }
+
+    @GetMapping("/provider/{providerId}")
+    @Operation(summary = "Get bookings for a specific provider")
+    public ResponseEntity<ApiResponse<List<BookingResponseDto>>> getProviderBookings(@PathVariable UUID providerId) {
+        List<BookingResponseDto> list = bookingService.getProviderBookings(providerId);
+        return ResponseEntity.ok(ApiResponse.ok(list, "Provider bookings retrieved successfully"));
+    }
+
+    @PutMapping("/{id}/status")
+    @Operation(summary = "Update booking status")
+    public ResponseEntity<ApiResponse<BookingResponseDto>> updateBookingStatus(
+            @PathVariable UUID id,
+            @RequestParam String status) {
+        BookingResponseDto response = bookingService.updateStatus(id, status);
+        return ResponseEntity.ok(ApiResponse.ok(response, "Booking status updated successfully"));
+    }
+
+    @PostMapping("/{id}/cancel")
+    @Operation(summary = "Cancel booking")
+    public ResponseEntity<ApiResponse<BookingResponseDto>> cancelBooking(@PathVariable UUID id) {
+        BookingResponseDto response = bookingService.cancelBooking(id);
+        return ResponseEntity.ok(ApiResponse.ok(response, "Booking cancelled successfully"));
+    }
+
     @PostMapping("/{id}/respond")
     @PreAuthorize("hasAnyRole('PROVIDER', 'ADMIN')")
     @Operation(summary = "Provider accept or reject booking request")

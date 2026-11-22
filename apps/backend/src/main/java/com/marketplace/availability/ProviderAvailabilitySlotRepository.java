@@ -26,5 +26,9 @@ public interface ProviderAvailabilitySlotRepository extends JpaRepository<Provid
 
     List<ProviderAvailabilitySlot> findByProviderIdAndSlotDateBetween(UUID providerId, LocalDate start, LocalDate end);
 
+    List<ProviderAvailabilitySlot> findByProviderIdAndSlotDate(UUID providerId, LocalDate slotDate);
+
+    void deleteByProviderIdAndSlotDate(UUID providerId, LocalDate slotDate);
+
     List<ProviderAvailabilitySlot> findByReservationStatusAndLockExpiresAtBefore(String reservationStatus, Instant cutoff);
 }

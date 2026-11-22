@@ -75,6 +75,13 @@ public class ProviderProfile {
     @Column(name = "fssai_expiry_date")
     private LocalDate fssaiExpiryDate;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "profile_completion")
+    @Builder.Default
+    private Integer profileCompletion = 90;
+
     @Column(name = "verified_at")
     private Instant verifiedAt;
 

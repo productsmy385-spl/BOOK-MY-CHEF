@@ -41,20 +41,13 @@ export default function BookingStep3Quotation() {
           paidAdvance: advanceAmount,
           totalAmount: totalAmount,
         });
+        navigate('/booking/step-4');
+      } else {
+        throw new Error('Server did not return a valid booking reservation ID.');
       }
-
-      navigate('/booking/step-4');
     } catch (err) {
-      console.warn('Backend booking creation fallback:', err.message);
-      // Fallback to local draft if offline
-      setConfirmedBooking({
-        bookingId: '5f154cff-3dcf-43ad-b22a-793b3fac436a',
-        bookingReference: '#BMC-6821-HYD',
-        status: 'PENDING_PAYMENT',
-        paidAdvance: advanceAmount,
-        totalAmount: totalAmount,
-      });
-      navigate('/booking/step-4');
+      console.error('Backend booking creation failed:', err.message);
+      setErrorMsg('Failed to lock reservation: ' + err.message + '. Please ensure dates and details are valid.');
     } finally {
       setIsSubmitting(false);
     }

@@ -59,4 +59,17 @@ public class AvailabilityController {
         ProviderAvailabilitySlot saved = slotRepository.save(slot);
         return ResponseEntity.ok(ApiResponse.ok(saved, "Date successfully marked as blocked"));
     }
+
+    @PostMapping("/provider/{providerId}/unblock")
+    @Transactional
+    @Operation(summary = "Provider marks a date or slot as unblocked / available")
+    public ResponseEntity<ApiResponse<String>> unblockSlot(
+            @PathVariable UUID providerId,
+            @RequestParam LocalDate date) {
+        List<ProviderAvailabilitySlot> slots = slotRepository.findByProviderIdAndSlotDate(providerId, date);
+        if (!slots.isEmpty()) {
+            slotRepository.deleteAll(slots);
+        }
+        return ResponseEntity.ok(ApiResponse.ok("UNBLOCKED", "Date successfully unblocked"));
+    }
 }

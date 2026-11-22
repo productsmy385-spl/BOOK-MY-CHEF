@@ -13,23 +13,33 @@ export default function CustomerBookings() {
   const [loading, setLoading] = useState(false);
 
   // Fetch real persistent bookings from PostgreSQL backend
-  useEffect(() => {
-    async function loadBookings() {
-      if (!user?.id) return;
-      try {
-        setLoading(true);
-        const res = await apiClient.get(`/api/v1/bookings/customer/${user.id}`);
-        if (Array.isArray(res.data)) {
-          setDbBookings(res.data);
-        }
-      } catch (err) {
-        console.warn('Could not load PostgreSQL customer bookings, using store fallback:', err);
-      } finally {
-        setLoading(false);
-      }
+  const loadBookings = async () => {
+    const customerId = user?.id || 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+    try {
+      setLoading(true);
+      const res = await apiClient.get(`/api/v1/bookings/customer/${customerId}`);
+      const items = Array.isArray(res.data) ? res.data : (Array.isArray(res.data?.data) ? res.data.data : []);
+      setDbBookings(items);
+    } catch (err) {
+      console.warn('Could not load PostgreSQL customer bookings:', err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadBookings();
   }, [user?.id]);
+
+  const handleCancel = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking reservation?')) return;
+    try {
+      await apiClient.post(`/api/v1/bookings/${bookingId}/cancel`);
+      await loadBookings();
+    } catch (err) {
+      alert('Failed to cancel booking: ' + err.message);
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -59,7 +69,10 @@ export default function CustomerBookings() {
       <div className="mt-4 flex flex-col gap-4">
         {/* Real Database Bookings */}
         {dbBookings.map((b) => {
-          const badge = getStatusBadge(b.status);
+          const statusKey = b.bookingStatus || b.status || 'PENDING';
+          const badge = getStatusBadge(statusKey);
+          const totalAmt = b.finalAmount || b.estimatedTotal || b.totalAmount || 0;
+          const advanceAmt = b.advanceAmount || 0;
           return (
             <div key={b.id} className="card-sharp p-4 flex flex-col gap-3 border-[#2196F3]/40">
               <div className="flex items-center justify-between">
@@ -79,7 +92,7 @@ export default function CustomerBookings() {
                   <h4 className="heading-4 text-sm truncate">
                     {b.providerName || 'Chef Raghavendra Rao'}
                   </h4>
-                  <p className="font-sora text-xs text-[#2196F3] font-semibold">{b.eventType || 'Family Feast'}</p>
+                  <p className="font-sora text-xs text-[#2196F3] font-semibold">{b.serviceDeliveryMode || 'Chef Visits Home'}</p>
                   <p className="font-inter text-xs text-[#64748B]">
                     {b.eventDate} • {b.timeSlot || 'Lunch'}
                   </p>
@@ -89,11 +102,11 @@ export default function CustomerBookings() {
               <div className="p-3 rounded-md bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-sora flex items-center justify-between">
                 <div>
                   <span className="text-[#64748B] block text-[10px] font-inter">Total Booking:</span>
-                  <span className="font-bold text-[#172033]">₹{Number(b.totalAmount || 11000).toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-[#172033]">₹{Number(totalAmt).toLocaleString('en-IN')}</span>
                 </div>
                 <div>
                   <span className="text-[#64748B] block text-[10px] font-inter">Advance Paid:</span>
-                  <span className="font-bold text-[#059669]">₹{Number(b.advanceAmount || 3300).toLocaleString('en-IN')} (Escrow)</span>
+                  <span className="font-bold text-[#059669]">₹{Number(advanceAmt).toLocaleString('en-IN')} (Escrow)</span>
                 </div>
                 <div>
                   <span className="text-[#64748B] block text-[10px] font-inter">Guest Count:</span>
@@ -109,7 +122,7 @@ export default function CustomerBookings() {
                   <span className="material-symbols-outlined text-[16px]">location_searching</span>
                   <span>Live Event Tracking</span>
                 </button>
-                {b.status === 'COMPLETED' ? (
+                {statusKey === 'COMPLETED' ? (
                   <button
                     onClick={() => navigate(`/review/${b.id}`)}
                     className="px-4 py-2.5 bg-[#059669] hover:bg-[#047857] text-white rounded-md font-sora text-xs font-bold transition-all flex items-center gap-1"
@@ -117,14 +130,14 @@ export default function CustomerBookings() {
                     <span className="material-symbols-outlined text-[15px]">star</span>
                     <span>Review</span>
                   </button>
-                ) : (
+                ) : statusKey !== 'CANCELLED' ? (
                   <button
-                    onClick={() => navigate('/provider/chat')}
-                    className="btn-secondary px-4 py-2.5 text-xs font-semibold"
+                    onClick={() => handleCancel(b.id)}
+                    className="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-md font-sora text-xs font-semibold transition-all"
                   >
-                    Chat
+                    Cancel
                   </button>
-                )}
+                ) : null}
               </div>
             </div>
           );

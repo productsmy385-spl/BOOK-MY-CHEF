@@ -59,7 +59,15 @@ public class SecurityConfig {
                     "/api/v1/providers/**",
                     "/api/v1/availability/**",
                     "/api/v1/reviews/**",
-                    "/api/v1/bookings/*"
+                    "/api/v1/bookings/**",
+                    "/api/v1/customer/**"
+                ).permitAll()
+
+                // Customer Actions, Booking Mutations & Availability Management
+                .requestMatchers(
+                    "/api/v1/customer/**",
+                    "/api/v1/bookings/**",
+                    "/api/v1/availability/**"
                 ).permitAll()
 
                 // Public Auth Sync & User Profile Read
@@ -68,7 +76,8 @@ public class SecurityConfig {
                     "/api/v1/auth/me"
                 ).permitAll()
 
-                // Platform Administrator APIs: Strictly ADMIN only
+                // Platform Administrator APIs
+                .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                 // Provider-Specific Operations

@@ -27,6 +27,7 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private final com.marketplace.identity.UserProfileRepository userProfileRepository;
     private final ProviderProfileRepository providerProfileRepository;
     private final BookingSlotLockService slotLockService;
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -171,16 +172,67 @@ public class BookingService {
         return mapToDto(saved);
     }
 
+    @Transactional
+    public BookingResponseDto updateStatus(UUID bookingId, String status) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found: " + bookingId));
+        try {
+            BookingStatus newStatus = BookingStatus.valueOf(status.toUpperCase());
+            booking.setBookingStatus(newStatus);
+            if (newStatus == BookingStatus.CONFIRMED) {
+                booking.setPaymentStatus("ESCROW_LOCKED");
+            } else if (newStatus == BookingStatus.COMPLETED) {
+                booking.setPaymentStatus("CAPTURED");
+            } else if (newStatus == BookingStatus.CANCELLED) {
+                booking.setPaymentStatus("REFUNDED");
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("Unrecognized booking status: {}", status);
+        }
+        Booking saved = bookingRepository.save(booking);
+        return mapToDto(saved);
+    }
+
+    @Transactional
+    public BookingResponseDto cancelBooking(UUID bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found: " + bookingId));
+        booking.setBookingStatus(BookingStatus.CANCELLED);
+        booking.setPaymentStatus("REFUNDED");
+        Booking saved = bookingRepository.save(booking);
+        return mapToDto(saved);
+    }
+
     private BookingResponseDto mapToDto(Booking b) {
+        String custName = "Valued Host";
+        String custPhone = "+919876543210";
+        if (b.getCustomer() != null) {
+            if (b.getCustomer().getPhone() != null) {
+                custPhone = b.getCustomer().getPhone();
+            }
+            custName = userProfileRepository.findByUserId(b.getCustomer().getId())
+                    .map(com.marketplace.identity.UserProfile::getFullName)
+                    .orElse(b.getCustomer().getEmail() != null ? b.getCustomer().getEmail() : "Host");
+        }
+
+        String provName = "Culinary Atelier";
+        String provPhone = "+919876543210";
+        if (b.getProvider() != null) {
+            provName = b.getProvider().getProfessionalName();
+            if (b.getProvider().getUser() != null && b.getProvider().getUser().getPhone() != null) {
+                provPhone = b.getProvider().getUser().getPhone();
+            }
+        }
+
         return BookingResponseDto.builder()
                 .id(b.getId())
                 .bookingReference(b.getBookingReference())
                 .customerId(b.getCustomer() != null ? b.getCustomer().getId() : null)
-                .customerName("Host Ananya Sharma")
-                .customerPhone(b.getCustomer() != null ? b.getCustomer().getPhone() : "+919876543210")
+                .customerName(custName)
+                .customerPhone(custPhone)
                 .providerId(b.getProvider() != null ? b.getProvider().getId() : null)
-                .providerName(b.getProvider() != null ? b.getProvider().getProfessionalName() : "Chef Raghavendra Rao")
-                .providerPhone("+919876543210")
+                .providerName(provName)
+                .providerPhone(provPhone)
                 .bookingStatus(b.getBookingStatus())
                 .paymentStatus(b.getPaymentStatus())
                 .eventDate(b.getEventDate())
