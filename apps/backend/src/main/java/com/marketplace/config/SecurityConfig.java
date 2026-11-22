@@ -55,6 +55,7 @@ public class SecurityConfig {
 
                 // Public Discovery & Catalog APIs (Read-Only)
                 .requestMatchers(HttpMethod.GET,
+                    "/api/v1/search/**",
                     "/api/v1/providers/**",
                     "/api/v1/availability/**",
                     "/api/v1/reviews/**"
