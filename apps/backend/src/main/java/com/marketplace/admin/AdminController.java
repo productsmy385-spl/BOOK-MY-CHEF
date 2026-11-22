@@ -4,6 +4,9 @@ import com.marketplace.admin.dto.AdminDashboardMetricsDto;
 import com.marketplace.admin.dto.KycVerificationRequest;
 import com.marketplace.booking.BookingRepository;
 import com.marketplace.common.ApiResponse;
+import com.marketplace.identity.AuthenticatedUserPrincipal;
+import com.marketplace.identity.User;
+import com.marketplace.identity.UserRepository;
 import com.marketplace.provider.ProviderProfile;
 import com.marketplace.provider.ProviderProfileRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +29,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Platform Administration", description = "Marketplace metrics, KYC verification, commission oversight, and dispute management")
 public class AdminController {
 
     private final ProviderProfileRepository providerProfileRepository;
     private final BookingRepository bookingRepository;
     private final AdminAuditLogRepository auditLogRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/dashboard")
     @Operation(summary = "Get high-level marketplace operational metrics (GMV, Commission, Bookings)")
@@ -47,7 +54,7 @@ public class AdminController {
                 .disputeRatePercentage(0.42)
                 .build();
 
-        return ResponseEntity.ok(ApiResponse.ok(metrics, "Admin metrics retrieved"));
+        return ResponseEntity.ok(ApiResponse.ok(metrics, "Admin metrics retrieved successfully"));
     }
 
     @GetMapping("/kyc/pending")
@@ -61,12 +68,14 @@ public class AdminController {
     @Transactional
     @Operation(summary = "Approve or reject provider KYC dossier and license")
     public ResponseEntity<ApiResponse<ProviderProfile>> verifyProvider(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @PathVariable UUID providerId,
             @Valid @RequestBody KycVerificationRequest request) {
 
         ProviderProfile profile = providerProfileRepository.findById(providerId)
                 .orElseThrow(() -> new IllegalArgumentException("Provider profile not found: " + providerId));
 
+        String oldStatus = profile.getVerificationStatus();
         if ("APPROVE".equalsIgnoreCase(request.getDecision())) {
             profile.setVerificationStatus("VERIFIED");
             profile.setVerifiedAt(Instant.now());
@@ -75,8 +84,23 @@ public class AdminController {
         }
 
         ProviderProfile saved = providerProfileRepository.save(profile);
-        log.info("Admin verified provider {}: status={}", providerId, profile.getVerificationStatus());
 
+        // Record immutable audit log entry
+        UUID adminUserId = principal != null ? principal.getUserId() : null;
+        if (adminUserId != null) {
+            userRepository.findById(adminUserId).ifPresent(adminUser -> {
+                auditLogRepository.save(AdminAuditLog.builder()
+                        .adminUser(adminUser)
+                        .action("VERIFY_PROVIDER_" + request.getDecision().toUpperCase())
+                        .entityType("PROVIDER_PROFILE")
+                        .entityId(providerId)
+                        .performedAt(Instant.now())
+                        .ipAddress("0.0.0.0")
+                        .build());
+            });
+        }
+
+        log.info("Admin [{}] verified provider [{}]: new status={}", adminUserId, providerId, profile.getVerificationStatus());
         return ResponseEntity.ok(ApiResponse.ok(saved, "Provider verification status updated to " + profile.getVerificationStatus()));
     }
 

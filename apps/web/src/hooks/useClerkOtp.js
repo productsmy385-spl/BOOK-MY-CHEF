@@ -36,7 +36,9 @@ export function useClerkOtp() {
     try {
       if (!hasClerkKey || !signUpHook?.signUp) {
         throw new Error(
-          'Clerk publishable key not configured. Please add VITE_CLERK_PUBLISHABLE_KEY to apps/web/.env'
+          import.meta.env.PROD
+            ? 'Authentication service is temporarily unavailable. Please try again shortly.'
+            : 'Clerk publishable key not configured. Set VITE_CLERK_PUBLISHABLE_KEY in apps/web/.env'
         );
       }
 
@@ -121,7 +123,9 @@ export function useClerkOtp() {
     try {
       if (!hasClerkKey || !signInHook?.signIn) {
         throw new Error(
-          'Clerk publishable key not configured. Please add VITE_CLERK_PUBLISHABLE_KEY to apps/web/.env'
+          import.meta.env.PROD
+            ? 'Authentication service is temporarily unavailable. Please try again shortly.'
+            : 'Clerk publishable key not configured. Set VITE_CLERK_PUBLISHABLE_KEY in apps/web/.env'
         );
       }
 

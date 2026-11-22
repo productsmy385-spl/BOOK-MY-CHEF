@@ -79,6 +79,12 @@ public class RazorpayService {
         Payment payment = paymentRepository.findByRazorpayOrderId(req.getRazorpayOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("Payment record not found for order: " + req.getRazorpayOrderId()));
 
+        // Idempotency: prevent duplicate transaction processing
+        if ("ESCROW_HELD".equals(payment.getStatus()) || "COMPLETED".equals(payment.getStatus())) {
+            log.info("Payment order {} is already captured and held in escrow.", req.getRazorpayOrderId());
+            return true;
+        }
+
         // Validate HMAC-SHA256 signature
         boolean signatureValid = verifyHmacSha256(
                 req.getRazorpayOrderId() + "|" + req.getRazorpayPaymentId(),
@@ -87,7 +93,8 @@ public class RazorpayService {
         );
 
         if (!signatureValid) {
-            log.warn("Invalid signature for order: {}. In dev/test mode accepting payload.", req.getRazorpayOrderId());
+            log.error("CRITICAL SECURITY: Invalid payment signature for order: {}. Transaction rejected.", req.getRazorpayOrderId());
+            throw new SecurityException("Payment signature verification failed. Untrusted payment payload rejected.");
         }
 
         payment.setRazorpayPaymentId(req.getRazorpayPaymentId());

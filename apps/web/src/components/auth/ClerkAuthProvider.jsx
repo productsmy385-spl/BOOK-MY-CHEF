@@ -3,16 +3,36 @@ import { ClerkProvider } from '@clerk/clerk-react';
 
 export const CLERK_KEY_STORAGE = 'book_my_chef_clerk_pub_key';
 
+/**
+ * Retrieves the Clerk Publishable Key in order of precedence:
+ * 1. Runtime environment injected by Docker/Railway (window.__ENV__)
+ * 2. Build-time environment variable (import.meta.env)
+ * 3. Local development storage override (Dev only)
+ */
 export function getClerkPublishableKey() {
-  return (
-    import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ||
-    window.localStorage.getItem(CLERK_KEY_STORAGE) ||
-    ''
-  );
+  const runtimeKey = typeof window !== 'undefined' && window.__ENV__?.VITE_CLERK_PUBLISHABLE_KEY;
+  if (runtimeKey && !runtimeKey.startsWith('${') && runtimeKey.trim() !== '') {
+    return runtimeKey.trim();
+  }
+
+  const buildTimeKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  if (buildTimeKey && buildTimeKey.trim() !== '' && !buildTimeKey.includes('YOUR_CLERK_PUBLISHABLE_KEY')) {
+    return buildTimeKey.trim();
+  }
+
+  // Allow developer override in local development mode only
+  if (import.meta.env.DEV) {
+    const localKey = window.localStorage.getItem(CLERK_KEY_STORAGE);
+    if (localKey && localKey.trim() !== '') {
+      return localKey.trim();
+    }
+  }
+
+  return '';
 }
 
 export function saveClerkPublishableKey(key) {
-  if (key) {
+  if (key && key.trim() !== '') {
     window.localStorage.setItem(CLERK_KEY_STORAGE, key.trim());
   } else {
     window.localStorage.removeItem(CLERK_KEY_STORAGE);
@@ -20,45 +40,37 @@ export function saveClerkPublishableKey(key) {
 }
 
 /**
- * ClerkAuthProvider: Wraps app in ClerkProvider when publishableKey is configured.
- * Provides runtime key configuration dialog if not yet defined.
+ * ClerkAuthProvider:
+ * Securely initializes ClerkProvider with validated keys.
+ * Adheres strictly to Phase 2 & Phase 13:
+ * - In Production: Never leaks internal file paths or exposes prompt dialogs to customers.
+ * - In Development: Provides clean diagnostic state.
  */
 export default function ClerkAuthProvider({ children }) {
-  const [pubKey, setPubKey] = useState(getClerkPublishableKey());
+  const [pubKey] = useState(getClerkPublishableKey());
+  const isDev = import.meta.env.DEV;
 
-  if (!pubKey) {
-    // If Clerk key is not yet configured, render children with top guidance bar
+  // Case 1: Valid Publishable Key is present
+  if (pubKey && (pubKey.startsWith('pk_test_') || pubKey.startsWith('pk_live_'))) {
     return (
-      <>
-        <div className="bg-[#0D47A1] text-white text-[11px] font-sora py-2 px-4 flex items-center justify-between z-50 relative border-b border-[#2196F3]">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[16px] text-amber-300">key</span>
-            <span>
-              <strong>Clerk SMS OTP Config:</strong> Add <code className="bg-black/20 px-1.5 py-0.5 rounded font-mono">VITE_CLERK_PUBLISHABLE_KEY</code> in <code className="bg-black/20 px-1.5 py-0.5 rounded font-mono">apps/web/.env</code> to enable live SMS OTP delivery.
-            </span>
-          </div>
-          <button
-            onClick={() => {
-              const entered = prompt('Enter your Clerk Publishable Key (pk_test_... or pk_live_...):', pubKey);
-              if (entered && entered.trim()) {
-                saveClerkPublishableKey(entered);
-                setPubKey(entered.trim());
-                window.location.reload();
-              }
-            }}
-            className="px-2.5 py-1 bg-[#2196F3] hover:bg-[#1E88E5] text-white rounded-md font-bold text-[10px] uppercase tracking-wider transition-colors shadow-sm ml-2 flex-shrink-0"
-          >
-            Set Key
-          </button>
-        </div>
+      <ClerkProvider publishableKey={pubKey}>
         {children}
-      </>
+      </ClerkProvider>
     );
   }
 
-  return (
-    <ClerkProvider publishableKey={pubKey}>
-      {children}
-    </ClerkProvider>
-  );
+  // Case 2: Missing key in Development
+  if (isDev) {
+    console.warn(
+      '[DEV NOTICE] Clerk Publishable Key is not yet configured. Provide VITE_CLERK_PUBLISHABLE_KEY in apps/web/.env to enable live Clerk SMS delivery.'
+    );
+  } else {
+    // Case 3: Missing key in Production (Diagnostic logged securely without leaking secrets)
+    console.error(
+      '[AUTH CONFIG] VITE_CLERK_PUBLISHABLE_KEY is not configured in production environment. Verify Railway service variables.'
+    );
+  }
+
+  // In production, render cleanly without any intrusive debug banners or internal path disclosure
+  return <>{children}</>;
 }
