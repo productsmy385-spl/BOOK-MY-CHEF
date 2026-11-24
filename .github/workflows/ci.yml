@@ -19,7 +19,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: chmod +x mvnw && ./mvnw -B test
+      - run: mvn -B test
 
   frontend:
     name: Frontend lint & build
@@ -67,6 +67,14 @@ jobs:
       APP_RATE_LIMIT_WRITE_PER_MINUTE: '5000'
       APP_RATE_LIMIT_SEARCH_PER_MINUTE: '5000'
       PORT: '8081'
+      # Stand-in ImageKit and image-generation endpoints served by e2e/support/fake-clerk.mjs
+      IMAGEKIT_PUBLIC_KEY: public_test
+      IMAGEKIT_PRIVATE_KEY: private_test_key
+      IMAGEKIT_URL_ENDPOINT: http://localhost:9999/imagekit/img
+      IMAGEKIT_API_URL: http://localhost:9999/imagekit/v1
+      IMAGEKIT_UPLOAD_URL: http://localhost:9999/imagekit/upload
+      OPENAI_API_KEY: sk-test-openai
+      AI_IMAGE_API_URL: http://localhost:9999/openai
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -82,7 +90,7 @@ jobs:
 
       - name: Build backend
         working-directory: apps/backend
-        run: chmod +x mvnw && ./mvnw -B -q package -DskipTests
+        run: mvn -B -q package -DskipTests
 
       - name: Install web dependencies and browser
         working-directory: apps/web
@@ -103,7 +111,10 @@ jobs:
 
       - name: API scenarios
         working-directory: apps/web
-        run: npm run test:api
+        run: |
+          npm run test:api
+          node e2e/promotions-scenarios.mjs
+          node e2e/support/menu-scenarios.mjs
 
       - name: Browser tests
         working-directory: apps/web

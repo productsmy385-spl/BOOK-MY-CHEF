@@ -44,15 +44,29 @@ Transitions are enforced in `BookingStatus` and `BookingService`, recorded in `b
 and notify the other party. Double booking is prevented by a provider row lock plus a capacity check
 (verified with a concurrent-accept test). Payment is off by default (`booking.payment_required`).
 
+## Banners, promotions & discovery (2026-11-24, migration V8)
+
+| Capability | Implemented | Tested locally | Real external service | In production |
+|---|---|---|---|---|
+| Platform campaigns (home, sign-in, register, explore, category; schedule, publish, duplicate, archive, preview) | Yes | Yes | n/a | Deployed 59a7bcf; no campaigns created yet |
+| Provider banners with admin approval (draft → pending → approved/rejected/changes requested/paused/expired) | Yes | Yes | n/a | Deployed; none submitted yet |
+| Featured / top-rated (≥ `marketplace.top_rated_min_reviews` genuine reviews) / nearby chefs | Yes | Yes | n/a | Deployed; empty until providers publish |
+| Banner analytics (impressions/clicks, de-duplicated per visitor per day) | Yes | Yes | n/a | Deployed |
+| ImageKit uploads (signed per folder, verified with ImageKit before recording, owner-only delete) | Yes | Against a stand-in ImageKit | **Not verified** — production `IMAGEKIT_*` values are rejected by ImageKit (HTTP 403); real keys needed | Uploads report "not configured/failed" until valid keys are set |
+| AI campaign images (OpenAI Images API → ImageKit) | Yes | Against a stand-in API | **Not verified** — no `OPENAI_API_KEY` | Shows "not configured"; manual upload still works |
+
+Railway: set `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT` (and optionally `OPENAI_API_KEY`)
+on the **book-my-chef-backend** service only. Then upload one image from Admin → Images to verify.
+
 ## Test evidence
 
 | Suite | Command | Result |
 |---|---|---|
-| Backend unit | `cd apps/backend && ./mvnw test` | 24 passed (6 menu pricing) |
+| Backend unit | `cd apps/backend && mvn test` | 24 passed (6 menu pricing) |
 | Menu API scenarios | `cd apps/web && node e2e/support/menu-scenarios.mjs` (stack as in `e2e/README.md`) | 36 passed |
-| Menu browser tests | `cd apps/web && npx playwright test e2e/menu.spec.js` | 2 passed (incl. 360 px layout) |
-| API end-to-end | scenario script (auth, isolation, filters, lifecycle, race, admin) | 93 passed |
-| Browser | `cd apps/web && npm run test:e2e` (setup in `apps/web/e2e/README.md`) | 16 passed (re-run 2026-11-24 after menus) |
+| Promotion API scenarios | `cd apps/web && node e2e/promotions-scenarios.mjs` | 61 passed |
+| API end-to-end | `cd apps/web && npm run test:api` (auth, isolation, filters, lifecycle, race, admin) | 93 passed |
+| Browser | `cd apps/web && npm run test:e2e` (marketplace, menus, promotions incl. Bartender filter regression, 360–1920 px) | 31 passed (2026-11-24, merged 59a7bcf) |
 
 ## Open items
 
@@ -61,4 +75,5 @@ and notify the other party. Double booking is prevented by a provider row lock p
 3. Rebuild and run the Capacitor Android app. Note: the Gradle wrapper was changed to 9.7.1 outside this work (IDE); confirm compatibility with the Android Gradle Plugin before building.
 4. Not implemented: chat/messages, disputes UI, refunds, push notifications, admin editing of the category/cuisine catalog, map/geocoded address search (location uses device GPS or city/area text).
 5. Frontend stays JavaScript (JSX); TypeScript migration was not done.
-6. Delete or archive the outdated report files listed at the top once you have reviewed them.
+6. Provide valid ImageKit credentials (and optionally an OpenAI key) — see the banners section above.
+7. Production still holds three non-Clerk test accounts (`user_guest_*`, `test_verify_live_*`) and their one booking; they are hidden but should be removed by a new migration (not by editing V6, which is applied).
