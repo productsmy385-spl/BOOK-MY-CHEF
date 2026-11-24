@@ -22,6 +22,7 @@ const ProviderSetup = lazy(() => import('./features/provider/ProviderSetup'));
 const ProviderServicesPage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderServicesPage })));
 const ProviderProfilePage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderProfilePage })));
 const ProviderCalendarPage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderCalendarPage })));
+const ProviderMenuPage = lazy(() => import('./features/provider/MenuPage'));
 const admin = (name) => lazy(() => import('./features/admin/AdminConsole').then((m) => ({ default: m[name] })));
 const AdminLayout = admin('AdminLayout');
 const AdminDashboard = admin('AdminDashboard');
@@ -76,6 +77,7 @@ export default function App() {
               <Route path="bookings" element={<BookingList viewer="PROVIDER" />} />
               <Route path="bookings/:id" element={<BookingDetail viewer="PROVIDER" />} />
               <Route path="services" element={<ProviderServicesPage />} />
+              <Route path="menu" element={<ProviderMenuPage />} />
               <Route path="calendar" element={<ProviderCalendarPage />} />
               <Route path="profile" element={<ProviderProfilePage />} />
               <Route path="notifications" element={<Notifications />} />

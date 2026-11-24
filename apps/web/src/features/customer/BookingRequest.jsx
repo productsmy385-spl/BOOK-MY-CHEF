@@ -1,19 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Info } from 'lucide-react';
 import { api } from '../../services/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { isoDate, money, priceLabel } from '../../lib/format';
+import { isoDate, priceLabel } from '../../lib/format';
 import { Alert, Avatar, Button, EmptyState, Field, Spinner, cx } from '../../components/ui';
+import { MenuPicker, PriceBreakdown } from '../../components/menu/MenuBits';
+import { EMPTY_PICK, missingChoices, toSelection } from '../../components/menu/menuSelection';
 
-/** Mirrors the server's estimate so customers see it as they type; the server recomputes it. */
-function estimate(model, price, guests, hours, days) {
-  if (price == null || model === 'CUSTOM_QUOTE') return null;
-  const g = Number(guests) || 0;
-  const n = { PER_PERSON: g, PER_PLATE: g, PER_100_GUESTS: Math.ceil(g / 100), PER_HOUR: Number(hours) || 1, PER_DAY: Number(days) || 1 }[model] ?? 1;
-  return Number(price) * n;
+function useDebounced(value, ms) {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return v;
 }
 
 const DIETARY = ['Vegetarian', 'Non-vegetarian', 'Both veg & non-veg', 'Jain', 'Vegan'];
@@ -27,6 +30,8 @@ export default function BookingRequest() {
   const { account } = useAuthStore();
   const provider = useQuery({ queryKey: ['provider', providerId], queryFn: () => api.providers.get(providerId) });
   const addresses = useQuery({ queryKey: ['addresses'], queryFn: api.customer.addresses });
+  const menu = useQuery({ queryKey: ['menu', providerId], queryFn: () => api.providers.menu(providerId) });
+  const [pick, setPick] = useState(EMPTY_PICK);
 
   const [serviceId, setServiceId] = useState(sp.get('service') || '');
   const [f, setF] = useState({ eventDate: '', eventTime: '19:00', guestCount: '', eventAddress: '', eventCity: account?.city || '',
@@ -51,8 +56,22 @@ export default function BookingRequest() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses.data]);
 
-  const est = useMemo(() => service && estimate(service.pricingModel, service.price, f.guestCount, f.hours, f.days),
-    [service, f.guestCount, f.hours, f.days]);
+  // The price shown is always calculated by the server, exactly as the booking will be.
+  const isChef = !!category?.culinary;
+  const hasMenu = isChef && !!(menu.data?.items.length || menu.data?.menus.length);
+  const missing = hasMenu ? missingChoices(pick, menu.data) : [];
+  const selection = hasMenu ? toSelection(pick) : undefined;
+  const estInput = service && Number(f.guestCount) >= 1 && !missing.length
+    ? JSON.stringify({ serviceId, guests: Number(f.guestCount), hours: Number(f.hours) || undefined, days: Number(f.days) || undefined, menu: selection })
+    : null;
+  const estKey = useDebounced(estInput, 350);
+  const est = useQuery({
+    queryKey: ['estimate', providerId, estKey],
+    queryFn: () => api.providers.estimate(providerId, JSON.parse(estKey)),
+    enabled: !!estKey && estKey === estInput,
+    placeholderData: keepPreviousData,
+    retry: false,
+  });
 
   const submit = useMutation({
     mutationFn: (body) => api.bookings.create(body),
@@ -78,6 +97,7 @@ export default function BookingRequest() {
     if (!f.eventCity.trim()) e.eventCity = 'Enter the city.';
     if (service?.pricingModel === 'PER_HOUR' && !(Number(f.hours) >= 1)) e.hours = 'How many hours do you need?';
     if (service?.pricingModel === 'PER_DAY' && !(Number(f.days) >= 1)) e.days = 'How many days do you need?';
+    if (missing.length) e.menu = `Finish your menu: ${missing.join(', ')}.`;
     setErrors(e);
     return !Object.keys(e).length;
   };
@@ -91,11 +111,10 @@ export default function BookingRequest() {
       eventAddress: f.eventAddress.trim(), eventCity: f.eventCity.trim(),
       hours: f.hours ? Number(f.hours) : undefined, days: f.days ? Number(f.days) : undefined,
       cuisinePreference: f.cuisinePreference || undefined, budget: f.budget ? Number(f.budget) : undefined,
-      specialInstructions: f.specialInstructions.trim() || undefined, details: clean,
+      specialInstructions: f.specialInstructions.trim() || undefined, details: clean, menu: selection,
     });
   };
 
-  const isChef = category?.culinary;
   const atHome = service?.deliveryMode === 'CHEF_VISITS_HOME';
 
   return (
@@ -154,8 +173,16 @@ export default function BookingRequest() {
               <Field label="Your budget (₹, optional)" type="number" inputMode="numeric" min="0" value={f.budget} onChange={set('budget')} />
             </fieldset>
 
+            {hasMenu && (
+              <fieldset>
+                <legend className="t-h4 mb-3">3. Menu</legend>
+                <MenuPicker menu={menu.data} value={pick} onChange={setPick} guests={f.guestCount} catalog={catalog} />
+                {errors.menu && missing.length > 0 && <p className="t-caption !text-danger mt-2">{errors.menu}</p>}
+              </fieldset>
+            )}
+
             <fieldset className="grid sm:grid-cols-2 gap-4">
-              <legend className="t-h4 mb-3 col-span-full">3. Your requirements</legend>
+              <legend className="t-h4 mb-3 col-span-full">{hasMenu ? '4' : '3'}. Your requirements</legend>
               {isChef ? (
                 <>
                   <Field as="select" label="Cuisine" value={f.cuisinePreference} onChange={set('cuisinePreference')}>
@@ -167,8 +194,10 @@ export default function BookingRequest() {
                     <option value="">Select</option>
                     {DIETARY.map((d) => <option key={d}>{d}</option>)}
                   </Field>
-                  <Field as="textarea" rows={3} className="col-span-full" label="Menu you have in mind" placeholder="e.g. Pulihora, gongura pachadi, pappu, two curries, payasam"
-                    value={details.menu || ''} onChange={setD('menu')} maxLength={1000} />
+                  {(!hasMenu || pick.mode === 'none') && (
+                    <Field as="textarea" rows={3} className="col-span-full" label="Menu you have in mind" placeholder="e.g. Pulihora, gongura pachadi, pappu, two curries, payasam"
+                      value={details.menu || ''} onChange={setD('menu')} maxLength={1000} />
+                  )}
                   {atHome && (
                     <>
                       <Field as="select" label="Ingredients" value={details.ingredients || ''} onChange={setD('ingredients')}>
@@ -195,18 +224,17 @@ export default function BookingRequest() {
                 value={f.specialInstructions} onChange={set('specialInstructions')} maxLength={2000} />
             </fieldset>
 
-            <section className="panel p-4 bg-canvas">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="t-h4">{service.pricingModel === 'CUSTOM_QUOTE' ? 'Price' : 'Estimated price'}</p>
-                  <p className="t-caption mt-1 flex gap-1.5"><Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                    {service.pricingModel === 'CUSTOM_QUOTE'
-                      ? 'The provider will review your request and send a quotation.'
-                      : 'Based on the listed price. The provider confirms the final amount — you pay nothing now.'}
-                  </p>
-                </div>
-                <p className="t-metric shrink-0">{service.pricingModel === 'CUSTOM_QUOTE' ? 'On request' : est != null && f.guestCount ? money(est) : '—'}</p>
+            <section className="panel p-4 bg-canvas" aria-live="polite">
+              <p className="t-h4">{service.pricingModel === 'CUSTOM_QUOTE' ? 'Price' : 'Estimated price'}</p>
+              <div className="mt-2">
+                <PriceBreakdown catalog={catalog} missing={missing} est={estInput ? est.data : null}
+                  pending={!!estInput && (est.isFetching || estKey !== estInput)} error={estInput ? est.error?.message : null} />
               </div>
+              <p className="t-caption mt-2 flex gap-1.5"><Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                {service.pricingModel === 'CUSTOM_QUOTE'
+                  ? 'The provider will review your request and send a quotation.'
+                  : 'Based on the listed prices. The provider confirms the final amount — you pay nothing now.'}
+              </p>
             </section>
 
             <Alert>{submit.error?.message}</Alert>

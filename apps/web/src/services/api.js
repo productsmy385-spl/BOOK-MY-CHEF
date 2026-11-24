@@ -94,6 +94,9 @@ export const api = {
   providers: {
     get: (id) => get(`/providers/${id}`, { auth: false }),
     reviews: (id, page = 0) => get(`/reviews/provider/${id}?page=${page}`, { auth: false }),
+    menu: (id) => get(`/providers/${id}/menu`, { auth: false }),
+    /** Server-computed price breakdown: { serviceId, guests, hours?, days?, menu? } */
+    estimate: (id, d) => request('POST', `/providers/${id}/estimate`, d, { auth: false }),
   },
   me: {
     get: () => get('/providers/me'),
@@ -110,6 +113,13 @@ export const api = {
     addPortfolio: (d) => post('/providers/me/portfolio', d),
     deletePortfolio: (id) => del(`/providers/me/portfolio/${id}`),
     addDocument: (d) => post('/providers/me/documents', d),
+    menu: () => get('/providers/me/menu'),
+    addDish: (d) => post('/providers/me/menu/items', d),
+    updateDish: (id, d) => put(`/providers/me/menu/items/${id}`, d),
+    deleteDish: (id) => del(`/providers/me/menu/items/${id}`),
+    addSetMenu: (d) => post('/providers/me/menu/sets', d),
+    updateSetMenu: (id, d) => put(`/providers/me/menu/sets/${id}`, d),
+    deleteSetMenu: (id) => del(`/providers/me/menu/sets/${id}`),
     publish: () => post('/providers/me/publish'),
     unpublish: () => post('/providers/me/unpublish'),
   },

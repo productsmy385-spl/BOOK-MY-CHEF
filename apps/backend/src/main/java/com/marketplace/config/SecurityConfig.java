@@ -74,8 +74,11 @@ public class SecurityConfig {
                     "/api/v1/catalog",
                     "/api/v1/search/providers",
                     "/api/v1/providers/*",
+                    "/api/v1/providers/*/menu",
                     "/api/v1/reviews/provider/*"
                 ).permitAll()
+                // Read-only price calculation for the booking form
+                .requestMatchers(HttpMethod.POST, "/api/v1/providers/*/estimate").permitAll()
 
                 .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

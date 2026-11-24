@@ -33,6 +33,7 @@ Legend: **Done** = implemented and verified by tests; **Partial** = works but ha
 | 8 Mobile | Partial | Responsive and mobile-first (verified 360–1920 px). Capacitor Android build **not** re-verified; push notifications not implemented. |
 | 9 Security | Done | See Audit findings — all fixed; covered by tests below. |
 | 10 QA | Done | 18 backend unit tests, 93 API end-to-end checks, 16 Playwright browser tests. |
+| 12 Menus & menu cost calculator | Done | V7. Providers manage dishes (course, veg/egg/non-veg/vegan, spice, allergens, photo, price per person, minimum guests, availability) and set menus with "pick N" sections and per-dish surcharges. Customers see the menu on the profile and pick a set menu or build their own in the booking form; the server prices it live (`POST /providers/{id}/estimate`) with the same code as booking creation. Bookings keep a snapshot of the menu. Pricing rule: see `MenuPricing`. Not done: customers saving favourite menus. |
 | 11 Production readiness | Partial | Config is env-driven with no fallback secrets; nginx security headers. Not deployed or verified on Railway in this session. |
 
 ## Booking lifecycle
@@ -47,9 +48,11 @@ and notify the other party. Double booking is prevented by a provider row lock p
 
 | Suite | Command | Result |
 |---|---|---|
-| Backend unit | `cd apps/backend && ./mvnw test` | 18 passed |
+| Backend unit | `cd apps/backend && ./mvnw test` | 24 passed (6 menu pricing) |
+| Menu API scenarios | `cd apps/web && node e2e/support/menu-scenarios.mjs` (stack as in `e2e/README.md`) | 36 passed |
+| Menu browser tests | `cd apps/web && npx playwright test e2e/menu.spec.js` | 2 passed (incl. 360 px layout) |
 | API end-to-end | scenario script (auth, isolation, filters, lifecycle, race, admin) | 93 passed |
-| Browser | `cd apps/web && npm run test:e2e` (setup in `apps/web/e2e/README.md`) | 16 passed |
+| Browser | `cd apps/web && npm run test:e2e` (setup in `apps/web/e2e/README.md`) | 16 passed (re-run 2026-11-24 after menus) |
 
 ## Open items
 

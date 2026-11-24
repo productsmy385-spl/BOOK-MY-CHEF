@@ -1,5 +1,7 @@
 package com.marketplace.catalog;
 
+import com.marketplace.menu.MenuCatalog;
+
 import com.marketplace.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +38,12 @@ public class CatalogController {
         body.put("cuisines", cuisines);
         body.put("pricingModels", toOptions(ServiceCatalog.PRICING_LABELS));
         body.put("deliveryModes", toOptions(ServiceCatalog.DELIVERY_MODE_LABELS));
+        body.put("menu", Map.of(
+                "courses", toOptions(MenuCatalog.COURSES),
+                "diets", toOptions(MenuCatalog.DIETS),
+                "spiceLevels", toOptions(MenuCatalog.SPICE_LEVELS),
+                "allergens", toOptions(MenuCatalog.ALLERGENS),
+                "mealTypes", toOptions(MenuCatalog.MEAL_TYPES)));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES).cachePublic())
                 .body(ApiResponse.ok(body));

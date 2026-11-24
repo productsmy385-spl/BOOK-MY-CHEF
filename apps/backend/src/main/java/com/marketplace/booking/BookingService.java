@@ -8,6 +8,9 @@ import com.marketplace.common.ApiException;
 import com.marketplace.common.PageResponse;
 import com.marketplace.common.SettingsService;
 import com.marketplace.identity.AuthenticatedUserPrincipal;
+import com.marketplace.menu.MenuPricing;
+import com.marketplace.menu.MenuRequests;
+import com.marketplace.menu.MenuService;
 import com.marketplace.notification.NotificationService;
 import com.marketplace.provider.ProviderRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +50,7 @@ public class BookingService {
     private final NotificationService notifications;
     private final SettingsService settings;
     private final ObjectMapper objectMapper;
+    private final MenuService menus;
 
     // ================================================================== create
 
@@ -60,25 +64,8 @@ public class BookingService {
             throw ApiException.conflict("This provider is not accepting new bookings right now.");
         }
 
-        List<Map<String, Object>> svcRows = jdbc.queryForList("""
-                SELECT s.id, s.title, s.role_type, s.service_delivery_mode, s.min_guests, s.max_guests, s.is_active,
-                       spm.code AS pricing_model, sp.amount
-                FROM services s
-                JOIN service_prices sp ON sp.service_id = s.id
-                JOIN service_pricing_models spm ON spm.id = sp.pricing_model_id
-                WHERE s.id = :sid AND s.provider_id = :pid""", Map.of("sid", r.serviceId(), "pid", r.providerId()));
-        if (svcRows.isEmpty() || !Boolean.TRUE.equals(svcRows.get(0).get("is_active"))) {
-            throw ApiException.notFound("Service");
-        }
-        Map<String, Object> svc = svcRows.get(0);
-        Integer minGuests = (Integer) svc.get("min_guests");
-        Integer maxGuests = (Integer) svc.get("max_guests");
-        if (minGuests != null && r.guestCount() < minGuests) {
-            throw ApiException.invalid("This service needs at least " + minGuests + " guests.");
-        }
-        if (maxGuests != null && r.guestCount() > maxGuests) {
-            throw ApiException.invalid("This service can serve at most " + maxGuests + " guests.");
-        }
+        Map<String, Object> svc = loadBookableService(r.providerId(), r.serviceId(), r.guestCount());
+        MenuService.Priced menu = priceMenu(r.providerId(), svc, r.menu(), r.guestCount());
 
         assertDateBookable(r.providerId(), r.eventDate(), r.eventTime());
 
@@ -91,8 +78,9 @@ public class BookingService {
         }
 
         String pricingModel = (String) svc.get("pricing_model");
-        BigDecimal estimate = ServiceCatalog.estimate(pricingModel, (BigDecimal) svc.get("amount"),
-                r.guestCount(), r.hours(), r.days());
+        MenuPricing.Breakdown price = MenuPricing.combine(pricingModel, (BigDecimal) svc.get("amount"),
+                r.guestCount(), r.hours(), r.days(), menu == null ? null : menu.perPerson());
+        BigDecimal estimate = price.total();
 
         Map<String, Object> details = new LinkedHashMap<>();
         if (r.details() != null) details.putAll(r.details());
@@ -104,11 +92,11 @@ public class BookingService {
                 INSERT INTO bookings (booking_reference, customer_id, provider_id, service_id, booking_status, payment_status,
                     event_date, event_time, time_slot, guest_count, service_delivery_mode, estimated_total,
                     event_address, event_city, budget_amount, cuisine_preference, service_category, pricing_model,
-                    service_title, host_special_instructions, details)
+                    service_title, host_special_instructions, details, service_charge, food_cost, menu_pricing)
                 VALUES (:ref, :cid, :pid, :sid, 'PENDING_PROVIDER_CONFIRMATION', 'PENDING',
                     :date, :time, :slot, :guests, :mode, :estimate,
                     :address, :city, :budget, :cuisine, :category, :pricing,
-                    :title, :instructions, CAST(:details AS jsonb))
+                    :title, :instructions, CAST(:details AS jsonb), :serviceCharge, :foodCost, :menuPricing)
                 RETURNING id""",
                 new MapSqlParameterSource()
                         .addValue("ref", reference).addValue("cid", customerId).addValue("pid", r.providerId())
@@ -119,8 +107,11 @@ public class BookingService {
                         .addValue("budget", r.budget()).addValue("cuisine", blankToNull(r.cuisinePreference()))
                         .addValue("category", svc.get("role_type")).addValue("pricing", pricingModel)
                         .addValue("title", svc.get("title")).addValue("instructions", blankToNull(r.specialInstructions()))
-                        .addValue("details", toJson(details)),
+                        .addValue("details", toJson(details))
+                        .addValue("serviceCharge", price.serviceCharge()).addValue("foodCost", price.foodCost())
+                        .addValue("menuPricing", price.mode().name()),
                 UUID.class);
+        if (menu != null) menus.saveBookingLines(bookingId, menu, r.guestCount());
 
         recordHistory(bookingId, "NONE", BookingStatus.PENDING_PROVIDER_CONFIRMATION, customerId, null);
         notifications.notify((UUID) provider.get("user_id"), "BOOKING_REQUEST", "New booking request " + reference,
@@ -128,6 +119,76 @@ public class BookingService {
                 "/provider/bookings/" + bookingId);
         log.info("Booking {} requested by {} for provider {}", reference, customerId, r.providerId());
         return get(bookingId, customerId, "CUSTOMER");
+    }
+
+    /**
+     * Live price for the booking form, computed exactly as {@link #create} will
+     * compute it. Public: it reveals nothing beyond the provider's listed prices.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> preview(UUID providerId, MenuRequests.EstimateRequest r) {
+        if (!providers.isPubliclyListed(providerId)) throw ApiException.notFound("Provider");
+        Map<String, Object> svc = loadBookableService(providerId, r.serviceId(), r.guests());
+        MenuService.Priced menu = priceMenu(providerId, svc, r.menu(), r.guests());
+        String pricingModel = (String) svc.get("pricing_model");
+        MenuPricing.Breakdown price = MenuPricing.combine(pricingModel, (BigDecimal) svc.get("amount"),
+                r.guests(), r.hours(), r.days(), menu == null ? null : menu.perPerson());
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("mode", price.mode().name());
+        out.put("pricingModel", pricingModel);
+        out.put("servicePrice", svc.get("amount"));
+        out.put("guests", r.guests());
+        out.put("serviceCharge", price.serviceCharge());
+        out.put("foodCost", price.foodCost());
+        out.put("total", price.total());
+        out.put("menuName", menu == null ? null : menu.menuName());
+        out.put("menuPerPerson", menu == null ? null : menu.perPerson());
+        out.put("menuLines", menu == null ? List.of() : menu.lines().stream().map(l -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("type", l.type());
+            m.put("sectionTitle", l.sectionTitle());
+            m.put("name", l.name());
+            m.put("course", l.course());
+            m.put("diet", l.diet());
+            m.put("unitPricePerPerson", l.unitPricePerPerson());
+            m.put("lineTotal", MenuService.lineTotal(l, r.guests()));
+            return m;
+        }).toList());
+        return out;
+    }
+
+    /** Active, priced service of this provider, with the guest count checked against its limits. */
+    private Map<String, Object> loadBookableService(UUID providerId, UUID serviceId, int guests) {
+        List<Map<String, Object>> svcRows = jdbc.queryForList("""
+                SELECT s.id, s.title, s.role_type, s.service_delivery_mode, s.min_guests, s.max_guests, s.is_active,
+                       spm.code AS pricing_model, sp.amount
+                FROM services s
+                JOIN service_prices sp ON sp.service_id = s.id
+                JOIN service_pricing_models spm ON spm.id = sp.pricing_model_id
+                WHERE s.id = :sid AND s.provider_id = :pid""", Map.of("sid", serviceId, "pid", providerId));
+        if (svcRows.isEmpty() || !Boolean.TRUE.equals(svcRows.get(0).get("is_active"))) {
+            throw ApiException.notFound("Service");
+        }
+        Map<String, Object> svc = svcRows.get(0);
+        Integer minGuests = (Integer) svc.get("min_guests");
+        Integer maxGuests = (Integer) svc.get("max_guests");
+        if (minGuests != null && guests < minGuests) {
+            throw ApiException.invalid("This service needs at least " + minGuests + " guests.");
+        }
+        if (maxGuests != null && guests > maxGuests) {
+            throw ApiException.invalid("This service can serve at most " + maxGuests + " guests.");
+        }
+        return svc;
+    }
+
+    /** Prices the menu selection; menus only apply to food services (chefs and caterers). */
+    private MenuService.Priced priceMenu(UUID providerId, Map<String, Object> svc, MenuRequests.Selection sel, int guests) {
+        MenuService.Priced menu = menus.price(providerId, sel, guests);
+        if (menu != null && !ServiceCatalog.find((String) svc.get("role_type")).map(ServiceCatalog.Category::culinary).orElse(false)) {
+            throw ApiException.invalid("Menus can only be added to chef and catering services.");
+        }
+        return menu;
     }
 
     // ================================================================== provider actions
@@ -381,6 +442,7 @@ public class BookingService {
                        b.event_address AS "eventAddress", b.event_city AS "city", b.budget_amount AS "budget",
                        b.cuisine_preference AS "cuisinePreference", b.host_special_instructions AS "specialInstructions",
                        b.details::text AS "detailsJson", b.provider_message AS "providerMessage",
+                       b.service_charge AS "serviceCharge", b.food_cost AS "foodCost", b.menu_pricing AS "menuPricing",
                        b.created_at::text AS "createdAt",
                        b.customer_id AS "customerId", cu.full_name AS "customerName", cuser.phone AS "customerPhone",
                        cuser.email AS "customerEmail",
@@ -416,6 +478,7 @@ public class BookingService {
         b.put("details", fromJson((String) b.remove("detailsJson")));
         b.put("viewerRole", isAdmin ? "ADMIN" : isCustomer ? "CUSTOMER" : "PROVIDER");
         b.put("allowedActions", allowedActions(st, isCustomer, isProvider, b));
+        b.put("menuLines", menus.bookingLines(bookingId));
 
         b.put("history", jdbc.queryForList("""
                 SELECT from_status AS "from", to_status AS "to", transition_reason AS "reason", created_at::text AS "at"

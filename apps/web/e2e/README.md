@@ -30,6 +30,8 @@ verifies its tokens with exactly the same code path it uses for Clerk.
    ```
 
 5. `npm run test:e2e`
+6. Optional API-level checks for menus and menu pricing (needs steps 1–3 only):
+   `node e2e/support/menu-scenarios.mjs`
 
 Signed-in tests inject a `window.Clerk` session object that returns tokens from
 the fake issuer; see `support/api.js`.
