@@ -1,7 +1,5 @@
 package com.marketplace.admin;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.booking.BookingService;
 import com.marketplace.common.ApiException;
 import com.marketplace.common.ApiResponse;
@@ -55,7 +53,7 @@ public class AdminController {
     private final SettingsService settings;
     private final NotificationService notifications;
     private final ClerkBackendClient clerk;
-    private final ObjectMapper objectMapper;
+    private final AdminSupport support;
 
     @Value("${app.public-web-url:http://localhost:5173}")
     private String publicWebUrl;
@@ -371,41 +369,16 @@ public class AdminController {
     // ================================================================= helpers
 
     private void require(AuthenticatedUserPrincipal u, Set<String> allowed) {
-        List<String> roles = jdbc.queryForList(
-                "SELECT admin_role FROM admin_users WHERE user_id = :uid AND status = 'ACTIVE'", Map.of("uid", u.getUserId()), String.class);
-        if (roles.isEmpty() || !allowed.contains(roles.get(0))) throw ApiException.forbidden();
+        support.require(u, allowed);
     }
 
     private PageResponse<Map<String, Object>> page(String sql, MapSqlParameterSource p, int page, int size) {
-        int s = Math.min(Math.max(size, 1), 100);
-        int pg = Math.max(page, 0);
-        p.addValue("lim", s).addValue("off", pg * s);
-        List<Map<String, Object>> items = jdbc.queryForList(sql, p);
-        long total = items.isEmpty() ? 0 : ((Number) items.get(0).get("_total")).longValue();
-        items.forEach(m -> m.remove("_total"));
-        return new PageResponse<>(items, pg, s, total);
+        return support.page(sql, p, page, size);
     }
 
     private void audit(AuthenticatedUserPrincipal u, String action, String entityType, UUID entityId,
                        Map<String, ?> before, Map<String, ?> after, HttpServletRequest req) {
-        String forwarded = req.getHeader("X-Forwarded-For");
-        String ip = forwarded != null && !forwarded.isBlank() ? forwarded.split(",")[0].trim() : req.getRemoteAddr();
-        jdbc.update("""
-                INSERT INTO admin_audit_logs (admin_user_id, action, entity_type, entity_id, old_values, new_values, ip_address)
-                VALUES (:admin, :action, :type, :eid, CAST(:before AS jsonb), CAST(:after AS jsonb), :ip)""",
-                new MapSqlParameterSource().addValue("admin", u.getUserId()).addValue("action", action)
-                        .addValue("type", entityType).addValue("eid", entityId)
-                        .addValue("before", json(before)).addValue("after", json(after))
-                        .addValue("ip", ip.length() > 45 ? ip.substring(0, 45) : ip));
-    }
-
-    private String json(Map<String, ?> m) {
-        if (m == null) return null;
-        try {
-            return objectMapper.writeValueAsString(m);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
+        support.audit(u, action, entityType, entityId, before, after, req);
     }
 
     private static Map<String, Object> mapOf(String k1, Object v1, String k2, Object v2) {

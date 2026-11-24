@@ -29,6 +29,8 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    # Parallel branches may add lower-numbered migrations later; let them apply.
+    out-of-order: true
   jackson:
     time-zone: Asia/Kolkata
     serialization:
@@ -68,6 +70,15 @@ imagekit:
   public-key: ${IMAGEKIT_PUBLIC_KEY:}
   private-key: ${IMAGEKIT_PRIVATE_KEY:}
   url-endpoint: ${IMAGEKIT_URL_ENDPOINT:}
+  api-url: ${IMAGEKIT_API_URL:https://api.imagekit.io/v1}
+  upload-url: ${IMAGEKIT_UPLOAD_URL:https://upload.imagekit.io/api/v1/files/upload}
+
+ai-images:
+  # Real image generation provider. Only "openai" is implemented; empty key = feature unavailable.
+  provider: ${AI_IMAGE_PROVIDER:openai}
+  api-key: ${OPENAI_API_KEY:}
+  model: ${AI_IMAGE_MODEL:gpt-image-1}
+  api-url: ${AI_IMAGE_API_URL:https://api.openai.com/v1}
 
 app:
   public-web-url: ${PUBLIC_WEB_URL:http://localhost:5173}

@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, BadgeCheck, Clock, Heart, MapPin, Star, Users } from 'lucide-react';
 import { api } from '../../services/api';
+import PromoCard from '../../components/marketing/PromoCard';
 import { useCatalog } from '../../hooks/useCatalog';
 import { useFavourites } from '../../hooks/useFavourites';
 import { dateLabel, priceLabel, relativeTime, timeLabel, WEEKDAYS } from '../../lib/format';
@@ -14,6 +15,7 @@ export default function ProviderProfile() {
   const favs = useFavourites();
   const { data: p, isLoading, error } = useQuery({ queryKey: ['provider', id], queryFn: () => api.providers.get(id) });
   const reviews = useQuery({ queryKey: ['reviews', id], queryFn: () => api.providers.reviews(id), enabled: !!p });
+  const promos = useQuery({ queryKey: ['promotions', id], queryFn: () => api.public.promotions({ providerId: id, limit: 6 }), enabled: !!p });
 
   if (isLoading) return <Spinner />;
   if (error) {
@@ -76,6 +78,15 @@ export default function ProviderProfile() {
               <section>
                 <h2 className="t-h3 mb-2">About</h2>
                 <p className="t-body text-muted whitespace-pre-line break-words">{p.bio}</p>
+              </section>
+            )}
+
+            {promos.data?.length > 0 && (
+              <section>
+                <h2 className="t-h3 mb-3">Current offers</h2>
+                <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
+                  {promos.data.map((pr) => <PromoCard key={pr.id} promo={pr} placement="PROVIDER_PROFILE" catalog={catalog} />)}
+                </div>
               </section>
             )}
 

@@ -77,6 +77,10 @@ public class SecurityConfig {
                     "/api/v1/reviews/provider/*"
                 ).permitAll()
 
+                // Public discovery, banners and banner analytics events
+                .requestMatchers(HttpMethod.GET, "/api/v1/public/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/public/banners/*/impression", "/api/v1/public/banners/*/click").permitAll()
+
                 .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/reviews").hasRole("CUSTOMER")

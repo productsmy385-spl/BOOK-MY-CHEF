@@ -7,6 +7,7 @@ import { useCatalog } from '../../hooks/useCatalog';
 import { isClerkConfigured } from '../../components/auth/ClerkAuthProvider';
 import { Alert, Button, Checkbox, Field, Spinner, cx } from '../../components/ui';
 import Brand from '../../components/layout/Brand';
+import BannerCarousel from '../../components/marketing/BannerCarousel';
 
 const COPY = {
   CUSTOMER: {
@@ -33,10 +34,13 @@ export default function AuthPage({ role }) {
       <div className="min-h-screen flex flex-col bg-canvas">
         <header className="h-16 flex items-center px-4 sm:px-6 bg-white border-b border-line"><Brand /></header>
         <main className="flex-1 flex justify-center px-4 py-12">
-          <div className="card p-6 sm:p-8 w-full max-w-[440px] flex flex-col gap-4">
-            <h1 className="t-h2">{COPY[role].title.signin}</h1>
-            <Alert tone="warning">Sign-in is temporarily unavailable. Please try again later.</Alert>
-            <Link to="/" className="btn btn-outline">Browse the marketplace</Link>
+          <div className="w-full max-w-[440px] flex flex-col gap-5">
+            {role === 'CUSTOMER' && <BannerCarousel placement="SIGN_IN" variant="compact" />}
+            <div className="card p-6 sm:p-8 flex flex-col gap-4">
+              <h1 className="t-h2">{COPY[role].title.signin}</h1>
+              <Alert tone="warning">Sign-in is temporarily unavailable. Please try again later.</Alert>
+              <Link to="/" className="btn btn-outline">Browse the marketplace</Link>
+            </div>
           </div>
         </main>
       </div>
@@ -154,6 +158,9 @@ function AuthForm({ role }) {
       </header>
       <main className="flex-1 flex justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-[440px]">
+          {role === 'CUSTOMER' && step === 'form' && (
+            <BannerCarousel key={mode} placement={mode === 'register' ? 'REGISTER' : 'SIGN_IN'} variant="compact" className="mb-5" />
+          )}
           <div className="card p-6 sm:p-8">
             {step === 'form' ? (
               <>

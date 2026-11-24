@@ -49,7 +49,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (path.startsWith("/api/v1/auth/")) {
             limit = authLimit;
             bucket = "auth";
-        } else if (path.startsWith("/api/v1/search/")) {
+        } else if (path.startsWith("/api/v1/public/banners/")) {
+            limit = searchLimit;
+            bucket = "events";
+        } else if (path.startsWith("/api/v1/search/") || path.startsWith("/api/v1/public/")) {
             limit = searchLimit;
             bucket = "search";
         } else if (path.startsWith("/api/v1/") && !HttpMethod.GET.matches(method)) {

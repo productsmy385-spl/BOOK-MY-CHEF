@@ -7,6 +7,7 @@ import { useCatalog } from '../../hooks/useCatalog';
 import { useFavourites } from '../../hooks/useFavourites';
 import { addDays, dateLabel, isoDate, money } from '../../lib/format';
 import ProviderCard from '../../components/marketplace/ProviderCard';
+import BannerCarousel from '../../components/marketing/BannerCarousel';
 import { Alert, Button, Checkbox, Drawer, EmptyState, Field, cx } from '../../components/ui';
 
 const PAGE_SIZE = 12;
@@ -94,6 +95,10 @@ export default function Explore() {
           )}
         </Button>
       </div>
+
+      {singleCategory
+        ? <BannerCarousel key={singleCategory} placement="CATEGORY" category={singleCategory} variant="compact" className="mt-4" />
+        : <BannerCarousel placement="EXPLORE" variant="compact" className="mt-4" />}
 
       {/* Category chips: in-page filter, no navigation */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar py-4 -mx-4 px-4 sm:mx-0 sm:px-0" role="toolbar" aria-label="Service category">

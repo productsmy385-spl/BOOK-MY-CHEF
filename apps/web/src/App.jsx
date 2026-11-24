@@ -22,6 +22,13 @@ const ProviderSetup = lazy(() => import('./features/provider/ProviderSetup'));
 const ProviderServicesPage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderServicesPage })));
 const ProviderProfilePage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderProfilePage })));
 const ProviderCalendarPage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderCalendarPage })));
+const ProviderPromotions = lazy(() => import('./features/provider/ProviderPromotions'));
+const promo = (name) => lazy(() => import('./features/admin/AdminPromotions').then((m) => ({ default: m[name] })));
+const AdminCampaigns = promo('AdminCampaigns');
+const AdminProviderPromotions = promo('AdminProviderPromotions');
+const AdminFeatured = promo('AdminFeatured');
+const AdminBannerAnalytics = promo('AdminBannerAnalytics');
+const AdminMedia = promo('AdminMedia');
 const admin = (name) => lazy(() => import('./features/admin/AdminConsole').then((m) => ({ default: m[name] })));
 const AdminLayout = admin('AdminLayout');
 const AdminDashboard = admin('AdminDashboard');
@@ -78,6 +85,7 @@ export default function App() {
               <Route path="services" element={<ProviderServicesPage />} />
               <Route path="calendar" element={<ProviderCalendarPage />} />
               <Route path="profile" element={<ProviderProfilePage />} />
+              <Route path="promotions" element={<ProviderPromotions />} />
               <Route path="notifications" element={<Notifications />} />
               <Route path="*" element={<Navigate to="dashboard" replace />} />
             </Route>
@@ -94,6 +102,11 @@ export default function App() {
               <Route path="team" element={<AdminTeam />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="audit" element={<AdminAudit />} />
+              <Route path="campaigns" element={<AdminCampaigns />} />
+              <Route path="promotions" element={<AdminProviderPromotions />} />
+              <Route path="featured" element={<AdminFeatured />} />
+              <Route path="banner-analytics" element={<AdminBannerAnalytics />} />
+              <Route path="media" element={<AdminMedia />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Route>
           </Route>

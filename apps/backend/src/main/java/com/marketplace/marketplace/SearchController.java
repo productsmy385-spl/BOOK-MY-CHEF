@@ -80,7 +80,7 @@ public class SearchController {
 
         SearchCriteria criteria = new SearchCriteria(q, category, cuisine, mode, pricingModel, minPrice, maxPrice,
                 city, area, lat, lng, radiusKm, date, time, guests, verified, minRating, minExperience, minCompleted,
-                SORTS.contains(sort) ? sort : "recommended", page, size);
+                SORTS.contains(sort) ? sort : "recommended", page, size, null, null);
         return ResponseEntity.ok(ApiResponse.ok(searchService.search(criteria)));
     }
 }

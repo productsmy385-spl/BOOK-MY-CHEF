@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BadgeCheck, CalendarRange, FileText, Gauge, IndianRupee, LogOut, Menu, ScrollText, Settings, ShieldCheck, Users } from 'lucide-react';
+import { BadgeCheck, BarChart3, CalendarRange, FileText, Gauge, GalleryHorizontal, Images, IndianRupee, LogOut, Megaphone, Menu, ScrollText, Settings, ShieldCheck, Star, Users } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useCatalog } from '../../hooks/useCatalog';
@@ -14,6 +14,11 @@ const NAV = [
   { to: '/admin/providers', label: 'Providers', icon: BadgeCheck },
   { to: '/admin/customers', label: 'Customers', icon: Users },
   { to: '/admin/bookings', label: 'Bookings', icon: CalendarRange },
+  { to: '/admin/campaigns', label: 'Campaigns', icon: GalleryHorizontal },
+  { to: '/admin/promotions', label: 'Provider promotions', icon: Megaphone },
+  { to: '/admin/featured', label: 'Featured providers', icon: Star },
+  { to: '/admin/banner-analytics', label: 'Banner analytics', icon: BarChart3 },
+  { to: '/admin/media', label: 'Images', icon: Images },
   { to: '/admin/finance', label: 'Finance', icon: IndianRupee, roles: ['SUPER_ADMIN', 'FINANCE_ADMIN'] },
   { to: '/admin/team', label: 'Admin team', icon: ShieldCheck, roles: ['SUPER_ADMIN'] },
   { to: '/admin/settings', label: 'Settings', icon: Settings },

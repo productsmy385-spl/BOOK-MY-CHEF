@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Bell, CalendarDays, ClipboardList, LayoutDashboard, LogOut, Menu, Store, UserRound } from 'lucide-react';
+import { Bell, CalendarDays, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, Store, UserRound } from 'lucide-react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { Avatar, Drawer, cx } from '../ui';
 import Brand from './Brand';
@@ -28,6 +28,11 @@ export default function ProviderLayout() {
           <n.icon className="w-[18px] h-[18px]" aria-hidden /> {n.label}
         </NavLink>
       ))}
+      <NavLink to="/provider/promotions"
+        className={({ isActive }) => cx('flex items-center gap-3 px-3 h-10 rounded-sm text-[14px] font-medium',
+          isActive ? 'bg-pale text-navy' : 'text-muted hover:text-ink hover:bg-canvas')}>
+        <Megaphone className="w-[18px] h-[18px]" aria-hidden /> Marketing
+      </NavLink>
       <NavLink to="/provider/notifications"
         className={({ isActive }) => cx('flex items-center gap-3 px-3 h-10 rounded-sm text-[14px] font-medium',
           isActive ? 'bg-pale text-navy' : 'text-muted hover:text-ink hover:bg-canvas')}>

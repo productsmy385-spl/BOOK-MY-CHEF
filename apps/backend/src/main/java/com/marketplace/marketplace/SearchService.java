@@ -113,6 +113,15 @@ public class SearchService {
             where.add("r.avg_rating >= :minRating");
             params.addValue("minRating", c.minRating());
         }
+        if (c.ids() != null) {
+            if (c.ids().isEmpty()) return new PageResponse<>(List.of(), 0, Math.max(c.size(), 1), 0);
+            where.add("p.id IN (:ids)");
+            params.addValue("ids", c.ids());
+        }
+        if (c.minReviews() != null && c.minReviews() > 0) {
+            where.add("COALESCE(r.review_count, 0) >= :minReviews");
+            params.addValue("minReviews", c.minReviews());
+        }
         if (c.minExperience() != null && c.minExperience() > 0) {
             where.add("p.experience_years >= :minExperience");
             params.addValue("minExperience", c.minExperience());
