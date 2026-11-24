@@ -10,123 +10,111 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.Optional;
+import java.util.Base64;
 
+/**
+ * Receives Clerk user lifecycle events (delivered by Svix). Every request must
+ * carry a valid Svix signature made with CLERK_WEBHOOK_SECRET and a timestamp
+ * within five minutes; otherwise it is rejected.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class ClerkWebhookController {
 
+    private static final long TOLERANCE_SECONDS = 300;
+
     private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${clerk.webhook.secret:whsec_default_secret}")
+    @Value("${clerk.webhook-secret:}")
     private String webhookSecret;
 
     @PostMapping("/webhook")
     @Transactional
-    public ResponseEntity<String> handleClerkWebhook(
-            @RequestBody String rawPayload,
+    public ResponseEntity<String> handle(
+            @RequestBody String payload,
             @RequestHeader(value = "svix-id", required = false) String svixId,
             @RequestHeader(value = "svix-timestamp", required = false) String svixTimestamp,
-            @RequestHeader(value = "svix-signature", required = false) String svixSignature) {
+            @RequestHeader(value = "svix-signature", required = false) String svixSignature) throws Exception {
 
-        log.info("Received Clerk Webhook event, svix-id: {}", svixId);
-
-        try {
-            JsonNode root = objectMapper.readTree(rawPayload);
-            String eventType = root.path("type").asText();
-            JsonNode data = root.path("data");
-
-            log.info("Processing Clerk webhook event type: {}", eventType);
-
-            switch (eventType) {
-                case "user.created":
-                case "user.updated":
-                    processUserSync(data);
-                    break;
-
-                case "user.deleted":
-                    String deletedClerkId = data.path("id").asText();
-                    Optional<User> userOpt = userRepository.findByClerkId(deletedClerkId);
-                    userOpt.ifPresent(u -> {
-                        u.setAccountStatus("DELETED");
-                        u.setDeletedAt(Instant.now());
-                        userRepository.save(u);
-                        log.info("Marked user {} as DELETED in PostgreSQL", deletedClerkId);
-                    });
-                    break;
-
-                default:
-                    log.debug("Unhandled Clerk webhook event type: {}", eventType);
-                    break;
-            }
-
-            return ResponseEntity.ok("{\"status\":\"success\"}");
-        } catch (Exception ex) {
-            log.error("Failed to process Clerk webhook payload", ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"status\":\"error\",\"message\":\"" + ex.getMessage() + "\"}");
+        if (webhookSecret.isBlank()) {
+            log.error("Clerk webhook received but CLERK_WEBHOOK_SECRET is not configured");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("not configured");
         }
+        if (!isValidSignature(payload, svixId, svixTimestamp, svixSignature)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid signature");
+        }
+
+        JsonNode root = objectMapper.readTree(payload);
+        JsonNode data = root.path("data");
+        String clerkId = data.path("id").asText("");
+        switch (root.path("type").asText()) {
+            case "user.updated" -> userRepository.findByClerkId(clerkId).ifPresent(user -> applyUpdate(user, data));
+            case "user.deleted" -> userRepository.findByClerkId(clerkId).ifPresent(user -> {
+                user.setAccountStatus("DELETED");
+                user.setDeletedAt(Instant.now());
+                userRepository.save(user);
+                log.info("Deactivated user {} after Clerk deletion", user.getId());
+            });
+            default -> log.debug("Ignoring Clerk event {}", root.path("type").asText());
+        }
+        return ResponseEntity.ok("{\"received\":true}");
     }
 
-    private void processUserSync(JsonNode data) {
-        String clerkId = data.path("id").asText();
-        if (clerkId == null || clerkId.isEmpty()) return;
-
-        // Extract primary phone number
-        String phone = "";
-        JsonNode phoneNumbers = data.path("phone_numbers");
-        if (phoneNumbers.isArray() && phoneNumbers.size() > 0) {
-            phone = phoneNumbers.get(0).path("phone_number").asText();
+    private void applyUpdate(User user, JsonNode data) {
+        String email = primaryVerified(data, "email_addresses", "email_address", "primary_email_address_id");
+        String phone = primaryVerified(data, "phone_numbers", "phone_number", "primary_phone_number_id");
+        if (email != null && !email.equalsIgnoreCase(user.getEmail()) && !userRepository.existsByEmail(email.toLowerCase())) {
+            user.setEmail(email.toLowerCase());
         }
-
-        // Extract primary email
-        String email = "";
-        JsonNode emailAddresses = data.path("email_addresses");
-        if (emailAddresses.isArray() && emailAddresses.size() > 0) {
-            email = emailAddresses.get(0).path("email_address").asText();
+        if (phone != null) {
+            String normalized = AuthService.normalizePhone(phone);
+            if (!normalized.equals(user.getPhone()) && !userRepository.existsByPhone(normalized)) {
+                user.setPhone(normalized);
+            }
         }
+        userRepository.save(user);
+    }
 
-        // Extract user full name
-        String firstName = data.path("first_name").asText("");
-        String lastName = data.path("last_name").asText("");
-        String fullName = (firstName + " " + lastName).trim();
-        if (fullName.isEmpty()) fullName = "User";
+    private static String primaryVerified(JsonNode data, String arrayField, String valueField, String primaryField) {
+        String primaryId = data.path(primaryField).asText(null);
+        for (JsonNode n : data.path(arrayField)) {
+            if (n.path("id").asText().equals(primaryId)
+                    && "verified".equals(n.path("verification").path("status").asText())) {
+                return n.path(valueField).asText(null);
+            }
+        }
+        return null;
+    }
 
-        final String finalPhone = phone;
-        final String finalEmail = email;
-        final String finalFullName = fullName;
+    boolean isValidSignature(String payload, String id, String timestamp, String signatureHeader) {
+        if (id == null || timestamp == null || signatureHeader == null) return false;
+        try {
+            long ts = Long.parseLong(timestamp);
+            if (Math.abs(Instant.now().getEpochSecond() - ts) > TOLERANCE_SECONDS) return false;
 
-        User user = userRepository.findByClerkId(clerkId)
-                .map(existing -> {
-                    if (!finalPhone.isEmpty()) existing.setPhone(finalPhone);
-                    if (!finalEmail.isEmpty()) existing.setEmail(finalEmail);
-                    return userRepository.save(existing);
-                })
-                .orElseGet(() -> {
-                    String role = "CUSTOMER"; // Default role for webhook sync
-                    return userRepository.save(User.builder()
-                            .clerkId(clerkId)
-                            .phone(finalPhone.isEmpty() ? "+910000000000" : finalPhone)
-                            .email(finalEmail.isEmpty() ? null : finalEmail)
-                            .userType(role)
-                            .accountStatus("ACTIVE")
-                            .build());
-                });
+            String secret = webhookSecret.startsWith("whsec_") ? webhookSecret.substring(6) : webhookSecret;
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA256"));
+            byte[] expected = mac.doFinal((id + "." + timestamp + "." + payload).getBytes(StandardCharsets.UTF_8));
 
-        // Ensure user profile exists
-        userProfileRepository.findByUserId(user.getId()).orElseGet(() ->
-                userProfileRepository.save(UserProfile.builder()
-                        .user(user)
-                        .fullName(finalFullName)
-                        .preferredLanguage("en")
-                        .build())
-        );
-
-        log.info("Synchronized Clerk user {} with PostgreSQL user ID {}", clerkId, user.getId());
+            for (String part : signatureHeader.split(" ")) {
+                String[] versioned = part.split(",", 2);
+                if (versioned.length == 2 && "v1".equals(versioned[0])
+                        && MessageDigest.isEqual(expected, Base64.getDecoder().decode(versioned[1]))) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Webhook signature check failed: {}", e.getMessage());
+        }
+        return false;
     }
 }

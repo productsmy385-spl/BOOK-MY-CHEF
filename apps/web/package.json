@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:api": "node e2e/api-scenarios.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.2",
+    "@playwright/test": "^1.56.1",
     "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

@@ -1,160 +1,75 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { ASSETS } from '../assets/assetCatalog';
+import { api } from '../services/api';
 
-export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      // Clean Authentication State (Unauthenticated by default)
-      userType: null, // 'CUSTOMER' | 'PROVIDER' | 'ADMIN' | null
-      isAuthenticated: false,
-      user: null,
-      sessionToken: null,
+/**
+ * Signed-in account state. The source of truth is the Clerk session plus the
+ * backend's /auth/me — nothing is persisted to localStorage, so a stale or
+ * hand-edited local value can never grant access.
+ *
+ * status:
+ *   'loading'   – Clerk or the account is still loading
+ *   'signedOut' – no Clerk session
+ *   'needsSync' – Clerk session exists but the account is not set up yet
+ *   'blocked'   – account suspended
+ *   'error'     – server unreachable
+ *   'ready'     – account loaded
+ */
+export const useAuthStore = create((set, get) => ({
+  status: 'loading',
+  account: null,
+  error: null,
 
-      // 1. Customer Authentication Actions
-      loginCustomer: ({ id, identifier, phone, email, name, location, clerkId, sessionToken }) => {
-        const resolvedPhone = phone || (identifier && (identifier.startsWith('+') || /^\d+$/.test(identifier)) ? identifier : '');
-        const resolvedEmail = email || (identifier && identifier.includes('@') ? identifier : '');
-        const user = {
-          id: id || `usr_cust_${Date.now()}`,
-          name: name || 'Customer',
-          phone: resolvedPhone,
-          email: resolvedEmail,
-          location: location || '',
-          accountType: 'CUSTOMER',
-          clerkId: clerkId || '',
-          avatar: ASSETS.userAvatar,
-        };
-        set({
-          isAuthenticated: true,
-          userType: 'CUSTOMER',
-          user,
-          sessionToken: sessionToken || `sess_cust_${Date.now()}`,
-        });
-        return user;
-      },
-
-      registerCustomer: ({ id, fullName, mobileNumber, email, location, clerkId, sessionToken }) => {
-        const user = {
-          id: id || `usr_cust_${Date.now()}`,
-          name: fullName || 'Customer',
-          phone: mobileNumber,
-          email: email || '',
-          location: location || '',
-          accountType: 'CUSTOMER',
-          clerkId: clerkId || '',
-          avatar: ASSETS.userAvatar,
-        };
-        set({
-          isAuthenticated: true,
-          userType: 'CUSTOMER',
-          user,
-          sessionToken: sessionToken || `sess_cust_${Date.now()}`,
-        });
-        return user;
-      },
-
-      // 2. Service Partner Authentication Actions
-      loginPartner: ({ id, identifier, phone, email, name, businessName, location, roles, clerkId, sessionToken }) => {
-        const resolvedPhone = phone || (identifier && (identifier.startsWith('+') || /^\d+$/.test(identifier)) ? identifier : '');
-        const resolvedEmail = email || (identifier && identifier.includes('@') ? identifier : '');
-        const user = {
-          id: id || `usr_prov_${Date.now()}`,
-          name: name || 'Service Partner',
-          phone: resolvedPhone,
-          email: resolvedEmail,
-          businessName: businessName || '',
-          location: location || '',
-          accountType: 'PROVIDER',
-          roles: roles && roles.length > 0 ? roles : ['PRO_CHEF'],
-          clerkId: clerkId || '',
-          avatar: ASSETS.chefRaghavendraStudio,
-        };
-        set({
-          isAuthenticated: true,
-          userType: 'PROVIDER',
-          user,
-          sessionToken: sessionToken || `sess_prov_${Date.now()}`,
-        });
-        return user;
-      },
-
-      registerPartner: ({ id, fullName, mobileNumber, email, businessName, location, roles, clerkId, sessionToken }) => {
-        const user = {
-          id: id || `usr_prov_${Date.now()}`,
-          name: fullName || 'Service Partner',
-          phone: mobileNumber,
-          email: email || '',
-          businessName: businessName || `${fullName || 'Partner'}'s Culinary Atelier`,
-          location: location || '',
-          accountType: 'PROVIDER',
-          roles: roles && roles.length > 0 ? roles : ['PRO_CHEF'],
-          clerkId: clerkId || '',
-          avatar: ASSETS.chefRaghavendraStudio,
-        };
-        set({
-          isAuthenticated: true,
-          userType: 'PROVIDER',
-          user,
-          sessionToken: sessionToken || `sess_prov_${Date.now()}`,
-        });
-        return user;
-      },
-
-      // 3. Platform Administrator Authentication Actions
-      loginAdmin: ({ id, email, phone, name, adminRole, clerkId, sessionToken }) => {
-        const normalizedEmail = (email || '').trim().toLowerCase();
-        const user = {
-          id: id || `usr_admin_${Date.now()}`,
-          name: name || 'Administrator',
-          phone: phone || '',
-          email: normalizedEmail,
-          location: 'Platform Operations HQ',
-          accountType: 'ADMIN',
-          adminRole: adminRole || 'ADMIN',
-          clerkId: clerkId || '',
-          avatar: ASSETS.userAvatar,
-        };
-
-        set({
-          isAuthenticated: true,
-          userType: 'ADMIN',
-          user,
-          sessionToken: sessionToken || `sess_admin_${Date.now()}`,
-        });
-        return user;
-      },
-
-      // 4. Logout & Session Termination
-      logout: () => {
-        set({
-          isAuthenticated: false,
-          userType: null,
-          user: null,
-          sessionToken: null,
-        });
-        try {
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('book_my_chef_auth_session');
-            localStorage.removeItem('bmc_clerk_token');
-            sessionStorage.clear();
-            if (window.Clerk && typeof window.Clerk.signOut === 'function') {
-              window.Clerk.signOut().catch((e) => console.warn('Global Clerk signOut warning:', e));
-            }
-          }
-        } catch (e) {
-          // ignore
-        }
-      },
-    }),
-    {
-      name: 'book_my_chef_auth_session',
-      partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        userType: state.userType,
-        user: state.user,
-        sessionToken: state.sessionToken,
-      }),
+  /** Load the account for the current Clerk session. */
+  async refresh() {
+    try {
+      const account = await api.auth.me();
+      set({ status: 'ready', account, error: null });
+      return account;
+    } catch (e) {
+      // A sign-in screen may have completed /auth/sync while this request was in flight.
+      if (get().account) return get().account;
+      if (e.status === 404) set({ status: 'needsSync', account: null, error: null });
+      else if (e.status === 403) set({ status: 'blocked', account: null, error: e.message });
+      else if (e.status === 401) set({ status: 'signedOut', account: null, error: null });
+      else set({ status: 'error', account: null, error: e.message });
+      return null;
     }
-  )
-);
+  },
+
+  /** Create or load the account after Clerk verified the user. Throws on failure. */
+  async completeSignIn(payload) {
+    const account = await api.auth.sync(payload);
+    set({ status: 'ready', account, error: null });
+    return account;
+  },
+
+  patchAccount(patch) {
+    set((s) => ({ account: s.account ? { ...s.account, ...patch } : s.account }));
+  },
+
+  setSignedOut() {
+    set({ status: 'signedOut', account: null, error: null });
+  },
+
+  async logout() {
+    try {
+      await window.Clerk?.signOut();
+    } catch {
+      /* already signed out */
+    }
+    try {
+      // Remove values written by earlier versions of the app.
+      ['book_my_chef_auth_session', 'bmc_clerk_token', 'token'].forEach((k) => localStorage.removeItem(k));
+    } catch {
+      /* storage unavailable */
+    }
+    set({ status: 'signedOut', account: null, error: null });
+  },
+}));
+
+/** Console home for an account type. */
+export function homeFor(userType) {
+  if (userType === 'PROVIDER') return '/provider/dashboard';
+  if (userType === 'ADMIN') return '/admin';
+  return '/customer/home';
+}

@@ -1,80 +1,76 @@
 package com.marketplace.media;
 
+import com.marketplace.common.ApiException;
 import com.marketplace.common.ApiResponse;
 import com.marketplace.identity.AuthenticatedUserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 
-@Slf4j
+/**
+ * Issues short-lived ImageKit client-upload signatures (HMAC-SHA1 of token+expire
+ * with the private key, per ImageKit's documented scheme). Files are uploaded
+ * into a per-user folder. Without ImageKit keys the endpoint reports that
+ * uploads are unavailable.
+ */
 @RestController
 @RequestMapping("/api/v1/media")
-@RequiredArgsConstructor
-@Tag(name = "Media & Document Security", description = "Secure upload authorization, mime-type validation, and private KYC storage")
+@Tag(name = "Media uploads")
 public class MediaController {
 
-    private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "application/pdf"
-    );
+    static final long MAX_FILE_SIZE_BYTES = 10L * 1024 * 1024;
+    static final List<String> ALLOWED_TYPES = List.of("image/jpeg", "image/png", "image/webp", "application/pdf", "video/mp4");
 
-    private static final long MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB limit
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private final String privateKey;
+    private final String publicKey;
+    private final String urlEndpoint;
 
-    @Value("${imagekit.private-key:default_imagekit_private_key}")
-    private String imagekitPrivateKey;
-
-    @Value("${imagekit.public-key:default_imagekit_public_key}")
-    private String imagekitPublicKey;
-
-    @GetMapping("/upload-token")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Generate secure signed token for authenticated client-side upload")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getUploadAuth(
-            @AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
-
-        long expire = (System.currentTimeMillis() / 1000) + 1800; // 30 minutes
-        String token = "tok_" + Math.abs(RANDOM.nextLong()) + "_" + (principal != null ? principal.getUserId() : "guest");
-        String signature = generateHmacSignature(token + expire, imagekitPrivateKey);
-
-        Map<String, Object> authParams = Map.of(
-                "token", token,
-                "expire", expire,
-                "signature", signature,
-                "publicKey", imagekitPublicKey,
-                "maxSizeBytes", MAX_FILE_SIZE_BYTES,
-                "allowedMimeTypes", ALLOWED_MIME_TYPES
-        );
-
-        return ResponseEntity.ok(ApiResponse.ok(authParams, "Upload authorization generated"));
+    public MediaController(@Value("${imagekit.private-key:}") String privateKey,
+                           @Value("${imagekit.public-key:}") String publicKey,
+                           @Value("${imagekit.url-endpoint:}") String urlEndpoint) {
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
+        this.urlEndpoint = urlEndpoint;
     }
 
-    private String generateHmacSignature(String data, String secret) {
+    @GetMapping("/upload-auth")
+    @Operation(summary = "Signed parameters for one direct upload to ImageKit (valid 10 minutes)")
+    public ApiResponse<Map<String, Object>> uploadAuth(@AuthenticationPrincipal AuthenticatedUserPrincipal u) {
+        if (privateKey.isBlank() || publicKey.isBlank() || urlEndpoint.isBlank()) {
+            throw ApiException.unavailable("Photo uploads are not set up yet. You can paste an image link instead.");
+        }
+        String token = UUID.randomUUID().toString();
+        long expire = System.currentTimeMillis() / 1000 + 600;
+        return ApiResponse.ok(Map.of(
+                "token", token,
+                "expire", expire,
+                "signature", hmacSha1(token + expire),
+                "publicKey", publicKey,
+                "urlEndpoint", urlEndpoint,
+                "folder", "/users/" + u.getUserId(),
+                "maxSizeBytes", MAX_FILE_SIZE_BYTES,
+                "allowedTypes", ALLOWED_TYPES));
+    }
+
+    private String hmacSha1(String data) {
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
-            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
-            mac.init(secretKey);
-            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
+            mac.init(new SecretKeySpec(privateKey.getBytes(StandardCharsets.UTF_8), "HmacSHA1"));
+            return HexFormat.of().formatHex(mac.doFinal(data.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
-            log.error("Failed to generate upload signature: {}", e.getMessage());
-            return "sig_mock_" + System.currentTimeMillis();
+            throw new IllegalStateException("Could not sign upload", e);
         }
     }
 }

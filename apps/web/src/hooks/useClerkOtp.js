@@ -1,6 +1,7 @@
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { useSignUp, useSignIn, useClerk } from '@clerk/react';
 import { getClerkPublishableKey } from '../components/auth/ClerkAuthProvider';
+import { useAuthStore } from '../stores/useAuthStore';
 
 /**
  * Custom Hook: useClerkOtp
@@ -10,24 +11,15 @@ import { getClerkPublishableKey } from '../components/auth/ClerkAuthProvider';
  * 3. Email OTP, Password Sign-In, and Phone SMS OTP
  * 4. Error shielding & user-friendly error formatting
  */
+// Must be rendered inside <ClerkProvider> (AuthPage only mounts it when Clerk is configured).
 export function useClerkOtp() {
   const hasClerkKey = Boolean(getClerkPublishableKey());
-
-  let signUpHook = null;
-  let signInHook = null;
-  let clerk = null;
-
-  try {
-    signUpHook = useSignUp();
-    signInHook = useSignIn();
-    clerk = useClerk();
-  } catch (e) {
-    // Graceful fallback if rendered outside ClerkProvider
-  }
+  const signUpHook = useSignUp();
+  const signInHook = useSignIn();
+  const clerk = useClerk();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [isPending, startTransition] = useTransition();
 
   /**
    * Helper: Formats Clerk API error messages into clear, actionable user guidance

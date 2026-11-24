@@ -41,6 +41,9 @@ public class UserProfile {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(name = "city", length = 100)
+    private String city;
+
     @Column(name = "preferred_language", length = 10)
     @Builder.Default
     private String preferredLanguage = "en";

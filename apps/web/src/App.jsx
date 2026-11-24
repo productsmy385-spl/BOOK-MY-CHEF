@@ -1,182 +1,109 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from './stores/useAuthStore';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import Guard, { MarketplaceOnly } from './components/layout/Guard';
+import CustomerLayout from './components/layout/CustomerLayout';
+import ProviderLayout from './components/layout/ProviderLayout';
+import { Spinner } from './components/ui';
+import Home from './features/customer/Home';
+import Explore from './features/customer/Explore';
 
-// Role Guard
-import RoleGuard from './components/auth/RoleGuard';
+// Code-split everything except the landing screens.
+const AuthPage = lazy(() => import('./features/auth/AuthPage'));
+const CompleteAccount = lazy(() => import('./features/auth/CompleteAccount'));
+const ProviderProfile = lazy(() => import('./features/customer/ProviderProfile'));
+const BookingRequest = lazy(() => import('./features/customer/BookingRequest'));
+const Favourites = lazy(() => import('./features/customer/Favourites'));
+const Profile = lazy(() => import('./features/customer/Profile'));
+const BookingList = lazy(() => import('./features/bookings/BookingList'));
+const BookingDetail = lazy(() => import('./features/bookings/BookingDetail'));
+const Notifications = lazy(() => import('./features/notifications/Notifications'));
+const ProviderDashboard = lazy(() => import('./features/provider/ProviderDashboard'));
+const ProviderSetup = lazy(() => import('./features/provider/ProviderSetup'));
+const ProviderServicesPage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderServicesPage })));
+const ProviderProfilePage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderProfilePage })));
+const ProviderCalendarPage = lazy(() => import('./features/provider/ProviderPages').then((m) => ({ default: m.ProviderCalendarPage })));
+const admin = (name) => lazy(() => import('./features/admin/AdminConsole').then((m) => ({ default: m[name] })));
+const AdminLayout = admin('AdminLayout');
+const AdminDashboard = admin('AdminDashboard');
+const AdminProviders = admin('AdminProviders');
+const AdminCustomers = admin('AdminCustomers');
+const AdminBookings = admin('AdminBookings');
+const AdminFinance = admin('AdminFinance');
+const AdminTeam = admin('AdminTeam');
+const AdminSettings = admin('AdminSettings');
+const AdminAudit = admin('AdminAudit');
 
-// Navigation & Layout Components
-import ConsoleHeader from './components/navigation/ConsoleHeader';
-import CustomerBottomNav from './components/navigation/CustomerBottomNav';
-import ProviderBottomNav from './components/navigation/ProviderBottomNav';
-import CustomerDrawer from './components/navigation/CustomerDrawer';
-
-// Authentication Feature Screens
-import AuthWelcome from './features/auth/AuthWelcome';
-import CustomerAuth from './features/auth/CustomerAuth';
-import PartnerAuth from './features/auth/PartnerAuth';
-import AdminLogin from './features/admin/AdminLogin';
-
-// Customer Feature Screens
-import CustomerHome from './features/customer/CustomerHome';
-import CustomerExplore from './features/customer/CustomerExplore';
-import ChefProfile from './features/customer/ChefProfile';
-import BookingStep1Requirements from './features/booking/BookingStep1Requirements';
-import BookingStep2ServiceMode from './features/booking/BookingStep2ServiceMode';
-import BookingStep3Quotation from './features/booking/BookingStep3Quotation';
-import BookingStep4Payment from './features/booking/BookingStep4Payment';
-import BookingStep5Confirmed from './features/booking/BookingStep5Confirmed';
-import CustomerLiveTracking from './features/tracking/CustomerLiveTracking';
-import HostReviewSubmission from './features/reviews/HostReviewSubmission';
-import CustomerBookings from './features/customer/CustomerBookings';
-import CustomerFavourites from './features/customer/CustomerFavourites';
-import CustomerProfile from './features/customer/CustomerProfile';
-
-// Provider Feature Screens
-import ProviderDashboard from './features/provider/ProviderDashboard';
-import ProviderOnboardingWizard from './features/provider/ProviderOnboardingWizard';
-import ProviderChat from './features/provider/ProviderChat';
-import ProviderWallet from './features/provider/ProviderWallet';
-import ProviderCalendar from './features/provider/ProviderCalendar';
-import ProviderEventDay from './features/provider/ProviderEventDay';
-import ProviderAlerts from './features/provider/ProviderAlerts';
-import ProviderServices from './features/provider/ProviderServices';
-import ProviderBookings from './features/provider/ProviderBookings';
-import ProviderProfile from './features/provider/ProviderProfile';
-
-// Platform Admin Feature Screens
-import AdminLayout from './features/admin/AdminLayout';
-import AdminDashboard from './features/admin/AdminDashboard';
-import AdminVerificationQueue from './features/admin/AdminVerificationQueue';
-import AdminBookings from './features/admin/AdminBookings';
-import AdminFinance from './features/admin/AdminFinance';
-import AdminUsers from './features/admin/AdminUsers';
-import AdminAuditLogs from './features/admin/AdminAuditLogs';
-
-function RootRedirect() {
-  const { isAuthenticated, userType } = useAuthStore();
-
-  if (!isAuthenticated || !userType) {
-    return <Navigate to="/auth/welcome" replace />;
-  }
-  if (userType === 'CUSTOMER') {
-    return <Navigate to="/customer/home" replace />;
-  }
-  if (userType === 'PROVIDER') {
-    return <Navigate to="/provider/dashboard" replace />;
-  }
-  if (userType === 'ADMIN') {
-    return <Navigate to="/admin" replace />;
-  }
-  return <Navigate to="/auth/welcome" replace />;
-}
-
-function AppContent() {
-  const location = useLocation();
-  const { isAuthenticated, userType } = useAuthStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // Authentication & Console path detection
-  const isAuthPage = location.pathname.startsWith('/auth') || location.pathname === '/admin/login';
-  const isAdminRoute = location.pathname.startsWith('/admin') && location.pathname !== '/admin/login';
-  const isProviderRoute = location.pathname.startsWith('/provider');
-  const isOnboarding = location.pathname.startsWith('/provider/onboarding');
-  const isBookingFlow = location.pathname.startsWith('/booking');
-  const isTrackingOrReview = location.pathname.startsWith('/tracking') || location.pathname.startsWith('/review');
-
-  // Control Header & Bottom Navigation presentation
-  const showHeader = !isAuthPage && !isAdminRoute;
-  const showCustomerBottomNav = isAuthenticated && userType === 'CUSTOMER' && !isBookingFlow && !isTrackingOrReview && !isAuthPage;
-  const showProviderBottomNav = isAuthenticated && userType === 'PROVIDER' && !isOnboarding && location.pathname !== '/provider/chat' && !isAuthPage;
-
-  return (
-    <div className="min-h-screen bg-white text-[#172033] flex flex-col font-sora">
-      {showHeader && <ConsoleHeader onOpenDrawer={() => setDrawerOpen(true)} />}
-
-      <CustomerDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
-
-      <main className={`flex-1 flex flex-col ${showHeader ? 'pt-16' : ''}`}>
-        <Routes>
-          {/* Default Root: Automatic Role-Based Redirection */}
-          <Route path="/" element={<RootRedirect />} />
-
-          {/* ======================================================== */}
-          {/* PUBLIC AUTHENTICATION ROUTES (Section 2 & 3 Mandate)     */}
-          {/* ======================================================== */}
-          <Route path="/auth/welcome" element={<AuthWelcome />} />
-          <Route path="/auth/customer" element={<CustomerAuth />} />
-          <Route path="/auth/partner" element={<PartnerAuth />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-
-          {/* ======================================================== */}
-          {/* CUSTOMER CONSOLE ROUTES (Role-Guarded: CUSTOMER Only)     */}
-          {/* ======================================================== */}
-          <Route element={<RoleGuard allowedRoles={['CUSTOMER']} />}>
-            <Route path="/customer/home" element={<CustomerHome />} />
-            <Route path="/customer" element={<Navigate to="/customer/home" replace />} />
-            <Route path="/explore" element={<CustomerExplore />} />
-            <Route path="/chef/:id" element={<ChefProfile />} />
-            <Route path="/booking/step-1" element={<BookingStep1Requirements />} />
-            <Route path="/booking/step-2" element={<BookingStep2ServiceMode />} />
-            <Route path="/booking/step-3" element={<BookingStep3Quotation />} />
-            <Route path="/booking/step-4" element={<BookingStep4Payment />} />
-            <Route path="/booking/step-5" element={<BookingStep5Confirmed />} />
-            <Route path="/tracking/:id" element={<CustomerLiveTracking />} />
-            <Route path="/review/:id" element={<HostReviewSubmission />} />
-            <Route path="/bookings" element={<CustomerBookings />} />
-            <Route path="/favourites" element={<CustomerFavourites />} />
-            <Route path="/profile" element={<CustomerProfile />} />
-          </Route>
-
-          {/* ======================================================== */}
-          {/* PROVIDER CONSOLE ROUTES (Role-Guarded: PROVIDER Only)     */}
-          {/* ======================================================== */}
-          <Route element={<RoleGuard allowedRoles={['PROVIDER']} />}>
-            <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
-            <Route path="/provider/dashboard" element={<ProviderDashboard />} />
-            <Route path="/provider/onboarding" element={<Navigate to="/provider/onboarding/step-1" replace />} />
-            <Route path="/provider/onboarding/step-:stepNumber" element={<ProviderOnboardingWizard />} />
-            <Route path="/provider/chat" element={<ProviderChat />} />
-            <Route path="/provider/wallet" element={<ProviderWallet />} />
-            <Route path="/provider/calendar" element={<ProviderCalendar />} />
-            <Route path="/provider/event-day" element={<ProviderEventDay />} />
-            <Route path="/provider/alerts" element={<ProviderAlerts />} />
-            <Route path="/provider/services" element={<ProviderServices />} />
-            <Route path="/provider/bookings" element={<ProviderBookings />} />
-            <Route path="/provider/profile" element={<ProviderProfile />} />
-          </Route>
-
-          {/* ======================================================== */}
-          {/* ADMINISTRATOR PORTAL ROUTES (Role-Guarded: ADMIN Only)    */}
-          {/* ======================================================== */}
-          <Route element={<RoleGuard allowedRoles={['ADMIN']} />}>
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="verification" element={<AdminVerificationQueue />} />
-              <Route path="bookings" element={<AdminBookings />} />
-              <Route path="finance" element={<AdminFinance />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="audit" element={<AdminAuditLogs />} />
-            </Route>
-          </Route>
-
-          {/* Catch-all Fallback */}
-          <Route path="*" element={<RootRedirect />} />
-        </Routes>
-      </main>
-
-      {/* 5-Item Persistent Bottom Navigations (Strictly Per Account Role) */}
-      {showCustomerBottomNav && <CustomerBottomNav />}
-      {showProviderBottomNav && <ProviderBottomNav />}
-    </div>
-  );
+function LegacyProviderRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/p/${id}`} replace />;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <Suspense fallback={<Spinner className="min-h-[50vh]" />}>
+        <Routes>
+          {/* Authentication */}
+          <Route path="/auth/customer" element={<AuthPage role="CUSTOMER" />} />
+          <Route path="/auth/partner" element={<AuthPage role="PROVIDER" />} />
+          <Route path="/admin/login" element={<AuthPage role="ADMIN" />} />
+          <Route path="/auth/complete" element={<CompleteAccount />} />
+          <Route path="/auth/*" element={<Navigate to="/auth/customer" replace />} />
+
+          {/* Customer marketplace: browsing is public, personal pages require a customer account */}
+          <Route element={<CustomerLayout />}>
+            <Route element={<MarketplaceOnly />}>
+              <Route index element={<Home />} />
+              <Route path="explore" element={<Explore />} />
+              <Route path="p/:id" element={<ProviderProfile />} />
+            </Route>
+            <Route element={<Guard roles={['CUSTOMER']} />}>
+              <Route path="book/:providerId" element={<BookingRequest />} />
+              <Route path="bookings" element={<BookingList viewer="CUSTOMER" />} />
+              <Route path="bookings/:id" element={<BookingDetail viewer="CUSTOMER" />} />
+              <Route path="favourites" element={<Favourites />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="notifications" element={<Notifications />} />
+            </Route>
+          </Route>
+
+          {/* Service provider console */}
+          <Route path="provider" element={<Guard roles={['PROVIDER']} />}>
+            <Route element={<ProviderLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<ProviderDashboard />} />
+              <Route path="setup" element={<ProviderSetup />} />
+              <Route path="bookings" element={<BookingList viewer="PROVIDER" />} />
+              <Route path="bookings/:id" element={<BookingDetail viewer="PROVIDER" />} />
+              <Route path="services" element={<ProviderServicesPage />} />
+              <Route path="calendar" element={<ProviderCalendarPage />} />
+              <Route path="profile" element={<ProviderProfilePage />} />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="*" element={<Navigate to="dashboard" replace />} />
+            </Route>
+          </Route>
+
+          {/* Platform administration (invite-only) */}
+          <Route path="admin" element={<Guard roles={['ADMIN']} />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="providers" element={<AdminProviders />} />
+              <Route path="customers" element={<AdminCustomers />} />
+              <Route path="bookings" element={<AdminBookings />} />
+              <Route path="finance" element={<AdminFinance />} />
+              <Route path="team" element={<AdminTeam />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="audit" element={<AdminAudit />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Route>
+          </Route>
+
+          {/* Old URLs */}
+          <Route path="/customer/*" element={<Navigate to="/" replace />} />
+          <Route path="/chef/:id" element={<LegacyProviderRedirect />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

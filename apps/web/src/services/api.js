@@ -1,206 +1,174 @@
 /**
- * REST API Client for BOOK MY CHEF (Culinary & Event Atelier)
- * Connects React frontend directly to Java Spring Boot Backend (/api/v1/*)
+ * REST client for the Book My Chef API (/api/v1).
+ * Every request carries a fresh Clerk session token; nothing about the user's
+ * identity or role is ever sent from the client as data.
  */
 
 export function getApiBaseUrl() {
   const runtimeUrl = typeof window !== 'undefined' && window.__ENV__?.VITE_API_BASE_URL;
-  if (runtimeUrl && !runtimeUrl.startsWith('${') && runtimeUrl.trim() !== '') {
-    return runtimeUrl.trim();
-  }
+  if (runtimeUrl && !runtimeUrl.startsWith('${') && runtimeUrl.trim() !== '') return runtimeUrl.trim();
   const buildTimeUrl = import.meta.env.VITE_API_BASE_URL;
-  if (buildTimeUrl && buildTimeUrl.trim() !== '') {
-    return buildTimeUrl.trim();
-  }
-  return 'http://localhost:8080/api/v1';
+  if (buildTimeUrl && buildTimeUrl.trim() !== '') return buildTimeUrl.trim();
+  return '/api/v1'; // Vite dev server proxies /api to the backend
 }
 
-async function request(endpoint, options = {}) {
-  const baseUrl = getApiBaseUrl();
-  const url = `${baseUrl}${endpoint}`;
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {}),
-  };
-
-  // Attach auth token if present
-  const token = localStorage.getItem('bmc_clerk_token') || localStorage.getItem('token');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+export class ApiError extends Error {
+  constructor(message, status, fields) {
+    super(message);
+    this.status = status;
+    this.fields = fields || null;
   }
+}
 
+async function sessionToken() {
   try {
-    const res = await fetch(url, { ...options, headers });
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData?.error?.message || errData?.message || `HTTP ${res.status}: ${res.statusText}`);
-    }
-    return await res.json();
-  } catch (err) {
-    console.warn(`[API] Request to ${endpoint} failed: ${err.message}. Using client fallback.`);
-    throw err;
+    // Clerk caches and refreshes short-lived session tokens itself.
+    return (await window.Clerk?.session?.getToken()) || null;
+  } catch {
+    return null;
   }
+}
+
+async function request(method, path, body, { auth = true } = {}) {
+  const headers = { Accept: 'application/json' };
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (auth) {
+    const token = await sessionToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
+
+  let res;
+  try {
+    res = await fetch(`${getApiBaseUrl()}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new ApiError('Cannot reach the server. Check your connection and try again.', 0);
+  }
+
+  let json = null;
+  try {
+    json = await res.json();
+  } catch {
+    /* empty body */
+  }
+  if (!res.ok) {
+    const fallback = {
+      401: 'Please sign in again.',
+      403: 'You do not have access to this.',
+      404: 'Not found.',
+      429: 'Too many requests. Please wait a moment.',
+    }[res.status] || 'Something went wrong. Please try again.';
+    throw new ApiError(json?.message || fallback, res.status, json?.data && typeof json.data === 'object' ? json.data : null);
+  }
+  return json?.data;
+}
+
+const get = (p, o) => request('GET', p, undefined, o);
+const post = (p, b) => request('POST', p, b === undefined ? {} : b);
+const put = (p, b) => request('PUT', p, b);
+const del = (p) => request('DELETE', p);
+
+/** Builds a query string, dropping empty values and joining arrays with commas. */
+export function toQuery(params) {
+  const sp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === '' || v === false) return;
+    if (Array.isArray(v)) {
+      if (v.length) sp.set(k, v.join(','));
+    } else sp.set(k, String(v));
+  });
+  const s = sp.toString();
+  return s ? `?${s}` : '';
 }
 
 export const api = {
-  // Authentication & Identity
   auth: {
-    syncUser: (data) => request('/auth/sync', { method: 'POST', body: JSON.stringify(data) }),
-    getCurrentUser: () => request('/auth/me', { method: 'GET' }),
+    me: () => get('/auth/me'),
+    sync: (data) => post('/auth/sync', data),
   },
-
-  // Service Provider Discovery & Profiles
+  catalog: () => get('/catalog', { auth: false }),
+  search: (params) => get(`/search/providers${toQuery(params)}`, { auth: false }),
   providers: {
-    search: (params = {}) => {
-      const searchParams = new URLSearchParams();
-      Object.entries(params).forEach(([k, v]) => {
-        if (v !== undefined && v !== null && v !== '') searchParams.append(k, v);
-      });
-      return request(`/search/providers?${searchParams.toString()}`);
-    },
-    getById: (providerId) => request(`/providers/${providerId}`),
-    getServices: (providerId) => request(`/providers/${providerId}/services`),
-    setupProfile: (userId, profileData) =>
-      request(`/providers/profile?userId=${userId}`, {
-        method: 'POST',
-        body: JSON.stringify(profileData),
-      }),
+    get: (id) => get(`/providers/${id}`, { auth: false }),
+    reviews: (id, page = 0) => get(`/reviews/provider/${id}?page=${page}`, { auth: false }),
   },
-
-  // Customer Profile, Favourites & Addresses
+  me: {
+    get: () => get('/providers/me'),
+    dashboard: () => get('/providers/me/dashboard'),
+    profile: (d) => put('/providers/me/profile', d),
+    categories: (categories) => put('/providers/me/categories', { categories }),
+    cuisines: (d) => put('/providers/me/cuisines', d),
+    addService: (d) => post('/providers/me/services', d),
+    updateService: (id, d) => put(`/providers/me/services/${id}`, d),
+    deleteService: (id) => del(`/providers/me/services/${id}`),
+    availability: (d) => put('/providers/me/availability', d),
+    blockDate: (d) => post('/providers/me/blocked-dates', d),
+    unblockDate: (date) => del(`/providers/me/blocked-dates/${date}`),
+    addPortfolio: (d) => post('/providers/me/portfolio', d),
+    deletePortfolio: (id) => del(`/providers/me/portfolio/${id}`),
+    addDocument: (d) => post('/providers/me/documents', d),
+    publish: () => post('/providers/me/publish'),
+    unpublish: () => post('/providers/me/unpublish'),
+  },
   customer: {
-    getFavourites: (customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/favourites${q}`);
-    },
-    addFavourite: (providerId, customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/favourites/${providerId}${q}`, { method: 'POST' });
-    },
-    removeFavourite: (providerId, customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/favourites/${providerId}${q}`, { method: 'DELETE' });
-    },
-    getAddresses: (customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/addresses${q}`);
-    },
-    addAddress: (addressData, customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/addresses${q}`, {
-        method: 'POST',
-        body: JSON.stringify(addressData),
-      });
-    },
-    deleteAddress: (addressId, customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/addresses/${addressId}${q}`, { method: 'DELETE' });
-    },
-    updateProfile: (profileData, customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/customer/profile${q}`, {
-        method: 'PUT',
-        body: JSON.stringify(profileData),
-      });
-    },
+    favourites: () => get('/customer/favourites'),
+    favouriteIds: () => get('/customer/favourites/ids'),
+    addFavourite: (id) => put(`/customer/favourites/${id}`),
+    removeFavourite: (id) => del(`/customer/favourites/${id}`),
+    addresses: () => get('/customer/addresses'),
+    addAddress: (d) => post('/customer/addresses', d),
+    updateAddress: (id, d) => put(`/customer/addresses/${id}`, d),
+    deleteAddress: (id) => del(`/customer/addresses/${id}`),
+    updateProfile: (d) => put('/customer/profile', d),
   },
-
-  // Bookings & Negotiations
   bookings: {
-    create: (bookingData, customerId) => {
-      const q = customerId ? `?customerId=${customerId}` : '';
-      return request(`/bookings${q}`, {
-        method: 'POST',
-        body: JSON.stringify(bookingData),
-      });
-    },
-    getById: (bookingId) => request(`/bookings/${bookingId}`),
-    getCustomerBookings: (customerId) => request(`/bookings/customer/${customerId}`),
-    getProviderBookings: (providerId) => request(`/bookings/provider/${providerId}`),
-    updateStatus: (bookingId, status) => request(`/bookings/${bookingId}/status?status=${status}`, { method: 'PUT' }),
-    cancel: (bookingId) => request(`/bookings/${bookingId}/cancel`, { method: 'POST' }),
-    getMyBookings: (params = {}) => {
-      const sp = new URLSearchParams(params).toString();
-      return request(`/bookings/my${sp ? `?${sp}` : ''}`);
-    },
-    respond: (bookingId, providerId, action, rejectionReason) =>
-      request(`/bookings/${bookingId}/respond?providerId=${providerId}`, {
-        method: 'POST',
-        body: JSON.stringify({ action, rejectionReason }),
-      }),
-    submitQuotation: (bookingId, providerId, items, providerNotes) =>
-      request(`/bookings/${bookingId}/quotation?providerId=${providerId}`, {
-        method: 'POST',
-        body: JSON.stringify({ items, providerNotes }),
-      }),
-    lockAndCheckout: (bookingId) =>
-      request(`/bookings/${bookingId}/lock-and-checkout`, { method: 'POST' }),
-    updateChecklist: (bookingId, statusStep, latitude, longitude) =>
-      request(`/bookings/${bookingId}/checklist`, {
-        method: 'POST',
-        body: JSON.stringify({ statusStep, latitude, longitude }),
-      }),
-    complete: (bookingId) =>
-      request(`/bookings/${bookingId}/complete`, { method: 'POST' }),
+    create: (d) => post('/bookings', d),
+    list: (scope = 'all', page = 0) => get(`/bookings?scope=${scope}&page=${page}`),
+    get: (id) => get(`/bookings/${id}`),
+    accept: (id, reason) => post(`/bookings/${id}/accept`, { reason }),
+    reject: (id, reason) => post(`/bookings/${id}/reject`, { reason }),
+    clarify: (id, message) => post(`/bookings/${id}/clarify`, { message }),
+    quote: (id, d) => post(`/bookings/${id}/quotation`, d),
+    complete: (id) => post(`/bookings/${id}/complete`),
+    acceptQuote: (id) => post(`/bookings/${id}/quotation/accept`),
+    declineQuote: (id, reason) => post(`/bookings/${id}/quotation/decline`, { reason }),
+    cancel: (id, reason) => post(`/bookings/${id}/cancel`, { reason }),
   },
-
-  // Payments & Escrow
-  payments: {
-    createOrder: (bookingId, paymentStage = 'ADVANCE_30') =>
-      request('/payments/create-order', {
-        method: 'POST',
-        body: JSON.stringify({ bookingId, paymentStage }),
-      }),
-    verify: (paymentPayload) =>
-      request('/payments/verify', {
-        method: 'POST',
-        body: JSON.stringify(paymentPayload),
-      }),
-  },
-
-  // Reviews & Ratings
   reviews: {
-    submit: (reviewData) =>
-      request('/reviews', {
-        method: 'POST',
-        body: JSON.stringify(reviewData),
-      }),
-    getByProvider: (providerId) => request(`/reviews/provider/${providerId}`),
+    submit: (d) => post('/reviews', d),
   },
-
-  // Availability & Calendar
-  availability: {
-    getSlots: (providerId, startDate, endDate) => {
-      const q = new URLSearchParams();
-      if (startDate) q.append('startDate', startDate);
-      if (endDate) q.append('endDate', endDate);
-      return request(`/availability/provider/${providerId}?${q.toString()}`);
-    },
-    blockDate: (providerId, date, timeSlot = 'FULL_DAY') =>
-      request(`/availability/provider/${providerId}/block?date=${date}&timeSlot=${timeSlot}`, {
-        method: 'POST',
-      }),
-    unblockDate: (providerId, date) =>
-      request(`/availability/provider/${providerId}/unblock?date=${date}`, {
-        method: 'POST',
-      }),
+  notifications: {
+    list: (page = 0) => get(`/notifications?page=${page}`),
+    unread: () => get('/notifications/unread-count'),
+    read: (id) => post(`/notifications/${id}/read`),
+    readAll: () => post('/notifications/read-all'),
   },
-
-  // Platform Administration
+  payments: {
+    config: () => get('/payments/config'),
+    order: (bookingId) => post('/payments/orders', { bookingId }),
+    verify: (d) => post('/payments/verify', d),
+  },
+  media: {
+    uploadAuth: () => get('/media/upload-auth'),
+  },
   admin: {
-    getDashboardMetrics: () => request('/admin/dashboard'),
-    getPendingKYC: () => request('/admin/kyc/pending'),
-    verifyProvider: (providerId, decision, remarks) =>
-      request(`/admin/providers/${providerId}/verify`, {
-        method: 'POST',
-        body: JSON.stringify({ decision, remarks }),
-      }),
-    getAuditLogs: () => request('/admin/audit-logs'),
-    getAllBookings: () => request('/admin/bookings'),
-    getAllUsers: () => request('/admin/users'),
-    suspendUser: (userId) => request(`/admin/users/${userId}/suspend`, { method: 'POST' }),
-    restoreUser: (userId) => request(`/admin/users/${userId}/restore`, { method: 'POST' }),
-    getFinance: () => request('/admin/finance'),
+    dashboard: () => get('/admin/dashboard'),
+    providers: (params) => get(`/admin/providers${toQuery(params)}`),
+    provider: (id) => get(`/admin/providers/${id}`),
+    verify: (id, decision, note) => post(`/admin/providers/${id}/verification`, { decision, note }),
+    customers: (params) => get(`/admin/customers${toQuery(params)}`),
+    setUserStatus: (id, status, reason) => post(`/admin/users/${id}/status`, { status, reason }),
+    bookings: (params) => get(`/admin/bookings${toQuery(params)}`),
+    finance: () => get('/admin/finance'),
+    team: () => get('/admin/invitations'),
+    invite: (email, role) => post('/admin/invitations', { email, role }),
+    revokeInvite: (id) => del(`/admin/invitations/${id}`),
+    settings: () => get('/admin/settings'),
+    updateSetting: (key, value) => put(`/admin/settings/${encodeURIComponent(key)}`, { value }),
+    audit: (page = 0) => get(`/admin/audit-logs?page=${page}`),
   },
 };
 

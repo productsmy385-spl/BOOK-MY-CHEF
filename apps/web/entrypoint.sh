@@ -1,15 +1,11 @@
 #!/bin/sh
-# Generate runtime environment configuration for production SPA deployment
-# Injects Railway container environment variables into window.__ENV__
+# Writes runtime configuration for the SPA from the container environment.
+# Only public values belong here (publishable key, API URL) — never secrets.
 
 cat <<EOF > /usr/share/nginx/html/env-config.js
 window.__ENV__ = {
-  VITE_CLERK_PUBLISHABLE_KEY: "${VITE_CLERK_PUBLISHABLE_KEY:-$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}",
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:-$VITE_CLERK_PUBLISHABLE_KEY}",
-  VITE_API_BASE_URL: "${VITE_API_BASE_URL}",
-  VITE_RAZORPAY_KEY_ID: "${VITE_RAZORPAY_KEY_ID}",
-  VITE_IMAGEKIT_URL_ENDPOINT: "${VITE_IMAGEKIT_URL_ENDPOINT}",
-  VITE_GOOGLE_MAPS_API_KEY: "${VITE_GOOGLE_MAPS_API_KEY}"
+  VITE_CLERK_PUBLISHABLE_KEY: "${VITE_CLERK_PUBLISHABLE_KEY}",
+  VITE_API_BASE_URL: "${VITE_API_BASE_URL}"
 };
 EOF
 

@@ -57,3 +57,7 @@ Thumbs.db
 
 # Docker & local data
 postgres_data/
+
+# Playwright
+apps/web/test-results/
+apps/web/playwright-report/

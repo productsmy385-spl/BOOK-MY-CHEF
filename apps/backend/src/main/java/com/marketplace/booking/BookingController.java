@@ -1,158 +1,102 @@
 package com.marketplace.booking;
 
-import com.marketplace.booking.dto.*;
+import com.marketplace.common.ApiException;
 import com.marketplace.common.ApiResponse;
+import com.marketplace.common.PageResponse;
 import com.marketplace.identity.AuthenticatedUserPrincipal;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Booking endpoints. The caller's identity and role come from the verified
+ * token; ownership of each booking is checked in {@link BookingService}.
+ */
 @RestController
 @RequestMapping("/api/v1/bookings")
 @RequiredArgsConstructor
-@Tag(name = "Bookings & Negotiations", description = "Quotation requests, instant bookings, status transitions, and day-of execution")
+@Tag(name = "Bookings")
 public class BookingController {
 
-    private final BookingService bookingService;
+    private final BookingService bookings;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN') or isAuthenticated()")
-    @Operation(summary = "Create initial booking or quotation request")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> createBooking(
-            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
-            @RequestParam(required = false) UUID customerId,
-            @Valid @RequestBody CreateBookingRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> create(@AuthenticationPrincipal AuthenticatedUserPrincipal u,
+                                                                   @Valid @RequestBody BookingRequests.Create body) {
+        if (!"CUSTOMER".equals(u.getUserType())) {
+            throw ApiException.forbidden();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(bookings.create(u.getUserId(), body), "Booking request sent"));
+    }
 
-        // Resolve authenticated customer ID, preventing arbitrary spoofing
-        UUID effectiveCustomerId = principal != null ? principal.getUserId()
-                : (customerId != null ? customerId : UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
-
-        BookingResponseDto response = bookingService.createBooking(effectiveCustomerId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response, "Booking request submitted successfully"));
+    @GetMapping
+    public ApiResponse<PageResponse<Map<String, Object>>> mine(@AuthenticationPrincipal AuthenticatedUserPrincipal u,
+                                                               @RequestParam(defaultValue = "all") String scope,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "20") int size) {
+        if ("ADMIN".equals(u.getUserType())) throw ApiException.forbidden();
+        return ApiResponse.ok(bookings.listMine(u, scope, page, size));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get booking details by ID")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> getBookingById(@PathVariable UUID id) {
-        BookingResponseDto response = bookingService.getBookingById(id);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Booking details retrieved successfully"));
+    public ApiResponse<Map<String, Object>> get(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id) {
+        return ApiResponse.ok(bookings.get(id, u.getUserId(), u.getUserType()));
     }
 
-    @GetMapping("/my")
-    @Operation(summary = "Get authenticated user bookings")
-    public ResponseEntity<ApiResponse<List<BookingResponseDto>>> getMyBookings(
-            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
-            @RequestParam(required = false) UUID customerId,
-            @RequestParam(required = false) UUID providerId) {
-
-        List<BookingResponseDto> list;
-        if (principal != null) {
-            if ("PROVIDER".equalsIgnoreCase(principal.getUserType())) {
-                list = bookingService.getProviderBookings(providerId != null ? providerId : principal.getUserId());
-            } else {
-                list = bookingService.getCustomerBookings(principal.getUserId());
-            }
-        } else if (providerId != null) {
-            list = bookingService.getProviderBookings(providerId);
-        } else {
-            UUID effectiveCustId = customerId != null ? customerId : UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
-            list = bookingService.getCustomerBookings(effectiveCustId);
-        }
-        return ResponseEntity.ok(ApiResponse.ok(list, "Bookings retrieved"));
+    // ---- provider
+    @PostMapping("/{id}/accept")
+    public ApiResponse<Map<String, Object>> accept(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                   @Valid @RequestBody(required = false) BookingRequests.Reason body) {
+        return ApiResponse.ok(bookings.accept(u, id, body == null ? null : body.reason()), "Booking accepted");
     }
 
-    @GetMapping("/customer/{customerId}")
-    @Operation(summary = "Get bookings for a specific customer")
-    public ResponseEntity<ApiResponse<List<BookingResponseDto>>> getCustomerBookings(@PathVariable UUID customerId) {
-        List<BookingResponseDto> list = bookingService.getCustomerBookings(customerId);
-        return ResponseEntity.ok(ApiResponse.ok(list, "Customer bookings retrieved successfully"));
+    @PostMapping("/{id}/reject")
+    public ApiResponse<Map<String, Object>> reject(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                   @Valid @RequestBody(required = false) BookingRequests.Reason body) {
+        return ApiResponse.ok(bookings.reject(u, id, body == null ? null : body.reason()), "Request declined");
     }
 
-    @GetMapping("/provider/{providerId}")
-    @Operation(summary = "Get bookings for a specific provider")
-    public ResponseEntity<ApiResponse<List<BookingResponseDto>>> getProviderBookings(@PathVariable UUID providerId) {
-        List<BookingResponseDto> list = bookingService.getProviderBookings(providerId);
-        return ResponseEntity.ok(ApiResponse.ok(list, "Provider bookings retrieved successfully"));
-    }
-
-    @PutMapping("/{id}/status")
-    @Operation(summary = "Update booking status")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> updateBookingStatus(
-            @PathVariable UUID id,
-            @RequestParam String status) {
-        BookingResponseDto response = bookingService.updateStatus(id, status);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Booking status updated successfully"));
-    }
-
-    @PostMapping("/{id}/cancel")
-    @Operation(summary = "Cancel booking")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> cancelBooking(@PathVariable UUID id) {
-        BookingResponseDto response = bookingService.cancelBooking(id);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Booking cancelled successfully"));
-    }
-
-    @PostMapping("/{id}/respond")
-    @PreAuthorize("hasAnyRole('PROVIDER', 'ADMIN')")
-    @Operation(summary = "Provider accept or reject booking request")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> respondToBooking(
-            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
-            @PathVariable UUID id,
-            @RequestParam(required = false) UUID providerId,
-            @Valid @RequestBody ProviderRespondRequest request) {
-
-        UUID effectiveProviderId = providerId != null ? providerId
-                : (principal != null ? principal.getUserId() : UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
-
-        BookingResponseDto response = bookingService.respondToBooking(effectiveProviderId, id, request);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Provider responded successfully"));
+    @PostMapping("/{id}/clarify")
+    public ApiResponse<Map<String, Object>> clarify(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                    @Valid @RequestBody BookingRequests.Message body) {
+        return ApiResponse.ok(bookings.askClarification(u, id, body.message()), "Question sent to the customer");
     }
 
     @PostMapping("/{id}/quotation")
-    @PreAuthorize("hasAnyRole('PROVIDER', 'ADMIN')")
-    @Operation(summary = "Provider submit custom itemized quotation")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> submitQuotation(
-            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
-            @PathVariable UUID id,
-            @RequestParam(required = false) UUID providerId,
-            @Valid @RequestBody QuotationRequest request) {
-
-        UUID effectiveProviderId = providerId != null ? providerId
-                : (principal != null ? principal.getUserId() : UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
-
-        BookingResponseDto response = bookingService.submitQuotation(effectiveProviderId, id, request);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Quotation submitted successfully"));
-    }
-
-    @PostMapping("/{id}/lock-and-checkout")
-    @Operation(summary = "Lock slot for 15 minutes and proceed to Razorpay escrow checkout")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> lockAndCheckout(@PathVariable UUID id) {
-        BookingResponseDto response = bookingService.lockAndCheckout(id);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Slot locked successfully. Proceed to payment."));
-    }
-
-    @PostMapping("/{id}/checklist")
-    @Operation(summary = "Update live event milestone (en route, arrived, cooking, served)")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> updateChecklist(
-            @PathVariable UUID id,
-            @Valid @RequestBody EventChecklistRequest request) {
-
-        BookingResponseDto response = bookingService.updateEventChecklist(id, request);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Event checklist milestone updated"));
+    public ApiResponse<Map<String, Object>> quote(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                  @Valid @RequestBody BookingRequests.Quote body) {
+        return ApiResponse.ok(bookings.quote(u, id, body), "Quotation sent");
     }
 
     @PostMapping("/{id}/complete")
-    @Operation(summary = "Customer confirms event completion and triggers escrow release")
-    public ResponseEntity<ApiResponse<BookingResponseDto>> completeBooking(@PathVariable UUID id) {
-        BookingResponseDto response = bookingService.completeBookingAndReleaseEscrow(id);
-        return ResponseEntity.ok(ApiResponse.ok(response, "Service confirmed completed and escrow released to provider"));
+    public ApiResponse<Map<String, Object>> complete(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id) {
+        return ApiResponse.ok(bookings.complete(u, id), "Marked as completed");
+    }
+
+    // ---- customer
+    @PostMapping("/{id}/quotation/accept")
+    public ApiResponse<Map<String, Object>> acceptQuote(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id) {
+        return ApiResponse.ok(bookings.acceptQuote(u, id), "Quotation accepted");
+    }
+
+    @PostMapping("/{id}/quotation/decline")
+    public ApiResponse<Map<String, Object>> declineQuote(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                         @Valid @RequestBody(required = false) BookingRequests.Reason body) {
+        return ApiResponse.ok(bookings.declineQuote(u, id, body == null ? null : body.reason()), "Quotation declined");
+    }
+
+    // ---- either side
+    @PostMapping("/{id}/cancel")
+    public ApiResponse<Map<String, Object>> cancel(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                   @Valid @RequestBody(required = false) BookingRequests.Reason body) {
+        return ApiResponse.ok(bookings.cancel(u, id, body == null ? null : body.reason()), "Booking cancelled");
     }
 }
