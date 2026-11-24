@@ -5,8 +5,59 @@ import { api } from '../../services/api';
 import PromoCard from '../../components/marketing/PromoCard';
 import { useCatalog } from '../../hooks/useCatalog';
 import { useFavourites } from '../../hooks/useFavourites';
-import { dateLabel, priceLabel, relativeTime, timeLabel, WEEKDAYS } from '../../lib/format';
+import { dateLabel, money, priceLabel, relativeTime, timeLabel, WEEKDAYS } from '../../lib/format';
 import { Alert, Avatar, Badge, Button, EmptyState, Spinner, cx } from '../../components/ui';
+import { DietMark } from '../../components/menu/MenuBits';
+
+/** Set menus and dishes, read-only. Customers choose from them in the booking form. */
+function MenuSection({ providerId, catalog }) {
+  const { data } = useQuery({ queryKey: ['menu', providerId], queryFn: () => api.providers.menu(providerId) });
+  if (!data || (!data.items.length && !data.menus.length)) return null;
+  const byCourse = data.items.reduce((acc, i) => ((acc[i.course] ||= []).push(i), acc), {});
+  return (
+    <section>
+      <h2 className="t-h3 mb-1">Menu</h2>
+      <p className="t-small text-muted mb-3">Pick a set menu or build your own when you request a booking.</p>
+      {data.menus.length > 0 && (
+        <div className="grid sm:grid-cols-2 gap-3 mb-5">
+          {data.menus.map((m) => (
+            <div key={m.id} className="panel p-4 min-w-0">
+              <div className="flex items-baseline justify-between gap-3">
+                <h3 className="t-h4 break-words">{m.name}</h3>
+                <span className="t-small font-semibold whitespace-nowrap">{money(m.pricePerPerson)}<span className="t-caption"> /person</span></span>
+              </div>
+              <p className="t-caption mt-0.5">{catalog.menu.mealLabels[m.mealType]}{(m.minGuests || m.maxGuests) && ` · ${m.minGuests || 1}–${m.maxGuests || 'any'} guests`}</p>
+              <ul className="mt-2 flex flex-col gap-1 t-small">
+                {m.sections.map((s) => (
+                  <li key={s.id} className="break-words"><span className="font-medium">{s.title}</span>
+                    <span className="text-muted"> · choose {s.chooseMin === s.chooseMax ? s.chooseMax : `${s.chooseMin}–${s.chooseMax}`} of {s.items.length}</span></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      {Object.entries(byCourse).map(([course, items]) => (
+        <div key={course} className="mb-4">
+          <h3 className="t-label mb-1.5">{catalog.menu.courseLabels[course] || course}</h3>
+          <ul className="divide-y divide-line">
+            {items.map((i) => (
+              <li key={i.id} className="py-2 flex items-start gap-3">
+                <DietMark diet={i.diet} className="mt-1" />
+                <div className="min-w-0 flex-1">
+                  <p className="t-small font-medium break-words">{i.name}</p>
+                  {i.description && <p className="t-caption break-words">{i.description}</p>}
+                  {i.allergens.length > 0 && <p className="t-caption">Contains: {i.allergens.map((a) => catalog.menu.allergenLabels[a] || a).join(', ')}</p>}
+                </div>
+                <span className="t-small whitespace-nowrap">{money(i.pricePerPerson)}<span className="t-caption"> /person</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+  );
+}
 
 export default function ProviderProfile() {
   const { id } = useParams();
@@ -116,6 +167,8 @@ export default function ProviderProfile() {
                 ))}
               </div>
             </section>
+
+            <MenuSection providerId={p.id} catalog={catalog} />
 
             {p.portfolio.length > 0 && (
               <section>

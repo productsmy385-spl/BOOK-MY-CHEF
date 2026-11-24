@@ -1,5 +1,6 @@
 package com.marketplace.booking;
 
+import com.marketplace.menu.MenuRequests;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -30,7 +31,9 @@ public final class BookingRequests {
             @DecimalMin(value = "0", message = "Budget cannot be negative") @DecimalMax("100000000") BigDecimal budget,
             @Size(max = 2000, message = "Instructions are too long") String specialInstructions,
             /* Category-specific answers (menu, occasion, dietary needs, ...). Small flat map of strings. */
-            @Size(max = 20) Map<@Size(max = 50) String, @Size(max = 1000) String> details) {
+            @Size(max = 20) Map<@Size(max = 50) String, @Size(max = 1000) String> details,
+            /* Optional menu: a set menu with choices, or the customer's own dishes. Priced on the server. */
+            @Valid MenuRequests.Selection menu) {
     }
 
     public record Message(@NotBlank(message = "Write a message") @Size(max = 1000) String message) {

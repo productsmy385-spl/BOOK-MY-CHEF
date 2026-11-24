@@ -6,6 +6,18 @@ import { api } from '../../services/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { BOOKING_STATUS, dateLabel, money, relativeTime, timeLabel } from '../../lib/format';
 import { Alert, Avatar, Badge, Button, Drawer, EmptyState, Field, Modal, Spinner, cx } from '../../components/ui';
+import { BookingMenu } from '../../components/menu/MenuBits';
+
+/** First quotation line: the chosen menu (per person × guests) when there is one, else the service. */
+function initialQuoteItems(b) {
+  const lines = b.menuLines || [];
+  if (lines.length) {
+    const setLine = lines.find((l) => l.type === 'SET_MENU');
+    const perPerson = lines.reduce((s, l) => s + Number(l.unitPricePerPerson), 0);
+    return [{ description: `${setLine ? setLine.name : 'Custom menu'} (per person)`, unitPrice: String(perPerson), quantity: String(b.guests || 1) }];
+  }
+  return [{ description: b.serviceTitle || '', unitPrice: '', quantity: String(b.guests || 1) }];
+}
 
 const DETAIL_LABELS = { menu: 'Menu', dietary: 'Food preference', ingredients: 'Ingredients', kitchen: 'Kitchen', occasion: 'Occasion', venue: 'Venue', hours: 'Hours', days: 'Days' };
 
@@ -95,6 +107,7 @@ export default function BookingDetail({ viewer }) {
         </div>
       )}
 
+      <BookingMenu booking={b} catalog={catalog} />
       {b.quotation && <Quotation q={b.quotation} />}
 
       {(other.phone || other.email) && (
@@ -202,7 +215,7 @@ function ReasonModal({ open, kind, value, onChange, onClose, onConfirm, loading,
 }
 
 function QuoteBuilder({ open, onClose, booking, onSubmit, loading, error }) {
-  const [items, setItems] = useState([{ description: booking.serviceTitle || '', unitPrice: '', quantity: String(booking.guests || 1) }]);
+  const [items, setItems] = useState(() => initialQuoteItems(booking));
   const [extra, setExtra] = useState({ travelCharges: '', ingredientCharges: '', staffCharges: '', notes: '' });
   const num = (v) => Number(v) || 0;
   const total = items.reduce((s, i) => s + num(i.unitPrice) * num(i.quantity), 0) + num(extra.travelCharges) + num(extra.ingredientCharges) + num(extra.staffCharges);

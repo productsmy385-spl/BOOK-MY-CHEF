@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Bell, CalendarDays, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, Store, UserRound } from 'lucide-react';
+import { Bell, CalendarDays, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, Store, UserRound, UtensilsCrossed } from 'lucide-react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { Avatar, Drawer, cx } from '../ui';
 import Brand from './Brand';
@@ -10,9 +10,12 @@ const NAV = [
   { to: '/provider/dashboard', label: 'Overview', icon: LayoutDashboard },
   { to: '/provider/bookings', label: 'Bookings', icon: ClipboardList },
   { to: '/provider/services', label: 'Services', icon: Store },
+  // Side navigation only; on mobile it is reached from the Services page and the menu drawer.
+  { to: '/provider/menu', label: 'Food menu', icon: UtensilsCrossed, sideOnly: true },
   { to: '/provider/calendar', label: 'Calendar', icon: CalendarDays },
   { to: '/provider/profile', label: 'Profile', icon: UserRound },
 ];
+const BOTTOM_NAV = NAV.filter((n) => !n.sideOnly);
 
 export default function ProviderLayout() {
   const { account, logout } = useAuthStore();
@@ -68,7 +71,7 @@ export default function ProviderLayout() {
       {!inSetup && (
         <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-line pb-safe" aria-label="Partner">
           <div className="grid grid-cols-5 h-16">
-            {NAV.map((n) => (
+            {BOTTOM_NAV.map((n) => (
               <NavLink key={n.to} to={n.to}
                 className={({ isActive }) => cx('flex flex-col items-center justify-center gap-1 text-[11px] font-medium', isActive ? 'text-navy' : 'text-muted')}>
                 <n.icon className="w-[22px] h-[22px]" aria-hidden /> {n.label}

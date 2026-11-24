@@ -36,6 +36,11 @@ export function ProviderServicesPage() {
       <Card title="Your services" hint="Each service has its own price and guest limits."><ServicesSection me={me} /></Card>
       <Card title="Service categories" hint="What kinds of work you take on."><CategoriesSection key={me.categories.join()} me={me} /></Card>
       {culinary && <Card title="Cuisines"><CuisinesSection me={me} /></Card>}
+      {culinary && (
+        <Card title="Food menu" hint="Dishes and set menus customers can choose when they book you, priced per person.">
+          <Link to="/provider/menu" className="btn btn-outline">Manage food menu</Link>
+        </Card>
+      )}
     </div>
   );
 }

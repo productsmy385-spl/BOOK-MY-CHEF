@@ -14,7 +14,16 @@ export function useCatalog() {
     const pricingLabels = Object.fromEntries(pricingModels.map((p) => [p.code, p.label]));
     const modeLabels = Object.fromEntries(deliveryModes.map((m) => [m.code, m.label]));
     const cuisineLabels = Object.fromEntries((data?.cuisines || []).map((c) => [c.code, c.label]));
+    const m = data?.menu || {};
+    const labels = (list) => Object.fromEntries((list || []).map((o) => [o.code, o.label]));
+    const menu = {
+      courses: m.courses || [], diets: m.diets || [], spiceLevels: m.spiceLevels || [],
+      allergens: m.allergens || [], mealTypes: m.mealTypes || [],
+      courseLabels: labels(m.courses), dietLabels: labels(m.diets), spiceLabels: labels(m.spiceLevels),
+      allergenLabels: labels(m.allergens), mealLabels: labels(m.mealTypes),
+    };
     return {
+      menu,
       categories,
       groups: data?.groups || [],
       cuisines: data?.cuisines || [],
