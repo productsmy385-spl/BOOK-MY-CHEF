@@ -3,7 +3,7 @@
 Status of the Enterprise Edition upgrade. Updated 2026-11-24.
 Legend: **Done** = implemented and verified by tests; **Partial** = works but has stated gaps; **Not started**.
 
-> The other `*_AUDIT.md`, `*_REPORT.md` and `EL100_*.md` files in this folder were written by
+> Older `*_AUDIT.md`, `*_REPORT.md` and `EL100_*.md` files (now in `docs/archive/legacy-reports-2026-11-22/`) were written by
 > earlier tooling and do not describe the code accurately (for example, they report a working
 > build and real OTP authentication when the backend did not compile and tokens were never
 > verified). Treat this file and the code as the source of truth.
