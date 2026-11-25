@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.util.*;
 
@@ -35,6 +36,9 @@ public class MediaService {
 
     private final NamedParameterJdbcTemplate jdbc;
     private final ImageKitClient imageKit;
+
+    @org.springframework.beans.factory.annotation.Value("${app.public-web-url:http://localhost:5173}")
+    private String publicWebUrl;
 
     public String folderFor(AuthenticatedUserPrincipal u, String purpose) {
         if ("PROVIDER".equals(u.getUserType()) && PROVIDER_PURPOSES.containsKey(purpose)) {
@@ -101,7 +105,7 @@ public class MediaService {
     }
 
     private static final String SELECT = """
-            SELECT id, purpose, url, width, height, mime_type AS "mimeType", size_bytes AS "sizeBytes",
+            SELECT id, purpose, storage, url, width, height, mime_type AS "mimeType", size_bytes AS "sizeBytes",
                    source, ai_prompt AS "aiPrompt", created_at::text AS "createdAt"
             FROM media_assets""";
 
@@ -146,7 +150,7 @@ public class MediaService {
     @Transactional
     public void delete(AuthenticatedUserPrincipal u, UUID assetId) {
         List<Map<String, Object>> rows = jdbc.queryForList(
-                "SELECT owner_user_id, purpose, file_id FROM media_assets WHERE id = :id AND deleted_at IS NULL FOR UPDATE", Map.of("id", assetId));
+                "SELECT owner_user_id, purpose, file_id, storage FROM media_assets WHERE id = :id AND deleted_at IS NULL FOR UPDATE", Map.of("id", assetId));
         if (rows.isEmpty()) throw ApiException.notFound("Image");
         Map<String, Object> a = rows.get(0);
         boolean sharedAdminAsset = "ADMIN".equals(u.getUserType()) && ADMIN_PURPOSES.containsKey((String) a.get("purpose"));
@@ -156,8 +160,38 @@ public class MediaService {
                     OR EXISTS (SELECT 1 FROM provider_banners WHERE (desktop_asset_id = :id OR mobile_asset_id = :id) AND status <> 'ARCHIVED')""",
                 Map.of("id", assetId), Boolean.class);
         if (Boolean.TRUE.equals(used)) throw ApiException.conflict("This image is used by a banner. Archive the banner first.");
-        imageKit.deleteFile((String) a.get("file_id"));
+        // Bundled images ship with the web app; only ImageKit files are deleted remotely.
+        if ("IMAGEKIT".equals(a.get("storage"))) imageKit.deleteFile((String) a.get("file_id"));
         jdbc.update("UPDATE media_assets SET deleted_at = now() WHERE id = :id", Map.of("id", assetId));
+    }
+
+    /**
+     * Copies a bundled image (served by the web app) into ImageKit and switches the asset to it.
+     * Every banner that uses the asset picks up the ImageKit URL automatically.
+     */
+    @Transactional
+    public Map<String, Object> copyBundledToImageKit(UUID assetId) {
+        imageKit.requireConfigured();
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "SELECT purpose, url, storage FROM media_assets WHERE id = :id AND deleted_at IS NULL FOR UPDATE", Map.of("id", assetId));
+        if (rows.isEmpty()) throw ApiException.notFound("Image");
+        Map<String, Object> a = rows.get(0);
+        if (!"BUNDLED".equals(a.get("storage"))) throw ApiException.conflict("This image is already stored in ImageKit.");
+        String path = (String) a.get("url");
+        byte[] bytes;
+        try {
+            bytes = RestClient.create().get().uri(publicWebUrl.replaceAll("/+$", "") + path).retrieve().body(byte[].class);
+        } catch (Exception e) {
+            throw ApiException.unavailable("Could not read the bundled image from the web app at " + publicWebUrl + ".");
+        }
+        if (bytes == null || bytes.length == 0) throw ApiException.unavailable("The bundled image is empty.");
+        String folder = "/book-my-chef/" + ("CAMPAIGN_ASSET".equals(a.get("purpose")) ? "campaign-assets" : "platform-banners");
+        JsonNode up = imageKit.uploadBytes(bytes, path.substring(path.lastIndexOf('/') + 1), folder);
+        jdbc.update("""
+                UPDATE media_assets SET storage = 'IMAGEKIT', file_id = :f, url = :u, file_path = :p, size_bytes = :s
+                WHERE id = :id""", new MapSqlParameterSource().addValue("f", up.path("fileId").asText()).addValue("u", up.path("url").asText())
+                .addValue("p", up.path("filePath").asText()).addValue("s", up.path("size").asLong(bytes.length)).addValue("id", assetId));
+        return jdbc.queryForMap(SELECT + " WHERE id = :id", Map.of("id", assetId));
     }
 
     private static Integer intOrNull(JsonNode n, String field) {

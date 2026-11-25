@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronRight, Rocket } from 'lucide-react';
+import { BadgeCheck, BarChart3, CalendarDays, ChevronRight, Inbox, Megaphone, Rocket, UserRound } from 'lucide-react';
+import BannerCarousel from '../../components/marketing/BannerCarousel';
 import { api } from '../../services/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -23,6 +24,8 @@ export default function ProviderDashboard() {
         subtitle={live ? (d.acceptingBookings ? 'Your profile is live and accepting bookings.' : 'Your profile is live but paused for new bookings.') : 'Your profile is not visible to customers yet.'}
         action={<Badge tone={v.tone}>{v.label}</Badge>} />
 
+      <BannerCarousel placement="PROVIDER_HOME" className="mb-6" />
+
       {!live && (
         <Link to="/provider/setup" className="card p-5 flex items-center gap-4 mb-6 border-sky bg-pale hover:shadow-raised transition-shadow">
           <Rocket className="w-6 h-6 text-navy shrink-0" />
@@ -34,7 +37,7 @@ export default function ProviderDashboard() {
         </Link>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div id="performance" className="grid grid-cols-2 lg:grid-cols-4 gap-3 scroll-mt-20">
         <Link to="/provider/bookings"><Stat label="New requests" value={d.newRequests} hint="Waiting for your reply" /></Link>
         <Stat label="Upcoming" value={d.upcoming} hint="Confirmed bookings" />
         <Stat label="Completed" value={d.completed} hint={d.cancelled ? `${d.cancelled} cancelled` : undefined} />
@@ -44,6 +47,35 @@ export default function ProviderDashboard() {
         <Stat label="Awaiting customer" value={d.awaitingCustomer} hint="Quotes or payment pending" />
         <Stat label="Rating" value={d.averageRating != null ? `${Number(d.averageRating).toFixed(1)} ★` : '—'} hint={d.reviewCount ? `${d.reviewCount} reviews` : 'No reviews yet'} />
       </div>
+
+      <section className="mt-8">
+        <h2 className="t-h3 mb-3">Grow your business</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            { to: live ? '/provider/profile' : '/provider/setup', icon: UserRound, title: 'Complete your professional profile',
+              text: live ? 'Keep your photos, description and service area up to date.' : 'Finish setup and publish to appear in search.' },
+            { to: '/provider/promotions', icon: Megaphone, title: 'Promote your services', text: 'Create a promotional banner for the homepage and your profile.' },
+            { to: '/provider/calendar', icon: CalendarDays, title: 'Manage your bookings', text: `${d.upcoming} upcoming. Block dates and set working hours.` },
+            { to: '/provider/profile#verification', icon: BadgeCheck, title: 'Improve your visibility',
+              text: d.verificationStatus === 'VERIFIED' ? 'You are verified. Add portfolio photos to stand out.' : 'Submit documents to earn the Verified badge.' },
+            { to: '/provider/bookings', icon: Inbox, title: 'Customer enquiries', text: d.newRequests ? `${d.newRequests} new request${d.newRequests === 1 ? '' : 's'} waiting for your reply.` : 'No new requests right now.' },
+            { to: '#performance', icon: BarChart3, title: 'Provider performance',
+              text: d.reviewCount ? `${Number(d.averageRating).toFixed(1)} ★ from ${d.reviewCount} reviews · ${d.completed} completed.` : `${d.completed} completed bookings so far.` },
+          ].map((c) => {
+            const body = (
+              <>
+                <span className="w-10 h-10 rounded-md bg-pale text-navy flex items-center justify-center shrink-0"><c.icon className="w-5 h-5" aria-hidden /></span>
+                <span className="min-w-0 flex-1"><span className="t-h4 block">{c.title}</span><span className="t-small text-muted block mt-0.5">{c.text}</span></span>
+                <ChevronRight className="w-4 h-4 text-muted shrink-0" aria-hidden />
+              </>
+            );
+            const cls = 'panel p-4 flex items-start gap-3 hover:border-sky hover:bg-pale/40 transition-colors';
+            return c.to.startsWith('#')
+              ? <a key={c.title} href={c.to} className={cls}>{body}</a>
+              : <Link key={c.title} to={c.to} className={cls}>{body}</Link>;
+          })}
+        </div>
+      </section>
 
       <div className="grid lg:grid-cols-2 gap-6 mt-8">
         <section>

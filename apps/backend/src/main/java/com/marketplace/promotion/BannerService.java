@@ -32,7 +32,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BannerService {
 
-    public static final Set<String> PLACEMENTS = Set.of("HOME", "SIGN_IN", "REGISTER", "EXPLORE", "CATEGORY");
+    public static final Set<String> PLACEMENTS = Set.of("HOME", "SIGN_IN", "REGISTER", "EXPLORE", "CATEGORY",
+            "PROVIDER_HOME", "PROVIDER_SIGN_IN", "PROVIDER_REGISTER");
     private static final Set<String> PLATFORM_ASSETS = Set.of("PLATFORM_BANNER", "CAMPAIGN_ASSET");
     private static final Set<String> PROVIDER_ASSETS = Set.of("PROVIDER_BANNER");
     private static final String PLATFORM_LIVE = "b.status = 'PUBLISHED' AND (b.start_at IS NULL OR b.start_at <= now()) AND (b.end_at IS NULL OR b.end_at > now())";
@@ -144,7 +145,7 @@ public class BannerService {
         UUID id = jdbc.queryForObject("""
                 INSERT INTO platform_banners (title, subtitle, cta_text, destination_type, destination_ref, desktop_asset_id,
                     mobile_asset_id, placements, category, priority, rotation_seconds, start_at, end_at, created_by)
-                VALUES (:title, :subtitle, :cta, :dt, :dr, :desk, :mob, CAST(:pl AS varchar(16)[]), :cat, :prio, :rot, :start, :end, :by)
+                VALUES (:title, :subtitle, :cta, :dt, :dr, :desk, :mob, CAST(:pl AS varchar(32)[]), :cat, :prio, :rot, :start, :end, :by)
                 RETURNING id""", platformParams(in).addValue("by", admin.getUserId()), UUID.class);
         return platformById(id);
     }
@@ -154,7 +155,7 @@ public class BannerService {
         validatePlatform(admin, in);
         int n = jdbc.update("""
                 UPDATE platform_banners SET title = :title, subtitle = :subtitle, cta_text = :cta, destination_type = :dt,
-                    destination_ref = :dr, desktop_asset_id = :desk, mobile_asset_id = :mob, placements = CAST(:pl AS varchar(16)[]),
+                    destination_ref = :dr, desktop_asset_id = :desk, mobile_asset_id = :mob, placements = CAST(:pl AS varchar(32)[]),
                     category = :cat, priority = :prio, rotation_seconds = :rot, start_at = :start, end_at = :end, updated_at = now()
                 WHERE id = :id AND status <> 'ARCHIVED'""", platformParams(in).addValue("id", id));
         if (n == 0) throw ApiException.notFound("Campaign");
@@ -190,10 +191,19 @@ public class BannerService {
         return platformById(copy);
     }
 
+    /** Changes display order (higher priority shows first). */
+    @Transactional
+    public Map<String, Object> setPriority(UUID id, int priority) {
+        if (jdbc.update("UPDATE platform_banners SET priority = :p, updated_at = now() WHERE id = :id",
+                Map.of("p", Math.max(-100, Math.min(100, priority)), "id", id)) == 0) throw ApiException.notFound("Campaign");
+        return platformById(id);
+    }
+
+    /** Deletes a draft or archived campaign (published ones must be unpublished or archived first). */
     @Transactional
     public void deletePlatformDraft(UUID id) {
         Map<String, Object> b = platformById(id);
-        if (!"DRAFT".equals(b.get("status"))) throw ApiException.conflict("Only drafts can be deleted. Archive published campaigns.");
+        if ("PUBLISHED".equals(b.get("status"))) throw ApiException.conflict("Unpublish or archive this campaign before deleting it.");
         jdbc.update("DELETE FROM banner_events WHERE banner_kind = 'PLATFORM' AND banner_id = :id", Map.of("id", id));
         jdbc.update("DELETE FROM platform_banners WHERE id = :id", Map.of("id", id));
     }

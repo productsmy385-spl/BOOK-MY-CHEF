@@ -30,6 +30,7 @@ public class PromotionAdminController {
     private final BannerService banners;
     private final DiscoveryService discovery;
     private final AiImageService ai;
+    private final com.marketplace.media.MediaService media;
 
     // ------------------------------------------------------------------ campaigns
 
@@ -94,12 +95,33 @@ public class PromotionAdminController {
         return ApiResponse.ok(out, "Campaign updated");
     }
 
+    public record PriorityBody(@NotNull @Min(-100) @Max(100) Integer priority) {
+    }
+
+    @PutMapping("/banners/{id}/priority")
+    public ApiResponse<Map<String, Object>> priority(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                     @Valid @RequestBody PriorityBody b, HttpServletRequest req) {
+        support.require(u, AdminSupport.OPS);
+        Map<String, Object> out = banners.setPriority(id, b.priority());
+        support.audit(u, "CAMPAIGN_REORDERED", "PLATFORM_BANNER", id, null, Map.of("priority", b.priority()), req);
+        return ApiResponse.ok(out, "Order updated");
+    }
+
+    @PostMapping("/media/{id}/copy-to-imagekit")
+    public ApiResponse<Map<String, Object>> copyToImageKit(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id,
+                                                           HttpServletRequest req) {
+        support.require(u, AdminSupport.OPS);
+        Map<String, Object> out = media.copyBundledToImageKit(id);
+        support.audit(u, "MEDIA_COPIED_TO_IMAGEKIT", "MEDIA_ASSET", id, null, Map.of("url", String.valueOf(out.get("url"))), req);
+        return ApiResponse.ok(out, "Image copied to ImageKit");
+    }
+
     @DeleteMapping("/banners/{id}")
     public ApiResponse<Void> deleteDraft(@AuthenticationPrincipal AuthenticatedUserPrincipal u, @PathVariable UUID id, HttpServletRequest req) {
         support.require(u, AdminSupport.OPS);
         banners.deletePlatformDraft(id);
         support.audit(u, "CAMPAIGN_DELETED", "PLATFORM_BANNER", id, null, null, req);
-        return ApiResponse.ok(null, "Draft deleted");
+        return ApiResponse.ok(null, "Campaign deleted");
     }
 
     // ------------------------------------------------------------------ provider promotions

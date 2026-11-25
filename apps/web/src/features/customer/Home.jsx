@@ -44,6 +44,9 @@ export default function Home() {
       <Rail title="Featured chefs" hint="Selected by Book My Chef" query={{ key: ['featured'], fn: () => api.public.featured(10) }} catalog={catalog} />
       <TopRated catalog={catalog} city={city} />
       <Nearby catalog={catalog} />
+      <Rail title="Popular catering services" hint="Caterers ranked by genuine reviews"
+        query={{ key: ['popularCatering'], fn: () => api.search({ category: 'CATERER', sort: 'rating', size: 6 }).then((r) => r.items) }}
+        catalog={catalog} seeAll="/explore?category=CATERER&sort=rating" />
       <Promotions catalog={catalog} />
 
       <section className="page mt-10">

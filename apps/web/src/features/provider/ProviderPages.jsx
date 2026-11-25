@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../../services/api';
@@ -47,6 +47,10 @@ export function ProviderServicesPage() {
 
 export function ProviderProfilePage() {
   const { me, loading } = useMe();
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (me && hash) document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [me, hash]);
   if (loading) return loading;
   return (
     <div className="page max-w-3xl pb-10 flex flex-col gap-5">

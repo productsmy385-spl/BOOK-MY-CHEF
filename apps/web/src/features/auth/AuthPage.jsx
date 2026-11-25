@@ -28,22 +28,55 @@ const COPY = {
 
 const MOBILE = /^(\+91[\s-]?)?[6-9]\d{9}$/;
 
-export default function AuthPage({ role }) {
-  if (!isClerkConfigured()) {
-    return (
-      <div className="min-h-screen flex flex-col bg-canvas">
-        <header className="h-16 flex items-center px-4 sm:px-6 bg-white border-b border-line"><Brand /></header>
-        <main className="flex-1 flex justify-center px-4 py-12">
-          <div className="w-full max-w-[440px] flex flex-col gap-5">
-            {role === 'CUSTOMER' && <BannerCarousel placement="SIGN_IN" variant="compact" />}
-            <div className="card p-6 sm:p-8 flex flex-col gap-4">
-              <h1 className="t-h2">{COPY[role].title.signin}</h1>
-              <Alert tone="warning">Sign-in is temporarily unavailable. Please try again later.</Alert>
-              <Link to="/" className="btn btn-outline">Browse the marketplace</Link>
-            </div>
+/** Banner placement for an auth page, or null (admins see no promotions). */
+function placementFor(role, mode) {
+  if (role === 'CUSTOMER') return mode === 'register' ? 'REGISTER' : 'SIGN_IN';
+  if (role === 'PROVIDER') return mode === 'register' ? 'PROVIDER_REGISTER' : 'PROVIDER_SIGN_IN';
+  return null;
+}
+
+/**
+ * Auth page frame. Desktop: split screen with a full-height campaign panel on the left.
+ * Mobile: compact banner above the form (hidden while entering the OTP code).
+ */
+function AuthShell({ role, mode, showBanner = true, children }) {
+  const placement = placementFor(role, mode);
+  return (
+    <div className="min-h-screen flex bg-canvas">
+      {placement && (
+        <aside className="hidden lg:block lg:w-[46%] xl:w-1/2 sticky top-0 h-screen p-4 pr-0">
+          <BannerCarousel key={placement} placement={placement} variant="panel" className="h-full" />
+        </aside>
+      )}
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-16 flex items-center px-4 sm:px-6 bg-white border-b border-line lg:bg-transparent lg:border-0">
+          <Brand to={role === 'ADMIN' ? '/admin/login' : '/'} />
+        </header>
+        <main className="flex-1 flex justify-center px-4 py-6 sm:py-10">
+          <div className="w-full max-w-[440px]">
+            {placement && showBanner && (
+              <div className="lg:hidden mb-5">
+                <BannerCarousel key={placement} placement={placement} variant="compact" />
+              </div>
+            )}
+            {children}
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+export default function AuthPage({ role }) {
+  if (!isClerkConfigured()) {
+    return (
+      <AuthShell role={role} mode="signin">
+        <div className="card p-6 sm:p-8 flex flex-col gap-4">
+          <h1 className="t-h2">{COPY[role].title.signin}</h1>
+          <Alert tone="warning">Sign-in is temporarily unavailable. Please try again later.</Alert>
+          <Link to="/" className="btn btn-outline">Browse the marketplace</Link>
+        </div>
+      </AuthShell>
     );
   }
   return <AuthForm role={role} />;
@@ -152,15 +185,7 @@ function AuthForm({ role }) {
     setForm((f) => ({ ...f, roles: f.roles.includes(codeValue) ? f.roles.filter((r) => r !== codeValue) : [...f.roles, codeValue] }));
 
   return (
-    <div className="min-h-screen flex flex-col bg-canvas">
-      <header className="h-16 flex items-center px-4 sm:px-6 bg-white border-b border-line">
-        <Brand to={role === 'ADMIN' ? '/admin/login' : '/'} />
-      </header>
-      <main className="flex-1 flex justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-[440px]">
-          {role === 'CUSTOMER' && step === 'form' && (
-            <BannerCarousel key={mode} placement={mode === 'register' ? 'REGISTER' : 'SIGN_IN'} variant="compact" className="mb-5" />
-          )}
+    <AuthShell role={role} mode={mode} showBanner={step === 'form'}>
           <div className="card p-6 sm:p-8">
             {step === 'form' ? (
               <>
@@ -261,8 +286,6 @@ function AuthForm({ role }) {
             <p className="flex items-center justify-center gap-1.5 t-caption mt-5"><ShieldCheck className="w-4 h-4" /> Sign-ins are verified and recorded.</p>
           )}
           {busy && <Spinner label="Setting up your account" />}
-        </div>
-      </main>
-    </div>
+    </AuthShell>
   );
 }

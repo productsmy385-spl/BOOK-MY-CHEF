@@ -8,7 +8,10 @@ import { Alert, Badge, Button, Checkbox, Drawer, EmptyState, Field, Modal, PageH
 import ImageAssetPicker from '../../components/marketing/ImageAssetPicker';
 import { BANNER_STATUS } from '../provider/ProviderPromotions';
 
-const PLACEMENTS = [['HOME', 'Homepage carousel'], ['SIGN_IN', 'Customer sign-in'], ['REGISTER', 'Customer registration'], ['EXPLORE', 'Explore page'], ['CATEGORY', 'A service category']];
+const PLACEMENTS = [['HOME', 'Customer homepage carousel'], ['SIGN_IN', 'Customer sign-in'], ['REGISTER', 'Customer registration'], ['EXPLORE', 'Explore page'], ['CATEGORY', 'A service category'],
+  ['PROVIDER_HOME', 'Provider dashboard carousel'], ['PROVIDER_SIGN_IN', 'Provider sign-in'], ['PROVIDER_REGISTER', 'Provider registration']];
+const PROVIDER_PLACEMENTS = ['PROVIDER_HOME', 'PROVIDER_SIGN_IN', 'PROVIDER_REGISTER'];
+const audienceOf = (b) => (b.placements.every((p) => PROVIDER_PLACEMENTS.includes(p)) ? 'PROVIDER' : b.placements.some((p) => PROVIDER_PLACEMENTS.includes(p)) ? 'BOTH' : 'CUSTOMER');
 const CAMPAIGN_STATUS = { DRAFT: { label: 'Draft', tone: 'neutral' }, PUBLISHED: { label: 'Published', tone: 'green' }, ARCHIVED: { label: 'Archived', tone: 'neutral' } };
 const toLocal = (iso) => (iso ? iso.slice(0, 16).replace(' ', 'T') : '');
 const toIso = (local) => (local ? new Date(local).toISOString() : null);
@@ -21,11 +24,13 @@ const EMPTY_CAMPAIGN = { title: '', subtitle: '', ctaText: '', destinationType: 
 export function AdminCampaigns() {
   const qc = useQueryClient();
   const [status, setStatus] = useState('');
+  const [audience, setAudience] = useState('ALL');
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(null);
   const [preview, setPreview] = useState(null);
   const { data, isLoading, error } = useQuery({ queryKey: ['admin', 'campaigns', status, page], queryFn: () => api.admin.campaigns(status, page), placeholderData: keepPreviousData });
-  const act = useMutation({ mutationFn: ({ id, action }) => (action === 'delete' ? api.admin.deleteCampaign(id) : api.admin.campaignAction(id, action)),
+  const act = useMutation({ mutationFn: ({ id, action, priority }) => (action === 'delete' ? api.admin.deleteCampaign(id)
+    : action === 'priority' ? api.admin.setCampaignPriority(id, priority) : api.admin.campaignAction(id, action)),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'campaigns'] }) });
 
   const edit = (b) => setEditing({ id: b.id, title: b.title, subtitle: b.subtitle || '', ctaText: b.ctaText || '', destinationType: b.destinationType,
@@ -38,19 +43,27 @@ export function AdminCampaigns() {
         action={<Button icon={Plus} onClick={() => setEditing({ ...EMPTY_CAMPAIGN })}>New campaign</Button>} />
       <Tabs value={status} onChange={(v) => { setStatus(v); setPage(0); }}
         options={[{ value: '', label: 'Active' }, { value: 'DRAFT', label: 'Drafts' }, { value: 'PUBLISHED', label: 'Published' }, { value: 'ARCHIVED', label: 'Archived' }]} />
+      <div className="flex flex-wrap gap-2 mt-3">
+        {[['ALL', 'All audiences'], ['CUSTOMER', 'Customer console'], ['PROVIDER', 'Provider console']].map(([v, l]) => (
+          <button key={v} className={cx('chip', audience === v && 'chip-active')} aria-pressed={audience === v} onClick={() => setAudience(v)}>{l}</button>
+        ))}
+      </div>
       <Alert className="mt-3">{act.error?.message}</Alert>
       <div className="mt-4">
         {isLoading ? <Spinner /> : error ? <Alert>{error.message}</Alert> : !data.items.length ? (
           <EmptyState icon={Images} title="No campaigns here" action={<Button icon={Plus} onClick={() => setEditing({ ...EMPTY_CAMPAIGN })}>Create campaign</Button>} />
         ) : (
           <ul className="flex flex-col gap-3">
-            {data.items.map((b) => (
+            {data.items.filter((b) => audience === 'ALL' || audienceOf(b) === audience || audienceOf(b) === 'BOTH').map((b) => (
               <li key={b.id} className="card overflow-hidden flex flex-col md:flex-row">
                 <img src={b.desktopUrl} alt="" className="w-full md:w-72 aspect-[21/8] md:aspect-auto object-cover bg-canvas shrink-0" />
                 <div className="p-4 flex-1 min-w-0 flex flex-col gap-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <p className="t-h4 break-words">{b.title}</p>
-                    <Badge tone={CAMPAIGN_STATUS[b.status].tone}>{CAMPAIGN_STATUS[b.status].label}</Badge>
+                    <div className="flex gap-1.5 shrink-0">
+                      <Badge tone="blue">{{ CUSTOMER: 'Customer', PROVIDER: 'Provider', BOTH: 'Both' }[audienceOf(b)]}</Badge>
+                      <Badge tone={CAMPAIGN_STATUS[b.status].tone}>{CAMPAIGN_STATUS[b.status].label}</Badge>
+                    </div>
                   </div>
                   {b.subtitle && <p className="t-small text-muted break-words">{b.subtitle}</p>}
                   <p className="t-caption">
@@ -59,13 +72,15 @@ export function AdminCampaigns() {
                     {b.href && ` · links to ${b.href}`}
                   </p>
                   <div className="flex flex-wrap gap-2 mt-auto pt-2">
+                    <Button size="sm" variant="ghost" aria-label="Show earlier" onClick={() => act.mutate({ id: b.id, action: 'priority', priority: Math.min(100, b.priority + 5) })}>▲</Button>
+                    <Button size="sm" variant="ghost" aria-label="Show later" onClick={() => act.mutate({ id: b.id, action: 'priority', priority: Math.max(-100, b.priority - 5) })}>▼</Button>
                     <Button size="sm" variant="ghost" icon={Eye} onClick={() => setPreview(b)}>Preview</Button>
                     {b.status !== 'ARCHIVED' && <Button size="sm" variant="ghost" icon={Pencil} onClick={() => edit(b)}>Edit</Button>}
                     {b.status === 'DRAFT' && <Button size="sm" onClick={() => act.mutate({ id: b.id, action: 'publish' })}>Publish</Button>}
                     {b.status === 'PUBLISHED' && <Button size="sm" variant="outline" onClick={() => act.mutate({ id: b.id, action: 'unpublish' })}>Unpublish</Button>}
                     <Button size="sm" variant="ghost" icon={Copy} onClick={() => act.mutate({ id: b.id, action: 'duplicate' })}>Duplicate</Button>
                     {b.status !== 'ARCHIVED' && <Button size="sm" variant="ghost" onClick={() => act.mutate({ id: b.id, action: 'archive' })}>Archive</Button>}
-                    {b.status === 'DRAFT' && <Button size="sm" variant="ghost" icon={Trash2} className="text-danger" onClick={() => act.mutate({ id: b.id, action: 'delete' })}>Delete</Button>}
+                    {b.status !== 'PUBLISHED' && <Button size="sm" variant="ghost" icon={Trash2} className="text-danger" onClick={() => act.mutate({ id: b.id, action: 'delete' })}>Delete</Button>}
                   </div>
                 </div>
               </li>
@@ -411,9 +426,11 @@ export function AdminMedia() {
   const [page, setPage] = useState(0);
   const { data, isLoading, error } = useQuery({ queryKey: ['media', 'admin', page], queryFn: () => api.media.list(undefined, page), placeholderData: keepPreviousData });
   const remove = useMutation({ mutationFn: (id) => api.media.remove(id), onSuccess: () => qc.invalidateQueries({ queryKey: ['media'] }) });
+  const copy = useMutation({ mutationFn: (id) => api.admin.copyToImageKit(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['media'] }); qc.invalidateQueries({ queryKey: ['admin', 'campaigns'] }); } });
   return (
     <>
-      <PageHeader title="Image management" subtitle="Campaign images stored in ImageKit. Images used by a banner cannot be deleted." />
+      <PageHeader title="Image management" subtitle="Campaign images. “Bundled” images ship with the app; copy them to ImageKit once it is configured. Images used by a banner cannot be deleted." />
+      <Alert className="mb-3">{copy.error?.message}</Alert>
       <div className="max-w-md mb-6"><ImageAssetPicker label="Upload a campaign image" purpose="CAMPAIGN_ASSET" value={null} onChange={() => qc.invalidateQueries({ queryKey: ['media'] })} /></div>
       <Alert className="mb-3">{remove.error?.message}</Alert>
       {isLoading ? <Spinner /> : error ? <Alert>{error.message}</Alert> : !data.items.length ? <EmptyState icon={Images} title="No images yet" /> : (
@@ -422,8 +439,13 @@ export function AdminMedia() {
             <div key={a.id} className="panel overflow-hidden">
               <img src={a.url} alt="" loading="lazy" className="w-full aspect-[4/3] object-cover bg-canvas" />
               <div className="p-2 flex items-center justify-between gap-2">
-                <span className="t-caption truncate">{a.source === 'AI' ? 'AI · ' : ''}{a.width && `${a.width}×${a.height} · `}{relativeTime(a.createdAt)}</span>
-                <button className="btn-icon w-8 h-8 text-danger" aria-label="Delete image" onClick={() => remove.mutate(a.id)}><Trash2 className="w-4 h-4" /></button>
+                <span className="t-caption truncate">{a.storage === 'BUNDLED' ? 'Bundled · ' : 'ImageKit · '}{a.source === 'AI' ? 'AI · ' : ''}{a.width && `${a.width}×${a.height}`}</span>
+                <span className="flex shrink-0">
+                  {a.storage === 'BUNDLED' && (
+                    <Button size="sm" variant="ghost" loading={copy.isPending && copy.variables === a.id} onClick={() => copy.mutate(a.id)}>Copy to ImageKit</Button>
+                  )}
+                  <button className="btn-icon w-8 h-8 text-danger" aria-label="Delete image" onClick={() => remove.mutate(a.id)}><Trash2 className="w-4 h-4" /></button>
+                </span>
               </div>
             </div>
           ))}

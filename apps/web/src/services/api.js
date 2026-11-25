@@ -204,6 +204,8 @@ export const api = {
     updateCampaign: (id, d) => put(`/admin/banners/${id}`, d),
     campaignAction: (id, action) => post(`/admin/banners/${id}/${action}`),
     deleteCampaign: (id) => del(`/admin/banners/${id}`),
+    setCampaignPriority: (id, priority) => put(`/admin/banners/${id}/priority`, { priority }),
+    copyToImageKit: (assetId) => post(`/admin/media/${assetId}/copy-to-imagekit`),
     promotionQueue: (status, page = 0) => get(`/admin/provider-promotions${toQuery({ status, page })}`),
     reviewPromotion: (id, decision, note) => post(`/admin/provider-banners/${id}/${decision}`, { note }),
     featured: () => get('/admin/featured-providers'),

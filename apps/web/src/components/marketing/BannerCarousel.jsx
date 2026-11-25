@@ -34,10 +34,12 @@ export default function BannerCarousel({ placement, category, variant = 'hero', 
 
   if (!n) return null;
   const compact = variant === 'compact';
+  const panel = variant === 'panel';
 
   return (
     <section aria-roledescription="carousel" aria-label="Promotions"
-      className={cx('relative overflow-hidden rounded-lg bg-pale', compact ? 'aspect-[16/7]' : 'aspect-[4/5] sm:aspect-[21/8]', className)}
+      className={cx('relative overflow-hidden rounded-lg bg-pale',
+        panel ? 'min-h-[420px]' : compact ? 'aspect-[16/9] sm:aspect-[16/7]' : 'aspect-[4/5] sm:aspect-[21/8]', className)}
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}
       onTouchStart={(e) => { touch.current = e.touches[0].clientX; setPaused(true); }}
@@ -47,7 +49,7 @@ export default function BannerCarousel({ placement, category, variant = 'hero', 
         setPaused(false);
       }}>
       <div className="flex h-full transition-transform duration-500 ease-out motion-reduce:transition-none" style={{ transform: `translateX(-${i * 100}%)` }}>
-        {banners.map((b, idx) => <Slide key={b.id} b={b} placement={placement} active={idx === i} compact={compact} eager={idx === 0} />)}
+        {banners.map((b, idx) => <Slide key={b.id} b={b} placement={placement} active={idx === i} compact={compact} panel={panel} eager={idx === 0} />)}
       </div>
       {n > 1 && (
         <>
@@ -71,20 +73,22 @@ export default function BannerCarousel({ placement, category, variant = 'hero', 
   );
 }
 
-function Slide({ b, placement, active, compact, eager }) {
+function Slide({ b, placement, active, compact, panel, eager }) {
   const ref = useImpression(active ? b : null, placement);
   const content = (
     <>
       <picture>
-        <source media="(max-width: 639px)" srcSet={ikSrcSet(b.mobileUrl, [480, 768]) || b.mobileUrl} />
+        {/* Tall layouts (phones, auth side panel) use the portrait crop */}
+        <source media={panel ? '(min-width: 0px)' : '(max-width: 639px)'} srcSet={ikSrcSet(b.mobileUrl, [480, 768, 1080]) || b.mobileUrl} />
         <img src={ikUrl(b.desktopUrl, { w: 1600 })} srcSet={ikSrcSet(b.desktopUrl)} sizes="(max-width: 1200px) 100vw, 1200px"
           alt="" loading={eager ? 'eager' : 'lazy'} className="absolute inset-0 w-full h-full object-cover" />
       </picture>
-      <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-ink/75 via-ink/35 to-transparent" />
-      <div className={cx('absolute text-white max-w-[560px]', compact ? 'left-4 right-4 bottom-4' : 'left-5 right-5 bottom-10 sm:left-10 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2')}>
-        <h2 className={cx('font-heading font-bold text-white leading-tight', compact ? 'text-[18px]' : 'text-[24px] sm:text-[34px]')}>{b.title}</h2>
-        {b.subtitle && <p className={cx('mt-2 text-white/90', compact ? 'text-[13px] line-clamp-2' : 'text-[15px] sm:text-[17px]')}>{b.subtitle}</p>}
-        {b.ctaText && b.href && <span className={cx('btn btn-primary mt-4', compact && 'btn-sm')}>{b.ctaText}</span>}
+      <div className={cx('absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent', !compact && !panel && 'sm:bg-gradient-to-r')} />
+      <div className={cx('absolute text-white max-w-[560px]',
+        panel ? 'left-8 right-8 bottom-14' : compact ? 'left-4 right-4 bottom-7' : 'left-5 right-5 bottom-10 sm:left-16 sm:right-16 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2')}>
+        <h2 className={cx('font-heading font-bold text-white leading-tight', panel ? 'text-[30px]' : compact ? 'text-[17px] sm:text-[19px] line-clamp-2' : 'text-[24px] sm:text-[34px]')}>{b.title}</h2>
+        {b.subtitle && <p className={cx('mt-2 text-white/90', compact ? 'hidden sm:block text-[13px] line-clamp-1' : 'text-[15px] sm:text-[17px]')}>{b.subtitle}</p>}
+        {b.ctaText && b.href && <span className={cx('btn btn-primary', compact ? 'btn-sm mt-2.5' : 'mt-4')}>{b.ctaText}</span>}
       </div>
     </>
   );
