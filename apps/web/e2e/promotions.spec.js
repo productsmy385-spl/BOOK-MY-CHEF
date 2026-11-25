@@ -49,7 +49,8 @@ test('homepage shows live campaign, featured chef, and the campaign button appli
 
 test('customer sign-in page shows the SIGN_IN campaign', async ({ page }) => {
   await page.goto('/auth/customer');
-  await expect(page.getByText(campaignTitle)).toBeVisible();
+  // The page holds a desktop side-panel carousel and a mobile one; only one is displayed.
+  await expect(page.getByText(campaignTitle).filter({ visible: true })).toBeVisible();
 });
 
 test('Bartender chip shows only bartenders (regression)', async ({ page }) => {

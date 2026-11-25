@@ -59,6 +59,19 @@ and notify the other party. Double booking is prevented by a provider row lock p
 Railway: set `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT` (and optionally `OPENAI_API_KEY`)
 on the **book-my-chef-backend** service only. Then upload one image from Admin → Images to verify.
 
+### Initial campaigns (2026-11-25, migration V10)
+
+| Item | Status |
+|---|---|
+| 7 customer + 7 provider campaigns, stored as `platform_banners` rows (not hardcoded in React) | Done. Images are **licensed Unsplash photographs, not AI-generated** (no image generator or OpenAI key was available); sources in `apps/web/public/banners/SOURCES.md` |
+| Image files | `apps/web/public/banners/<slug>-desktop.jpg` (1920×731) and `-mobile.jpg` (1080×1350); `media_assets.storage = 'BUNDLED'` |
+| ImageKit | Not used for these yet (keys invalid). Admin → Images → "Copy to ImageKit" moves a bundled image to ImageKit once keys work; no fake success |
+| Placements | Customer: HOME 7, SIGN_IN 3, REGISTER 3, EXPLORE 2, CATEGORY (home chef / caterer / personal chef). Provider: PROVIDER_HOME 7, PROVIDER_SIGN_IN 3, PROVIDER_REGISTER 3 |
+| Pages | Customer home (carousel, featured, top-rated, nearby, popular catering, provider offers); customer + partner sign-in/register (desktop split screen, compact banner above the form on phones, hidden during OTP); provider dashboard (carousel + 6 "Grow your business" cards linking to setup/profile, promotions, calendar, verification, bookings, performance) |
+| Admin | Audience filter, publish/unpublish, ▲/▼ reorder (priority), replace image, edit, schedule, delete (any non-published), desktop/mobile preview |
+| Schema | V10: `media_assets.owner_user_id` nullable for BUNDLED only; storage `IMAGEKIT`/`BUNDLED`; `platform_banners.placements` widened to `varchar(32)[]` |
+| Visual check | `node e2e/support/banner-visual-check.mjs` — all placements at 1440 and 390 px, every banner image loads, no horizontal overflow |
+
 ## Test evidence
 
 | Suite | Command | Result |
@@ -68,7 +81,8 @@ on the **book-my-chef-backend** service only. Then upload one image from Admin �
 | Event planner API scenarios | `cd apps/web && node e2e/support/events-scenarios.mjs` | 26 passed |
 | Promotion API scenarios | `cd apps/web && node e2e/promotions-scenarios.mjs` | 61 passed |
 | API end-to-end | `cd apps/web && npm run test:api` (auth, isolation, filters, lifecycle, race, admin) | 93 passed |
-| Browser | `cd apps/web && npm run test:e2e` (marketplace, menus, promotions incl. Bartender filter regression, events, 360–1920 px) | 33 passed (2026-11-25, with the event planner on top of 59a7bcf) |
+| Browser | `cd apps/web && npm run test:e2e` (marketplace, menus, promotions incl. Bartender filter regression, events, 360–1920 px) | 33 passed (2026-11-25, with V10 banners) |
+| Banner visual check | `cd apps/web && node e2e/support/banner-visual-check.mjs` | 14 page/viewport combinations, all images loaded (2026-11-25) |
 
 ## Open items
 

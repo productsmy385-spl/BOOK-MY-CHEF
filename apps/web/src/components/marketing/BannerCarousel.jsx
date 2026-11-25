@@ -7,6 +7,8 @@ import { ikSrcSet, ikUrl } from '../../lib/imagekit';
 import { cx } from '../ui';
 import { trackClick, useImpression } from './useBannerTracking';
 
+const NONE = [];
+
 /**
  * Platform campaign carousel for a placement. Renders nothing when no campaign is live.
  * Auto-rotates (pauses on hover/focus and for reduced-motion users), supports swipe,
@@ -18,19 +20,20 @@ export default function BannerCarousel({ placement, category, variant = 'hero', 
     queryFn: () => api.public.banners(placement, category),
     staleTime: 60_000,
   });
-  const banners = data || [];
-  const [i, setI] = useState(0);
+  const banners = data || NONE;
+  const [rawI, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const touch = useRef(null);
   const n = banners.length;
-  const go = useCallback((d) => setI((x) => (n ? (x + d + n) % n : 0)), [n]);
+  const i = n ? rawI % n : 0; // the list can shrink after a refetch
+  const go = useCallback((d) => setI((x) => (n ? (x % n + d + n) % n : 0)), [n]);
+  const seconds = banners[i]?.rotationSeconds || 6;
 
-  useEffect(() => { if (i >= n) setI(0); }, [i, n]);
   useEffect(() => {
     if (n < 2 || paused || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const t = setTimeout(() => go(1), (banners[i]?.rotationSeconds || 6) * 1000);
+    const t = setTimeout(() => go(1), seconds * 1000);
     return () => clearTimeout(t);
-  }, [i, n, paused, go, banners]);
+  }, [i, n, paused, go, seconds]);
 
   if (!n) return null;
   const compact = variant === 'compact';
