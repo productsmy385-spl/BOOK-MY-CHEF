@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- V10: Provider-console banner placements, bundled (non-ImageKit) media assets,
 --     and the initial platform campaigns.
 --
