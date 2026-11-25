@@ -30,6 +30,10 @@ const AdminFeatured = promo('AdminFeatured');
 const AdminBannerAnalytics = promo('AdminBannerAnalytics');
 const AdminMedia = promo('AdminMedia');
 const ProviderMenuPage = lazy(() => import('./features/provider/MenuPage'));
+const events = (name) => lazy(() => import('./features/events/Events').then((m) => ({ default: m[name] })));
+const EventList = events('EventList');
+const EventCreate = events('EventCreate');
+const EventDetail = events('EventDetail');
 const admin = (name) => lazy(() => import('./features/admin/AdminConsole').then((m) => ({ default: m[name] })));
 const AdminLayout = admin('AdminLayout');
 const AdminDashboard = admin('AdminDashboard');
@@ -67,6 +71,9 @@ export default function App() {
             </Route>
             <Route element={<Guard roles={['CUSTOMER']} />}>
               <Route path="book/:providerId" element={<BookingRequest />} />
+              <Route path="events" element={<EventList />} />
+              <Route path="events/new" element={<EventCreate />} />
+              <Route path="events/:id" element={<EventDetail />} />
               <Route path="bookings" element={<BookingList viewer="CUSTOMER" />} />
               <Route path="bookings/:id" element={<BookingDetail viewer="CUSTOMER" />} />
               <Route path="favourites" element={<Favourites />} />

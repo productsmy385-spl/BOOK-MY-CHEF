@@ -38,6 +38,7 @@ public class CatalogController {
         body.put("cuisines", cuisines);
         body.put("pricingModels", toOptions(ServiceCatalog.PRICING_LABELS));
         body.put("deliveryModes", toOptions(ServiceCatalog.DELIVERY_MODE_LABELS));
+        body.put("eventTypes", com.marketplace.event.EventCatalog.TYPES);
         body.put("menu", Map.of(
                 "courses", toOptions(MenuCatalog.COURSES),
                 "diets", toOptions(MenuCatalog.DIETS),

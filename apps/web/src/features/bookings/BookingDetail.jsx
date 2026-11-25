@@ -61,6 +61,12 @@ export default function BookingDetail({ viewer }) {
       </div>
 
       {justCreated && <Alert tone="success" className="mt-3">Request sent. You'll be notified when {b.providerName} responds.</Alert>}
+      {viewer === 'CUSTOMER' && b.eventId && b.eventTitle && (
+        <Link to={`/events/${b.eventId}`} className="mt-3 flex items-center gap-2 panel px-3 py-2.5 t-small hover:border-sky">
+          <CalendarDays className="w-4 h-4 text-navy" aria-hidden /> Part of <strong className="truncate">{b.eventTitle}</strong>
+          <span className="ml-auto text-navy font-medium shrink-0">View event</span>
+        </Link>
+      )}
 
       <div className="card p-5 mt-4">
         <div className="flex items-start gap-3">

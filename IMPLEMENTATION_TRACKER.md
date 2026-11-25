@@ -34,6 +34,7 @@ Legend: **Done** = implemented and verified by tests; **Partial** = works but ha
 | 9 Security | Done | See Audit findings — all fixed; covered by tests below. |
 | 10 QA | Done | 18 backend unit tests, 93 API end-to-end checks, 16 Playwright browser tests. |
 | 12 Menus & menu cost calculator | Done | V7. Providers manage dishes (course, veg/egg/non-veg/vegan, spice, allergens, photo, price per person, minimum guests, availability) and set menus with "pick N" sections and per-dish surcharges. Customers see the menu on the profile and pick a set menu or build their own in the booking form; the server prices it live (`POST /providers/{id}/estimate`) with the same code as booking creation. Bookings keep a snapshot of the menu. Pricing rule: see `MenuPricing`. Not done: customers saving favourite menus. |
+| 13 Event planner | Done | V9. Customers create an event (occasion, date, guests, city, budget); a fixed rule set suggests the services each occasion needs (`EventCatalog`). Bookings can be made for or attached to an event; the event page shows a checklist (to book / requested / booked), a budget tracker from real booking amounts (confirmed, requested, left to spend, over-budget warning), per-service budgets and a timeline. "Planning for" bar carries the event through Explore → profile → booking. Home page: category tiles, "Plan by occasion", "Your events", cuisines, how-it-works. |
 | 11 Production readiness | Partial | Config is env-driven with no fallback secrets; nginx security headers. Not deployed or verified on Railway in this session. |
 
 ## Booking lifecycle
@@ -62,11 +63,12 @@ on the **book-my-chef-backend** service only. Then upload one image from Admin �
 
 | Suite | Command | Result |
 |---|---|---|
-| Backend unit | `cd apps/backend && mvn test` | 24 passed (6 menu pricing) |
+| Backend unit | `cd apps/backend && mvn test` | 27 passed (6 menu pricing, 3 event rules) |
 | Menu API scenarios | `cd apps/web && node e2e/support/menu-scenarios.mjs` (stack as in `e2e/README.md`) | 36 passed |
+| Event planner API scenarios | `cd apps/web && node e2e/support/events-scenarios.mjs` | 26 passed |
 | Promotion API scenarios | `cd apps/web && node e2e/promotions-scenarios.mjs` | 61 passed |
 | API end-to-end | `cd apps/web && npm run test:api` (auth, isolation, filters, lifecycle, race, admin) | 93 passed |
-| Browser | `cd apps/web && npm run test:e2e` (marketplace, menus, promotions incl. Bartender filter regression, 360–1920 px) | 31 passed (2026-11-24, merged 59a7bcf) |
+| Browser | `cd apps/web && npm run test:e2e` (marketplace, menus, promotions incl. Bartender filter regression, events, 360–1920 px) | 33 passed (2026-11-25, with the event planner on top of 59a7bcf) |
 
 ## Open items
 

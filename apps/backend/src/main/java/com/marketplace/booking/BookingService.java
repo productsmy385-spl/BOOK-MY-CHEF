@@ -8,6 +8,7 @@ import com.marketplace.common.ApiException;
 import com.marketplace.common.PageResponse;
 import com.marketplace.common.SettingsService;
 import com.marketplace.identity.AuthenticatedUserPrincipal;
+import com.marketplace.event.EventService;
 import com.marketplace.menu.MenuPricing;
 import com.marketplace.menu.MenuRequests;
 import com.marketplace.menu.MenuService;
@@ -51,6 +52,7 @@ public class BookingService {
     private final SettingsService settings;
     private final ObjectMapper objectMapper;
     private final MenuService menus;
+    private final EventService events;
 
     // ================================================================== create
 
@@ -66,6 +68,7 @@ public class BookingService {
 
         Map<String, Object> svc = loadBookableService(r.providerId(), r.serviceId(), r.guestCount());
         MenuService.Priced menu = priceMenu(r.providerId(), svc, r.menu(), r.guestCount());
+        if (r.eventId() != null) events.assertBookable(customerId, r.eventId());
 
         assertDateBookable(r.providerId(), r.eventDate(), r.eventTime());
 
@@ -92,11 +95,11 @@ public class BookingService {
                 INSERT INTO bookings (booking_reference, customer_id, provider_id, service_id, booking_status, payment_status,
                     event_date, event_time, time_slot, guest_count, service_delivery_mode, estimated_total,
                     event_address, event_city, budget_amount, cuisine_preference, service_category, pricing_model,
-                    service_title, host_special_instructions, details, service_charge, food_cost, menu_pricing)
+                    service_title, host_special_instructions, details, service_charge, food_cost, menu_pricing, event_id)
                 VALUES (:ref, :cid, :pid, :sid, 'PENDING_PROVIDER_CONFIRMATION', 'PENDING',
                     :date, :time, :slot, :guests, :mode, :estimate,
                     :address, :city, :budget, :cuisine, :category, :pricing,
-                    :title, :instructions, CAST(:details AS jsonb), :serviceCharge, :foodCost, :menuPricing)
+                    :title, :instructions, CAST(:details AS jsonb), :serviceCharge, :foodCost, :menuPricing, :eventId)
                 RETURNING id""",
                 new MapSqlParameterSource()
                         .addValue("ref", reference).addValue("cid", customerId).addValue("pid", r.providerId())
@@ -109,7 +112,8 @@ public class BookingService {
                         .addValue("title", svc.get("title")).addValue("instructions", blankToNull(r.specialInstructions()))
                         .addValue("details", toJson(details))
                         .addValue("serviceCharge", price.serviceCharge()).addValue("foodCost", price.foodCost())
-                        .addValue("menuPricing", price.mode().name()),
+                        .addValue("menuPricing", price.mode().name())
+                        .addValue("eventId", r.eventId()),
                 UUID.class);
         if (menu != null) menus.saveBookingLines(bookingId, menu, r.guestCount());
 
@@ -443,6 +447,8 @@ public class BookingService {
                        b.cuisine_preference AS "cuisinePreference", b.host_special_instructions AS "specialInstructions",
                        b.details::text AS "detailsJson", b.provider_message AS "providerMessage",
                        b.service_charge AS "serviceCharge", b.food_cost AS "foodCost", b.menu_pricing AS "menuPricing",
+                       b.event_id AS "eventId",
+                       (SELECT ce.title FROM customer_events ce WHERE ce.id = b.event_id AND ce.customer_id = b.customer_id) AS "eventTitle",
                        b.created_at::text AS "createdAt",
                        b.customer_id AS "customerId", cu.full_name AS "customerName", cuser.phone AS "customerPhone",
                        cuser.email AS "customerEmail",
