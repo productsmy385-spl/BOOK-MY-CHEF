@@ -115,6 +115,7 @@ jobs:
           npm run test:api
           node e2e/promotions-scenarios.mjs
           node e2e/support/menu-scenarios.mjs
+          node e2e/support/events-scenarios.mjs
 
       - name: Browser tests
         working-directory: apps/web

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Bell, Briefcase, CalendarCheck, Compass, Heart, Home, LifeBuoy, LogOut, MapPin, Menu, User } from 'lucide-react';
+import { Bell, Briefcase, CalendarCheck, Compass, Heart, Home, LifeBuoy, LogOut, MapPin, Menu, PartyPopper, User, X } from 'lucide-react';
+import { setPlanningEvent, usePlanningEvent } from '../../hooks/usePlanningEvent';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { Avatar, Drawer, cx } from '../ui';
 import Brand from './Brand';
@@ -13,6 +14,9 @@ const NAV = [
   { to: '/favourites', label: 'Favourites', icon: Heart },
   { to: '/profile', label: 'Profile', icon: User },
 ];
+// Desktop header: the main tabs plus the event planner (on mobile it is in the menu drawer and on Home).
+// "My events" appears from 1024px; between 768 and 1023px the header has room for only four links.
+const DESKTOP_NAV = [NAV[0], NAV[1], { to: '/events', label: 'My events', icon: PartyPopper, wideOnly: true }, NAV[2], NAV[3]];
 
 const SUPPORT_EMAIL = import.meta.env.VITE_SUPPORT_EMAIL;
 
@@ -32,10 +36,10 @@ export default function CustomerLayout() {
           </button>
           <Brand />
           <nav className="hidden md:flex items-center gap-1 ml-6" aria-label="Main">
-            {NAV.slice(0, 4).map((n) => (
+            {DESKTOP_NAV.map((n) => (
               <NavLink key={n.to} to={n.to} end={n.end}
-                className={({ isActive }) => cx('px-3 h-9 inline-flex items-center rounded-sm text-[14px] font-medium transition-colors',
-                  isActive ? 'text-navy bg-pale' : 'text-muted hover:text-ink')}>
+                className={({ isActive }) => cx('px-3 h-9 items-center rounded-sm text-[14px] font-medium transition-colors whitespace-nowrap',
+                  n.wideOnly ? 'hidden lg:inline-flex' : 'inline-flex', isActive ? 'text-navy bg-pale' : 'text-muted hover:text-ink')}>
                 {n.label}
               </NavLink>
             ))}
@@ -52,7 +56,8 @@ export default function CustomerLayout() {
             ) : (
               status !== 'loading' && (
                 <>
-                  <Link to="/auth/partner" className="btn btn-ghost btn-sm hidden sm:inline-flex">Become a partner</Link>
+                  {/* Below 768px the header has no nav links, so there is room; 768–1023px it would overflow */}
+                  <Link to="/auth/partner" className="btn btn-ghost btn-sm hidden sm:inline-flex md:hidden lg:inline-flex">Become a partner</Link>
                   <Link to="/auth/customer" className="btn btn-primary btn-sm">Sign in</Link>
                 </>
               )
@@ -60,6 +65,8 @@ export default function CustomerLayout() {
           </div>
         </div>
       </header>
+
+      {signedIn && <PlanningBar path={location.pathname} />}
 
       <main className={cx('flex-1', !hideBottomNav && 'pb-20 md:pb-0')}>
         <Outlet />
@@ -97,6 +104,7 @@ export default function CustomerLayout() {
           )}
           {signedIn ? (
             <>
+              <MenuLink to="/events" icon={PartyPopper}>My events</MenuLink>
               <MenuLink to="/notifications" icon={Bell}>Notifications</MenuLink>
               <MenuLink to="/profile#addresses" icon={MapPin}>Saved addresses</MenuLink>
               <MenuLink to="/bookings" icon={CalendarCheck}>My bookings</MenuLink>
@@ -117,6 +125,24 @@ export default function CustomerLayout() {
           )}
         </div>
       </Drawer>
+    </div>
+  );
+}
+
+/** While shopping for an event, keeps it in view; booking requests are then added to that event. */
+function PlanningBar({ path }) {
+  const ev = usePlanningEvent();
+  if (!ev || !(path.startsWith('/explore') || path.startsWith('/p/') || path.startsWith('/book/'))) return null;
+  return (
+    <div className="bg-navy text-white">
+      <div className="page h-11 flex items-center gap-2 t-small">
+        <PartyPopper className="w-4 h-4 shrink-0" aria-hidden />
+        <span className="min-w-0 flex-1 truncate">Planning for <strong>{ev.title}</strong></span>
+        <Link to={`/events/${ev.id}`} className="font-semibold underline underline-offset-2 shrink-0">Back to event</Link>
+        <button onClick={() => setPlanningEvent(null)} className="w-8 h-8 -mr-2 flex items-center justify-center shrink-0" aria-label="Stop planning for this event">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }

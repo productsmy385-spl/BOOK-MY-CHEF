@@ -5,6 +5,7 @@ import { ArrowLeft, Info } from 'lucide-react';
 import { api } from '../../services/api';
 import { useCatalog } from '../../hooks/useCatalog';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { usePlanningEvent } from '../../hooks/usePlanningEvent';
 import { isoDate, priceLabel } from '../../lib/format';
 import { Alert, Avatar, Button, EmptyState, Field, Spinner, cx } from '../../components/ui';
 import { MenuPicker, PriceBreakdown } from '../../components/menu/MenuBits';
@@ -32,6 +33,10 @@ export default function BookingRequest() {
   const addresses = useQuery({ queryKey: ['addresses'], queryFn: api.customer.addresses });
   const menu = useQuery({ queryKey: ['menu', providerId], queryFn: () => api.providers.menu(providerId) });
   const [pick, setPick] = useState(EMPTY_PICK);
+  const planning = usePlanningEvent();
+  const myEvents = useQuery({ queryKey: ['events'], queryFn: api.events.list });
+  const openEvents = (myEvents.data || []).filter((e) => e.status === 'PLANNING');
+  const [eventId, setEventId] = useState(sp.get('event') || planning?.id || '');
 
   const [serviceId, setServiceId] = useState(sp.get('service') || '');
   const [f, setF] = useState({ eventDate: '', eventTime: '19:00', guestCount: '', eventAddress: '', eventCity: account?.city || '',
@@ -56,6 +61,25 @@ export default function BookingRequest() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses.data]);
 
+  /** Fills date, time, guests and city from the event (only fields the customer has not typed yet, unless forced). */
+  const applyEvent = (ev, force) => {
+    if (!ev) return;
+    setF((x) => ({
+      ...x,
+      eventDate: force || !x.eventDate ? (ev.eventDate >= isoDate() ? ev.eventDate : x.eventDate) : x.eventDate,
+      eventTime: ev.eventTime && (force || x.eventTime === '19:00') ? ev.eventTime : x.eventTime,
+      guestCount: force || !x.guestCount ? String(ev.guests) : x.guestCount,
+      eventCity: force || !x.eventCity ? ev.city : x.eventCity,
+    }));
+  };
+  useEffect(() => {
+    if (!myEvents.data) return;
+    const ev = openEvents.find((e) => e.id === eventId);
+    if (ev) applyEvent(ev, false);
+    else if (eventId) setEventId(''); // finished/cancelled or not the customer's event
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myEvents.data]);
+
   // The price shown is always calculated by the server, exactly as the booking will be.
   const isChef = !!category?.culinary;
   const hasMenu = isChef && !!(menu.data?.items.length || menu.data?.menus.length);
@@ -77,6 +101,8 @@ export default function BookingRequest() {
     mutationFn: (body) => api.bookings.create(body),
     onSuccess: (b) => {
       qc.invalidateQueries({ queryKey: ['bookings'] });
+      qc.invalidateQueries({ queryKey: ['events'] });
+      qc.invalidateQueries({ queryKey: ['event'] });
       navigate(`/bookings/${b.id}`, { replace: true, state: { justCreated: true } });
     },
   });
@@ -112,6 +138,7 @@ export default function BookingRequest() {
       hours: f.hours ? Number(f.hours) : undefined, days: f.days ? Number(f.days) : undefined,
       cuisinePreference: f.cuisinePreference || undefined, budget: f.budget ? Number(f.budget) : undefined,
       specialInstructions: f.specialInstructions.trim() || undefined, details: clean, menu: selection,
+      eventId: eventId || undefined,
     });
   };
 
@@ -150,6 +177,14 @@ export default function BookingRequest() {
           <>
             <fieldset className="grid sm:grid-cols-2 gap-4">
               <legend className="t-h4 mb-3 col-span-full">2. When and where</legend>
+              {openEvents.length > 0 && (
+                <Field as="select" label="For one of your events?" className="col-span-full" value={eventId}
+                  hint={eventId ? 'This booking will appear on the event checklist and budget.' : undefined}
+                  onChange={(e) => { setEventId(e.target.value); applyEvent(openEvents.find((x) => x.id === e.target.value), true); }}>
+                  <option value="">Not for a planned event</option>
+                  {openEvents.map((ev) => <option key={ev.id} value={ev.id}>{ev.title} · {ev.eventDate}</option>)}
+                </Field>
+              )}
               <Field label="Date" type="date" min={isoDate()} value={f.eventDate} onChange={set('eventDate')} error={errors.eventDate} required />
               <Field label="Start time" type="time" value={f.eventTime} onChange={set('eventTime')} error={errors.eventTime} required />
               <Field label="Number of guests" type="number" inputMode="numeric" min="1" value={f.guestCount} onChange={set('guestCount')} error={errors.guestCount} required

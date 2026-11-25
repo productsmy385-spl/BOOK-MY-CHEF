@@ -33,7 +33,9 @@ public final class BookingRequests {
             /* Category-specific answers (menu, occasion, dietary needs, ...). Small flat map of strings. */
             @Size(max = 20) Map<@Size(max = 50) String, @Size(max = 1000) String> details,
             /* Optional menu: a set menu with choices, or the customer's own dishes. Priced on the server. */
-            @Valid MenuRequests.Selection menu) {
+            @Valid MenuRequests.Selection menu,
+            /* Optional: one of the customer's own events this booking is for. */
+            UUID eventId) {
     }
 
     public record Message(@NotBlank(message = "Write a message") @Size(max = 1000) String message) {

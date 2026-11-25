@@ -22,8 +22,11 @@ export function useCatalog() {
       courseLabels: labels(m.courses), dietLabels: labels(m.diets), spiceLabels: labels(m.spiceLevels),
       allergenLabels: labels(m.allergens), mealLabels: labels(m.mealTypes),
     };
+    const eventTypes = data?.eventTypes || [];
     return {
       menu,
+      eventTypes,
+      eventTypeLabels: Object.fromEntries(eventTypes.map((t) => [t.code, t.label])),
       categories,
       groups: data?.groups || [],
       cuisines: data?.cuisines || [],
