@@ -53,7 +53,7 @@ and notify the other party. Double booking is prevented by a provider row lock p
 | Provider banners with admin approval (draft → pending → approved/rejected/changes requested/paused/expired) | Yes | Yes | n/a | Deployed; none submitted yet |
 | Featured / top-rated (≥ `marketplace.top_rated_min_reviews` genuine reviews) / nearby chefs | Yes | Yes | n/a | Deployed; empty until providers publish |
 | Banner analytics (impressions/clicks, de-duplicated per visitor per day) | Yes | Yes | n/a | Deployed |
-| ImageKit uploads (signed per folder, verified with ImageKit before recording, owner-only delete) | Yes | Against a stand-in ImageKit | **Not verified** — production `IMAGEKIT_*` values are rejected by ImageKit (HTTP 403); real keys needed | Uploads report "not configured/failed" until valid keys are set |
+| ImageKit uploads (signed per folder, verified with ImageKit before recording, owner-only delete) | Yes | Against a stand-in ImageKit | Keys on Railway verified 2026-11-25: direct upload, CDN delivery (incl. `tr:w-400`), details and delete all succeed against ImageKit account `Myproduct` | In-app admin upload not yet exercised with a real admin session |
 | AI campaign images (OpenAI Images API → ImageKit) | Yes | Against a stand-in API | **Not verified** — no `OPENAI_API_KEY` | Shows "not configured"; manual upload still works |
 
 Railway: set `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT` (and optionally `OPENAI_API_KEY`)
@@ -65,7 +65,7 @@ on the **book-my-chef-backend** service only. Then upload one image from Admin �
 |---|---|
 | 7 customer + 7 provider campaigns, stored as `platform_banners` rows (not hardcoded in React) | Done. Images are **licensed Unsplash photographs, not AI-generated** (no image generator or OpenAI key was available); sources in `apps/web/public/banners/SOURCES.md` |
 | Image files | `apps/web/public/banners/<slug>-desktop.jpg` (1920×731) and `-mobile.jpg` (1080×1350); `media_assets.storage = 'BUNDLED'` |
-| ImageKit | Not used for these yet (keys invalid). Admin → Images → "Copy to ImageKit" moves a bundled image to ImageKit once keys work; no fake success |
+| ImageKit | Keys valid (verified 2026-11-25). The 14 seeded banners are still served from the web app until an admin uses Admin → Images → "Copy to ImageKit" on each image; no fake success |
 | Placements | Customer: HOME 7, SIGN_IN 3, REGISTER 3, EXPLORE 2, CATEGORY (home chef / caterer / personal chef). Provider: PROVIDER_HOME 7, PROVIDER_SIGN_IN 3, PROVIDER_REGISTER 3 |
 | Pages | Customer home (carousel, featured, top-rated, nearby, popular catering, provider offers); customer + partner sign-in/register (desktop split screen, compact banner above the form on phones, hidden during OTP); provider dashboard (carousel + 6 "Grow your business" cards linking to setup/profile, promotions, calendar, verification, bookings, performance) |
 | Admin | Audience filter, publish/unpublish, ▲/▼ reorder (priority), replace image, edit, schedule, delete (any non-published), desktop/mobile preview |
@@ -91,5 +91,5 @@ on the **book-my-chef-backend** service only. Then upload one image from Admin �
 3. Rebuild and run the Capacitor Android app. Note: the Gradle wrapper was changed to 9.7.1 outside this work (IDE); confirm compatibility with the Android Gradle Plugin before building.
 4. Not implemented: chat/messages, disputes UI, refunds, push notifications, admin editing of the category/cuisine catalog, map/geocoded address search (location uses device GPS or city/area text).
 5. Frontend stays JavaScript (JSX); TypeScript migration was not done.
-6. Provide valid ImageKit credentials (and optionally an OpenAI key) — see the banners section above.
+6. ImageKit keys are valid (2026-11-25). Still to do: one admin upload through the app, and "Copy to ImageKit" for the seeded banners. AI images need an `OPENAI_API_KEY` (not set).
 7. Production still holds three non-Clerk test accounts (`user_guest_*`, `test_verify_live_*`) and their one booking; they are hidden but should be removed by a new migration (not by editing V6, which is applied).
